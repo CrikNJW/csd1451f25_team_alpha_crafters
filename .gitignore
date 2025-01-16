@@ -1,0 +1,10 @@
+
+*.vcxproj
+*.filters
+*.user
+*.db
+*.db-shm
+*.db-wal
+*.vsidx
+*.opendb
+/PlatformerGameAE/.vs
