@@ -4,7 +4,7 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 #include <iostream>
-#include "utils.h"
+#include "utils.hpp"
 
 
 
@@ -43,6 +43,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
 			gGameRunning = 0;
+
+		//std::cout << "Hello Bro";
 
 	
 
