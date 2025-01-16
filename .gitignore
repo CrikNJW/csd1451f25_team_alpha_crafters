@@ -8,3 +8,5 @@
 *.vsidx
 *.opendb
 /PlatformerGameAE/.vs
+/PlatformerGameAE/.tmp
+/PlatformerGameAE/bin
