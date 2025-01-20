@@ -9,8 +9,8 @@
 
 u32 white = 0xFFFFFFFF;
 
-f32 speed;
-f32 player_w, player_h, player_x, player_y;
+f32 speed, rotate_speed;
+f32 player_w, player_h, player_x, player_y, player_rotation;
 
 
 // ---------------------------------------------------------------------------
@@ -30,20 +30,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	int gGameRunning = 1;
 
 	//Initialisation of Player Variables
-	player_w = 100.f;
-	player_h = 100.f;
-	player_x = 0.f;
-	player_y = 0.f;
+	player_w = 50.f;
+	player_h = 50.f;
+	player_x = -500.f; //starting x position
+	player_y = -200.f; //starting y position
+	player_rotation = 0.f;
 
-	// Using custom window procedure
-	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
-	// Changing the window title
-	AESysSetWindowTitle("Thalassa");
 	// Using custom window procedure
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 
 	AEGfxVertexList* playerMesh = createSquareMesh();
-	AEMtx33 playerMtx = CreateTransformMtx(50.0f, 50.0f, 0, 0, 0);
+	
 
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
@@ -53,22 +50,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Create a Pointer to Mesh of Rectangle for player texture
 	AEGfxVertexList* squareMesh = 0;
-	// Informing the library that we're about to start adding triangles
-	AEGfxMeshStart();
-	//Triangle A that left side is start from origin
-	AEGfxTriAdd(
-		0.f, 0.f, white, 0.0f, 1.0f,
-		0.f, 1.0f, white, 1.0f, 1.0f,
-		1.0f, 0.f, white, 0.0f, 0.0f);
-	//Triangle B that form a square with triangle A
-	AEGfxTriAdd(
-		0.f, 1.0f, white, 1.0f, 1.0f,
-		1.0f, 1.0f, white, 1.0f, 0.0f,
-		1.0f, 0.f, white, 0.0f, 0.0f);
-
-	// Saving the mesh (list of triangles) in healthMesh that we created earlier
-	squareMesh = AEGfxMeshEnd();
-
 
 	// Game Loop
 	while (gGameRunning)
@@ -76,7 +57,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Informing the system about the loop's start
 		AESysFrameStart();
 		AEGfxSetBackgroundColor(1.0f, 1.0f, 1.0f); // Tell the Alpha Engine to set the background to white.
-		speed = AEFrameRateControllerGetFrameTime() * 500.f;
+		speed = AEFrameRateControllerGetFrameTime() * 300.f;
+		rotate_speed = AEFrameRateControllerGetFrameTime();
 		// Tell the Alpha Engine to get ready to draw something.
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
 
@@ -94,26 +76,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		else if (AEInputCheckCurr(AEVK_D)) {
 			player_x += speed;
 		}
+
+		if (AEInputCheckCurr(AEVK_LEFT)) {
+			player_rotation += 0.1f;
+			/*if (player_rotation >= 360.f) {
+				player_rotation = 0.f;
+			}*/
+		}
+		else if (AEInputCheckCurr(AEVK_RIGHT)) {
+			player_rotation -= 0.1f;
+		}
 		
-		//Draw the player
-		AEMtx33 scale_player = { 0 };
-		AEMtx33Scale(&scale_player, player_w, player_h);
-
-		AEMtx33 translate_player = { 0 }; //translate up
-		AEMtx33Trans(&translate_player, player_x, player_y); //second param is x-axis, third param is y-axis
-
-		AEMtx33 transform_player = { 0 }; //Transform to top of screen
-		AEMtx33Concat(&transform_player, &translate_player, &scale_player); //put the translate and scale matrix into transform (scale first then translate)
 
 
 		AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // Set to grey colour
-		AEGfxSetTransform(transform_player.m);
-		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
 		
+		//For player Mesh
+		AEMtx33 playerMtx = CreateTransformMtx(player_w, player_h, player_rotation, player_x, player_y);
+		AEGfxSetTransform(playerMtx.m);
+		AEGfxMeshDraw(playerMesh, AE_GFX_MDM_TRIANGLES);
 		
-		
-		
-		
+	
 		
 		
 		
@@ -129,7 +112,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 	
 	//Free the Mesh
-	AEGfxMeshFree(squareMesh);
+	AEGfxMeshFree(playerMesh);
 	// free the system
 	AESysExit();
 }

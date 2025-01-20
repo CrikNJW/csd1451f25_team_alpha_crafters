@@ -3,23 +3,26 @@
 #include <iostream>
 
 AEGfxVertexList* createSquareMesh() {
+	u32 white = 0xFFFFFFFF;
+	u32 red = 0xFFFF0000;
+	
 	AEGfxMeshStart();
 	// Draw square mesh
 	AEGfxTriAdd(
-		0.0f, 0.0f, 0xFFFFFFFF, 0.0f, 1.0f,  // bottom-left: white
-		1.0f, 0.0f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
-		0.0f, 1.0f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,  // bottom-left: white
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
+		-0.5f, 0.5f, red, 0.0f, 0.0f);  // top-left: white
 
 	AEGfxTriAdd(
-		1.0f, 0.0f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
-		1.0f, 1.0f, 0xFFFFFFFF, 1.0f, 0.0f,    // top-right: white
-		0.0f, 1.0f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
+		0.5f, 0.5f, red, 1.0f, 0.0f,    // top-right: white
+		-0.5f, 0.5f, red, 0.0f, 0.0f);  // top-left: white
 	// Saving the mesh (list of triangles) in mesh
 	return AEGfxMeshEnd();
 	////END OF MESH
 }
 
-AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, int rotate, f32 translX, f32 translY) {
+AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, float rotate, f32 translX, f32 translY) {
 	// Create a scale matrix that scales by 500 x and y
 	AEMtx33 scaleMtx = { 0 };
 	AEMtx33Scale(&scaleMtx, scaleX, scaleY);
