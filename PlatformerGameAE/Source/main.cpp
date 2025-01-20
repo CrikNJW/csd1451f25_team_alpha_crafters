@@ -5,6 +5,7 @@
 #include "AEEngine.h"
 #include <iostream>
 #include "utils.hpp"
+#include "Structs.hpp"
 
 
 
