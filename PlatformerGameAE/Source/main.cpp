@@ -28,6 +28,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	int gGameRunning = 1;
 
+	//Initialisation of Player Variables
 	player_w = 100.f;
 	player_h = 100.f;
 	player_x = 0.f;
@@ -36,11 +37,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Using custom window procedure
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 	// Changing the window title
-	AESysSetWindowTitle("My New Demo!");
+	AESysSetWindowTitle("Thalassa");
 	// reset the system modules
 	AESysReset();
 
-	// Create a Pointer to Mesh of Rectangle for texture
+	// Create a Pointer to Mesh of Rectangle for player texture
 	AEGfxVertexList* squareMesh = 0;
 	// Informing the library that we're about to start adding triangles
 	AEGfxMeshStart();
@@ -65,8 +66,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Informing the system about the loop's start
 		AESysFrameStart();
 		AEGfxSetBackgroundColor(1.0f, 1.0f, 1.0f); // Tell the Alpha Engine to set the background to white.
-		speed = AEFrameRateControllerGetFrameRate() / 10.f;
-		
+		speed = AEFrameRateControllerGetFrameTime() * 500.f;
+		// Tell the Alpha Engine to get ready to draw something.
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
 
 		//PLAYER RENDERING
 		//Movement of the Player
@@ -83,6 +85,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			player_x += speed;
 		}
 		
+		//Draw the player
 		AEMtx33 scale_player = { 0 };
 		AEMtx33Scale(&scale_player, player_w, player_h);
 
@@ -103,20 +106,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		
 		
 		
+		
+
 		// Basic way to trigger exiting the application
 		// when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
 			gGameRunning = 0;
 
-		
-
-	
-
 		// Informing the system about the loop's end
 		AESysFrameEnd();
 
 	}
-
+	
+	//Free the Mesh
+	AEGfxMeshFree(squareMesh);
 	// free the system
 	AESysExit();
 }
