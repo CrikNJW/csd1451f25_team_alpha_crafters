@@ -2,6 +2,46 @@
 #include "AEEngine.h"
 #include <iostream>
 
+AEGfxVertexList* createSquareMesh() {
+	AEGfxMeshStart();
+	// Draw square mesh
+	AEGfxTriAdd(
+		0.0f, 0.0f, 0xFFFFFFFF, 0.0f, 1.0f,  // bottom-left: white
+		1.0f, 0.0f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
+		0.0f, 1.0f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
+
+	AEGfxTriAdd(
+		1.0f, 0.0f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
+		1.0f, 1.0f, 0xFFFFFFFF, 1.0f, 0.0f,    // top-right: white
+		0.0f, 1.0f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
+	// Saving the mesh (list of triangles) in mesh
+	return AEGfxMeshEnd();
+	////END OF MESH
+}
+
+AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, int rotate, f32 translX, f32 translY) {
+	// Create a scale matrix that scales by 500 x and y
+	AEMtx33 scaleMtx = { 0 };
+	AEMtx33Scale(&scaleMtx, scaleX, scaleY);
+	// Create a rotation matrix that rotates by 90 degrees
+	// Note that PI in radians is 180 degrees.
+	// Since 90 degrees is 180/2, 90 degrees in radians is PI/2
+	AEMtx33 rotateMtx = { 0 };
+	AEMtx33Rot(&rotateMtx, rotate);
+	// Create a translation matrix that translates by
+	// 200 in the x-axis and 100 in the y-axis
+	AEMtx33 translateMtx = { 0 };
+	AEMtx33Trans(&translateMtx, translX, translY);
+	// Concatenate the matrices into the 'transform' variable.
+	// We concatenate in the order of translation * rotation * scale
+	// i.e. this means we scale, then rotate, then translate.
+	AEMtx33 transformMtx = { 0 };
+	AEMtx33Concat(&transformMtx, &rotateMtx, &scaleMtx);
+	AEMtx33Concat(&transformMtx, &translateMtx, &transformMtx);
+
+	return transformMtx;
+}
+
 int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y)
 {
 	// Reason why use half width and height is because the rectangle button was drew from the middle
@@ -48,4 +88,3 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 		return 0;
 	}
 }
-
