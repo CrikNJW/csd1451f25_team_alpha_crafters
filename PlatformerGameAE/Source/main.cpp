@@ -29,19 +29,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	int gGameRunning = 1;
 
-	//Initialisation of Player Variables
-	player_w = 50.f;
-	player_h = 50.f;
-	player_x = -500.f; //starting x position
-	player_y = -200.f; //starting y position
-	player_rotation = 0.f;
-
 	// Using custom window procedure
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
-
-	AEGfxVertexList* playerMesh = createSquareMesh();
-	
-
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
 
@@ -49,7 +38,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 
 	// Create a Pointer to Mesh of Rectangle for player texture
-	AEGfxVertexList* squareMesh = 0;
+	AEGfxVertexList* playerMesh = createSquareMesh();
+
+	//Initialisation of Player Variables
+	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health
+	Player player = { -500.f, -200.f, 50.f, 50.f, 0.f, 0.f, 3 };
 
 	// Game Loop
 	while (gGameRunning)
@@ -57,7 +50,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Informing the system about the loop's start
 		AESysFrameStart();
 		AEGfxSetBackgroundColor(1.0f, 1.0f, 1.0f); // Tell the Alpha Engine to set the background to white.
-		speed = AEFrameRateControllerGetFrameTime() * 300.f;
+		player.speed = AEFrameRateControllerGetFrameTime() * 300.f;
 		rotate_speed = AEFrameRateControllerGetFrameTime();
 		// Tell the Alpha Engine to get ready to draw something.
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
@@ -65,26 +58,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//PLAYER RENDERING
 		//Movement of the Player
 		if (AEInputCheckCurr(AEVK_W)) {
-			player_y += speed;
+			player.posY += player.speed;
 		}
 		else if (AEInputCheckCurr(AEVK_S)) {
-			player_y -= speed;
+			player.posY -= player.speed;
 		}
 		else if (AEInputCheckCurr(AEVK_A)) {
-			player_x -= speed;
+			player.posX -= player.speed;
 		}
 		else if (AEInputCheckCurr(AEVK_D)) {
-			player_x += speed;
+			player.posX += player.speed;
 		}
 
 		if (AEInputCheckCurr(AEVK_LEFT)) {
-			player_rotation += 0.1f;
+			player.rotation += 0.1f;
 			/*if (player_rotation >= 360.f) {
 				player_rotation = 0.f;
 			}*/
 		}
 		else if (AEInputCheckCurr(AEVK_RIGHT)) {
-			player_rotation -= 0.1f;
+			player.rotation -= 0.1f;
 		}
 		
 
@@ -92,7 +85,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // Set to grey colour
 		
 		//For player Mesh
-		AEMtx33 playerMtx = CreateTransformMtx(player_w, player_h, player_rotation, player_x, player_y);
+		AEMtx33 playerMtx = CreateTransformMtx(player.width, player.height, player.rotation, player.posX, player.posY);
 		AEGfxSetTransform(playerMtx.m);
 		AEGfxMeshDraw(playerMesh, AE_GFX_MDM_TRIANGLES);
 		

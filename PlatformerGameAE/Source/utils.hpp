@@ -5,7 +5,7 @@
 
 AEGfxVertexList* createSquareMesh();
 
-AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, float rotate, f32 translX, f32 translY);
+AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, f32 rotate, f32 translX, f32 translY);
 
 int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y);
 

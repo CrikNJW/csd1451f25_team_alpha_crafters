@@ -22,7 +22,7 @@ AEGfxVertexList* createSquareMesh() {
 	////END OF MESH
 }
 
-AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, float rotate, f32 translX, f32 translY) {
+AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, f32 rotate, f32 translX, f32 translY) {
 	// Create a scale matrix that scales by 500 x and y
 	AEMtx33 scaleMtx = { 0 };
 	AEMtx33Scale(&scaleMtx, scaleX, scaleY);
