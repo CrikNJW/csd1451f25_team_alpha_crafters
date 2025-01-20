@@ -53,21 +53,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
 			//playerCenter = getCenterFromCircleMtx(transform);
 		}
-
 		if (AEInputCheckCurr(AEVK_S)) {
 			//std::cout << "S Pressed\n";
 			AEMtx33 movementMtx = CreateTransformMtx(1, 1, 0, 0, -4);
 			AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
 			//playerCenter = getCenterFromCircleMtx(transform);
 		}
-
 		if (AEInputCheckCurr(AEVK_A)) {
 			//std::cout << "A Pressed\n";
 			AEMtx33 movementMtx = CreateTransformMtx(1, 1, 0, -4, 0);
 			AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
 			//playerCenter = getCenterFromCircleMtx(transform);
 		}
-
 		if (AEInputCheckCurr(AEVK_D)) {
 			//std::cout << "D Pressed\n";
 			AEMtx33 movementMtx = CreateTransformMtx(1, 1, 0, 4, 0);
@@ -87,6 +84,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
 		AEGfxSetTransform(playerMtx.m);
 		AEGfxMeshDraw(playerMesh, AE_GFX_MDM_TRIANGLES);
+
+
+
+		AEGfxSetCamPosition(250, 250);
 
 		// Informing the system about the loop's end
 		AESysFrameEnd();
