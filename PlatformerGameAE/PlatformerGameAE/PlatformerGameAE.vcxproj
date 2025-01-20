@@ -17,8 +17,6 @@
   <ItemGroup>
     <ClInclude Include="..\Source\Structs.hpp" />
     <ClInclude Include="..\Source\utils.hpp" />
-    <ClInclude Include="Header.h" />
-    <ClInclude Include="Structs.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
