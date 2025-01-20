@@ -5,6 +5,7 @@
 #include "AEEngine.h"
 #include <iostream>
 #include "utils.hpp"
+#include "Structs.hpp"
 
 u32 white = 0xFFFFFFFF;
 
@@ -38,6 +39,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
+	// Using custom window procedure
+	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
+
+	AEGfxVertexList* playerMesh = createSquareMesh();
+	AEMtx33 playerMtx = CreateTransformMtx(50.0f, 50.0f, 0, 0, 0);
+
+	// Changing the window title
+	AESysSetWindowTitle("Thalassa");
+
 	// reset the system modules
 	AESysReset();
 
