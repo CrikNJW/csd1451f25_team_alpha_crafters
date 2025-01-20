@@ -9,20 +9,20 @@ AEGfxVertexList* createSquareMesh() {
 	AEGfxMeshStart();
 	// Draw square mesh
 	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,  // bottom-left: white
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
-		-0.5f, 0.5f, red, 0.0f, 0.0f);  // top-left: white
+		-0.5f, -0.5f, white, 0.0f, 1.0f,  // bottom-left: white
+		0.5f, -0.5f, red, 1.0f, 1.0f,   // bottom-right: white
+		-0.5f, 0.5f, white, 0.0f, 0.0f);  // top-left: white
 
 	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
+		0.5f, -0.5f, red, 1.0f, 1.0f,   // bottom-right: white
 		0.5f, 0.5f, red, 1.0f, 0.0f,    // top-right: white
-		-0.5f, 0.5f, red, 0.0f, 0.0f);  // top-left: white
+		-0.5f, 0.5f, white, 0.0f, 0.0f);  // top-left: white
 	// Saving the mesh (list of triangles) in mesh
 	return AEGfxMeshEnd();
 	////END OF MESH
 }
 
-AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, f32 rotate, f32 translX, f32 translY) {
+AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, f32 translY) {
 	// Create a scale matrix that scales by 500 x and y
 	AEMtx33 scaleMtx = { 0 };
 	AEMtx33Scale(&scaleMtx, scaleX, scaleY);
@@ -30,7 +30,7 @@ AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, f32 rotate, f32 translX, f32 
 	// Note that PI in radians is 180 degrees.
 	// Since 90 degrees is 180/2, 90 degrees in radians is PI/2
 	AEMtx33 rotateMtx = { 0 };
-	AEMtx33Rot(&rotateMtx, rotate);
+	AEMtx33Rot(&rotateMtx, rotate_rad);
 	// Create a translation matrix that translates by
 	// 200 in the x-axis and 100 in the y-axis
 	AEMtx33 translateMtx = { 0 };

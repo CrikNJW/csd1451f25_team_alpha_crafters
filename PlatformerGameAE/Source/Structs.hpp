@@ -6,7 +6,7 @@
 typedef struct Player {
 	float posX, posY; // position of the player
 	float width, height; // width and height of player
-	float rotation;
+	float rotate_angle; //in angle, not radians
 	float speed; //  speed of player
 	int health; //health and
 };
