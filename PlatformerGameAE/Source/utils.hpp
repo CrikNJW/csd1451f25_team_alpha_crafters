@@ -8,7 +8,7 @@
 
 AEGfxVertexList* createSquareMesh();
 
-AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, int rotate, f32 translX, f32 translY);
+AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, f32 translY);
 
 void handlePlayerMovement(AEMtx33& playerMtx, AEVec2& playerCoord);
 

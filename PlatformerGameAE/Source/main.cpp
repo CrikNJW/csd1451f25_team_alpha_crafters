@@ -33,7 +33,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEGfxVertexList *playerMesh = createSquareMesh();
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
 	AEVec2 playerCoord = { 0, 0 };
-	f32 camPosX = 0, camPosY = 0;
 
 	AEGfxVertexList* dummyMesh = createSquareMesh();
 	AEMtx33 dummyMtx = createTransformMtx(100.0f, 100.0f, 0, 200.0, 0);
@@ -44,19 +43,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// reset the system modules
 	AESysReset();
 
-	// Create a Pointer to Mesh of Rectangle for player texture
-	AEGfxVertexList* playerMesh = createSquareMesh();
-
 	//Initialisation of Player Variables
 	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health
-	Player diver = { -500.f, -200.f, 50.f, 50.f, 0.f, 0.f, 3 };
+	Player diver = { 0.f, 0.f, 50.f, 50.f, 0.f, 0.f, 3 };
 
 	// Game Loop
 	while (gGameRunning)
 	{
 		// Informing the system about the loop's start
 		AESysFrameStart();
-		AEGfxSetBackgroundColor(1.0f, 1.0f, 1.0f); // Tell the Alpha Engine to set the background to white.
+		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to white.
+		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player
 		
 		// Tell the Alpha Engine to get ready to draw something.
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
@@ -71,7 +68,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		//Debugging
 		std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
-		std::cout << "Camera Position: " << camPosX << "," << camPosY << '\n';
 
 		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
@@ -83,6 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	
 	//Free the Mesh
 	AEGfxMeshFree(playerMesh);
+	AEGfxMeshFree(dummyMesh);
 	// free the system
 	AESysExit();
 }
