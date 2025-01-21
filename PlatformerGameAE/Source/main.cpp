@@ -7,9 +7,7 @@
 #include "utils.hpp"
 #include "Structs.hpp"
 
-u32 white = 0xFFFFFFFF;
 
-f32 speed, rotate_degree;
 
 
 // ---------------------------------------------------------------------------
@@ -41,8 +39,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	//Initialisation of Player Variables
 	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health
-	Player player = { -500.f, -200.f, 50.f, 50.f, 0.f, 0.f, 3 };
-	rotate_degree = 2.f;
+	Player diver = { -500.f, -200.f, 50.f, 50.f, 0.f, 0.f, 3 };
 
 	// Game Loop
 	while (gGameRunning)
@@ -50,57 +47,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Informing the system about the loop's start
 		AESysFrameStart();
 		AEGfxSetBackgroundColor(1.0f, 1.0f, 1.0f); // Tell the Alpha Engine to set the background to white.
-		player.speed = AEFrameRateControllerGetFrameTime() * 300.f;
+		
 		// Tell the Alpha Engine to get ready to draw something.
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
-
+		
 		//PLAYER RENDERING
-		//Movement of the Player
-		if (AEInputCheckCurr(AEVK_W)) {
-			player.posY += player.speed * AESin(AEDegToRad(player.rotate_angle));
-			player.posX += player.speed * AECos(AEDegToRad(player.rotate_angle));
-		}
-		else if (AEInputCheckCurr(AEVK_S)) {
-			player.posY -= player.speed * AESin(AEDegToRad(player.rotate_angle));
-			player.posX -= player.speed * AECos(AEDegToRad(player.rotate_angle));
-		}
-		
-
-		if (AEInputCheckCurr(AEVK_LEFT)) {
-			player.rotate_angle += 2.f;
-			if (player.rotate_angle >= 360.f) {
-				player.rotate_angle = 0.f;
-			}
-		}
-		else if (AEInputCheckCurr(AEVK_RIGHT)) {
-			player.rotate_angle -= 2.f;
-			if (player.rotate_angle < 0) {
-				player.rotate_angle = 360.f;
-			}
-		}
+		UpdatePlayerPos(&diver, playerMesh);
 		
 
 
-		AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // Set to grey colour
-		
-		//For player Mesh
-		AEMtx33 playerMtx = CreateTransformMtx(player.width, player.height, AEDegToRad(player.rotate_angle), player.posX, player.posY);
-		AEGfxSetTransform(playerMtx.m);
-		AEGfxMeshDraw(playerMesh, AE_GFX_MDM_TRIANGLES);
-		
-	
-		
-		
-		
-
-		// Basic way to trigger exiting the application
-		// when ESCAPE is hit or when the window is closed
+		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
 			gGameRunning = 0;
 
 		// Informing the system about the loop's end
 		AESysFrameEnd();
-
 	}
 	
 	//Free the Mesh

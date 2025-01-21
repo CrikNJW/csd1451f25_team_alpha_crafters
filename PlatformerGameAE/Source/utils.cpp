@@ -1,6 +1,12 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 #include <iostream>
+#include "Structs.hpp"
+
+//Marcos for the trigo functions that take input in degree 
+//cuz alpha engine only takes input in radians for function sin, cos, tan
+#define AESinDeg(x) AESin(AEDegToRad(x));
+#define AECosDeg(x) AESin(AEDegToRad(x));
 
 AEGfxVertexList* createSquareMesh() {
 	u32 white = 0xFFFFFFFF;
@@ -90,4 +96,41 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 	else {
 		return 0;
 	}
+}
+
+
+void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh) {
+	player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate
+	f32 rotate_degree = 2.f; //rotation degree is set to 2 degree when trigerred
+
+	if (AEInputCheckCurr(AEVK_W)) {
+		//alpha engine only takes input in radians for function sin, cos, tan
+		//Needs to manually convert the degree to radians
+		player->posY += player->speed * AESin(AEDegToRad(player->rotate_angle));
+		player->posX += player->speed * AECos(AEDegToRad(player->rotate_angle));
+	}
+	else if (AEInputCheckCurr(AEVK_S)) {
+		player->posY -= player->speed * AESin(AEDegToRad(player->rotate_angle));
+		player->posX -= player->speed * AECos(AEDegToRad(player->rotate_angle));
+	}
+
+
+	if (AEInputCheckCurr(AEVK_LEFT)) {
+		player->rotate_angle += rotate_degree;
+		if (player->rotate_angle >= 360.f) {
+			player->rotate_angle = 0.f;
+		}
+	}
+	else if (AEInputCheckCurr(AEVK_RIGHT)) {
+		player->rotate_angle -= rotate_degree;
+		if (player->rotate_angle < 0) {
+			player->rotate_angle = 360.f;
+		}
+	}
+
+	//Draw the player Mesh
+	AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey)
+	AEMtx33 playerMtx = CreateTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
+	AEGfxSetTransform(playerMtx.m);
+	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
 }
