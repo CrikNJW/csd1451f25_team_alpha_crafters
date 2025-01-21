@@ -2,6 +2,7 @@
 #include "AEEngine.h"
 #include <iostream>
 
+/*Creates a white square mesh, drawing from the center to top-right.*/
 AEGfxVertexList* createSquareMesh() {
 	AEGfxMeshStart();
 	// Draw square mesh
@@ -19,7 +20,8 @@ AEGfxVertexList* createSquareMesh() {
 	////END OF MESH
 }
 
-AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, int rotate, f32 translX, f32 translY) {
+/*Creates a 3x3 transformation matrix based on the scale, rotate and translate parameters provided.*/
+AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, int rotate, f32 translX, f32 translY) {
 	// Create a scale matrix that scales by 500 x and y
 	AEMtx33 scaleMtx = { 0 };
 	AEMtx33Scale(&scaleMtx, scaleX, scaleY);
@@ -40,6 +42,39 @@ AEMtx33 CreateTransformMtx(f32 scaleX, f32 scaleY, int rotate, f32 translX, f32 
 	AEMtx33Concat(&transformMtx, &translateMtx, &transformMtx);
 
 	return transformMtx;
+}
+
+/*Takes in a reference to a AEMtx33 matrix, and multiplies the matrix based with a new transformation matrix based on player movement*/
+void handlePlayerMovement(AEMtx33& playerMtx, AEVec2& playerCoord) {
+	//Check player WASD input
+	if (AEInputCheckCurr(AEVK_W)) {
+		//std::cout << "W Pressed\n";
+		AEMtx33 movementMtx = createTransformMtx(1, 1, 0, 0, 4);
+		AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
+		playerCoord.y += 4;
+		//playerCenter = getCenterFromCircleMtx(transform);
+	}
+	if (AEInputCheckCurr(AEVK_S)) {
+		//std::cout << "S Pressed\n";
+		AEMtx33 movementMtx = createTransformMtx(1, 1, 0, 0, -4);
+		AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
+		playerCoord.y -= 4;
+		//playerCenter = getCenterFromCircleMtx(transform);
+	}
+	if (AEInputCheckCurr(AEVK_A)) {
+		//std::cout << "A Pressed\n";
+		AEMtx33 movementMtx = createTransformMtx(1, 1, 0, -4, 0);
+		AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
+		playerCoord.x -= 4;
+		//playerCenter = getCenterFromCircleMtx(transform);
+	}
+	if (AEInputCheckCurr(AEVK_D)) {
+		//std::cout << "D Pressed\n";
+		AEMtx33 movementMtx = createTransformMtx(1, 1, 0, 4, 0);
+		AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
+		playerCoord.x += 4;
+		//playerCenter = getCenterFromCircleMtx(transform);
+	}
 }
 
 int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y)

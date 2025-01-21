@@ -26,8 +26,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Using custom window procedure
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 
+	//Initialize player variables
 	AEGfxVertexList* playerMesh = createSquareMesh();
-	AEMtx33 playerMtx = CreateTransformMtx(50.0f, 50.0f, 0, 0, 0);
+	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
+	AEVec2 playerCoord = { 0, 0 };
 
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
@@ -40,42 +42,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		// Informing the system about the loop's start
 		AESysFrameStart();
-
 		// Basic way to trigger exiting the application
 		// when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
 			gGameRunning = 0;
 
-		//Check player WASD input
-		if (AEInputCheckCurr(AEVK_W)) {
-			//std::cout << "W Pressed\n";
-			AEMtx33 movementMtx = CreateTransformMtx(1, 1, 0, 0, 4);
-			AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
-			//playerCenter = getCenterFromCircleMtx(transform);
-		}
-		if (AEInputCheckCurr(AEVK_S)) {
-			//std::cout << "S Pressed\n";
-			AEMtx33 movementMtx = CreateTransformMtx(1, 1, 0, 0, -4);
-			AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
-			//playerCenter = getCenterFromCircleMtx(transform);
-		}
-		if (AEInputCheckCurr(AEVK_A)) {
-			//std::cout << "A Pressed\n";
-			AEMtx33 movementMtx = CreateTransformMtx(1, 1, 0, -4, 0);
-			AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
-			//playerCenter = getCenterFromCircleMtx(transform);
-		}
-		if (AEInputCheckCurr(AEVK_D)) {
-			//std::cout << "D Pressed\n";
-			AEMtx33 movementMtx = CreateTransformMtx(1, 1, 0, 4, 0);
-			AEMtx33Concat(&playerMtx, &movementMtx, &playerMtx);
-			//playerCenter = getCenterFromCircleMtx(transform);
-		}
+		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Set the background to black.
+		handlePlayerMovement(playerMtx, playerCoord); //Handle basic WASD movement
 
-		// Set the background to black.
-		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR); //Set render mode to color instead of textures
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 1.0f);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetTransparency(1.0f);
@@ -85,9 +60,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetTransform(playerMtx.m);
 		AEGfxMeshDraw(playerMesh, AE_GFX_MDM_TRIANGLES);
 
+		//std::cout << "Player Location" << playerMtx.m[0][2] << " " << playerMtx.m[1][2] << '\n';
+		std::cout << "Player Location: " << playerCoord.x << "," << playerCoord.y << '\n';
 
-
-		AEGfxSetCamPosition(250, 250);
+		//AEGfxSetCamPosition(250, 250);
 
 		// Informing the system about the loop's end
 		AESysFrameEnd();
