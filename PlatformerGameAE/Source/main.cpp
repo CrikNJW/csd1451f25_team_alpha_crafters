@@ -26,10 +26,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Using custom window procedure
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 
-	//Initialize player variables
-	AEGfxVertexList* playerMesh = createSquareMesh();
+	//Initialize variables
+	AEGfxVertexList *playerMesh = createSquareMesh();
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
 	AEVec2 playerCoord = { 0, 0 };
+	f32 camPosX = 0, camPosY = 0;
+
+	AEGfxVertexList* dummyMesh = createSquareMesh();
+	AEMtx33 dummyMtx = createTransformMtx(100.0f, 100.0f, 0, 200.0, 0);
 
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
@@ -49,6 +53,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Set the background to black.
 		handlePlayerMovement(playerMtx, playerCoord); //Handle basic WASD movement
+		AEGfxSetCamPosition(playerCoord.x, playerCoord.y); //Set the camera to follow the player
+		AEGfxGetCamPosition(&camPosX, &camPosY);
 
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); //Set render mode to color instead of textures
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 1.0f);
@@ -60,10 +66,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetTransform(playerMtx.m);
 		AEGfxMeshDraw(playerMesh, AE_GFX_MDM_TRIANGLES);
 
-		//std::cout << "Player Location" << playerMtx.m[0][2] << " " << playerMtx.m[1][2] << '\n';
-		std::cout << "Player Location: " << playerCoord.x << "," << playerCoord.y << '\n';
+		//Dummy Mesh/Object to test camera movement
+		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
+		AEGfxSetTransform(dummyMtx.m);
+		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 
-		//AEGfxSetCamPosition(250, 250);
+
+		//Debugging
+		std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
+		std::cout << "Camera Position: " << camPosX << "," << camPosY << '\n';
 
 		// Informing the system about the loop's end
 		AESysFrameEnd();

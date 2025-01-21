@@ -2,19 +2,19 @@
 #include "AEEngine.h"
 #include <iostream>
 
-/*Creates a white square mesh, drawing from the center to top-right.*/
+/*Creates a white square mesh, drawing from the center outwards in every direction, this is done to preserve the center coordinate*/
 AEGfxVertexList* createSquareMesh() {
 	AEGfxMeshStart();
 	// Draw square mesh
 	AEGfxTriAdd(
-		0.0f, 0.0f, 0xFFFFFFFF, 0.0f, 1.0f,  // bottom-left: white
-		1.0f, 0.0f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
-		0.0f, 1.0f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,  // bottom-left: white
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
 
 	AEGfxTriAdd(
-		1.0f, 0.0f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
-		1.0f, 1.0f, 0xFFFFFFFF, 1.0f, 0.0f,    // top-right: white
-		0.0f, 1.0f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
+		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,    // top-right: white
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
 	// Saving the mesh (list of triangles) in mesh
 	return AEGfxMeshEnd();
 	////END OF MESH
