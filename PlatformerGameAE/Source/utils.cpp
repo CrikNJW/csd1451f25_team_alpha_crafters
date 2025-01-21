@@ -1,20 +1,29 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 #include <iostream>
+#include "Structs.hpp"
+
+//Marcos for the trigo functions that take input in degree 
+//cuz alpha engine only takes input in radians for function sin, cos, tan
+#define AESinDeg(x) AESin(AEDegToRad(x));
+#define AECosDeg(x) AESin(AEDegToRad(x));
 
 /*Creates a white square mesh, drawing from the center outwards in every direction, this is done to preserve the center coordinate*/
 AEGfxVertexList* createSquareMesh() {
+	u32 white = 0xFFFFFFFF;
+	u32 red = 0xFFFF0000;
+	
 	AEGfxMeshStart();
 	// Draw square mesh
 	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,  // bottom-left: white
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
+		-0.5f, -0.5f, white, 0.0f, 1.0f,  // bottom-left: white
+		0.5f, -0.5f, red, 1.0f, 1.0f,   // bottom-right: white
+		-0.5f, 0.5f, white, 0.0f, 0.0f);  // top-left: white
 
 	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: white
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,    // top-right: white
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: white
+		0.5f, -0.5f, red, 1.0f, 1.0f,   // bottom-right: white
+		0.5f, 0.5f, red, 1.0f, 0.0f,    // top-right: white
+		-0.5f, 0.5f, white, 0.0f, 0.0f);  // top-left: white
 	// Saving the mesh (list of triangles) in mesh
 	return AEGfxMeshEnd();
 	////END OF MESH
@@ -29,7 +38,7 @@ AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, int rotate, f32 translX, f32 
 	// Note that PI in radians is 180 degrees.
 	// Since 90 degrees is 180/2, 90 degrees in radians is PI/2
 	AEMtx33 rotateMtx = { 0 };
-	AEMtx33Rot(&rotateMtx, rotate);
+	AEMtx33Rot(&rotateMtx, rotate_rad);
 	// Create a translation matrix that translates by
 	// 200 in the x-axis and 100 in the y-axis
 	AEMtx33 translateMtx = { 0 };
@@ -122,4 +131,41 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 	else {
 		return 0;
 	}
+}
+
+
+void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh) {
+	player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate
+	f32 rotate_degree = 2.f; //rotation degree is set to 2 degree when trigerred
+
+	if (AEInputCheckCurr(AEVK_W)) {
+		//alpha engine only takes input in radians for function sin, cos, tan
+		//Needs to manually convert the degree to radians
+		player->posY += player->speed * AESin(AEDegToRad(player->rotate_angle));
+		player->posX += player->speed * AECos(AEDegToRad(player->rotate_angle));
+	}
+	else if (AEInputCheckCurr(AEVK_S)) {
+		player->posY -= player->speed * AESin(AEDegToRad(player->rotate_angle));
+		player->posX -= player->speed * AECos(AEDegToRad(player->rotate_angle));
+	}
+
+
+	if (AEInputCheckCurr(AEVK_LEFT)) {
+		player->rotate_angle += rotate_degree;
+		if (player->rotate_angle >= 360.f) {
+			player->rotate_angle = 0.f;
+		}
+	}
+	else if (AEInputCheckCurr(AEVK_RIGHT)) {
+		player->rotate_angle -= rotate_degree;
+		if (player->rotate_angle < 0) {
+			player->rotate_angle = 360.f;
+		}
+	}
+
+	//Draw the player Mesh
+	AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey)
+	AEMtx33 playerMtx = createTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
+	AEGfxSetTransform(playerMtx.m);
+	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
 }

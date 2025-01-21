@@ -5,6 +5,8 @@
 #include "AEEngine.h"
 #include <iostream>
 #include "utils.hpp"
+#include "Structs.hpp"
+
 
 
 
@@ -23,6 +25,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 	int gGameRunning = 1;
+
 	// Using custom window procedure
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 
@@ -41,46 +44,45 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// reset the system modules
 	AESysReset();
 
+	// Create a Pointer to Mesh of Rectangle for player texture
+	AEGfxVertexList* playerMesh = createSquareMesh();
+
+	//Initialisation of Player Variables
+	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health
+	Player diver = { -500.f, -200.f, 50.f, 50.f, 0.f, 0.f, 3 };
+
 	// Game Loop
 	while (gGameRunning)
 	{
 		// Informing the system about the loop's start
 		AESysFrameStart();
-		// Basic way to trigger exiting the application
-		// when ESCAPE is hit or when the window is closed
-		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
-			gGameRunning = 0;
-
-		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Set the background to black.
-		handlePlayerMovement(playerMtx, playerCoord); //Handle basic WASD movement
-		AEGfxSetCamPosition(playerCoord.x, playerCoord.y); //Set the camera to follow the player
-		AEGfxGetCamPosition(&camPosX, &camPosY);
-
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR); //Set render mode to color instead of textures
-		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 1.0f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxSetTransparency(1.0f);
-
-		//Draw the player
-		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
-		AEGfxSetTransform(playerMtx.m);
-		AEGfxMeshDraw(playerMesh, AE_GFX_MDM_TRIANGLES);
-
+		AEGfxSetBackgroundColor(1.0f, 1.0f, 1.0f); // Tell the Alpha Engine to set the background to white.
+		
+		// Tell the Alpha Engine to get ready to draw something.
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
+		
+		//PLAYER RENDERING
+		UpdatePlayerPos(&diver, playerMesh);
+		
 		//Dummy Mesh/Object to test camera movement
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
 		AEGfxSetTransform(dummyMtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 
-
 		//Debugging
 		std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 		std::cout << "Camera Position: " << camPosX << "," << camPosY << '\n';
 
+		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed
+		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
+			gGameRunning = 0;
+
 		// Informing the system about the loop's end
 		AESysFrameEnd();
-
 	}
-
+	
+	//Free the Mesh
+	AEGfxMeshFree(playerMesh);
 	// free the system
 	AESysExit();
 }

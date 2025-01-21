@@ -18,6 +18,7 @@
     <ClCompile Include="..\Source\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Structs.hpp" />
     <ClInclude Include="..\Source\utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
