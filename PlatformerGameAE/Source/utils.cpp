@@ -131,7 +131,7 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh) {
 	}
 
 	//Draw the player Mesh
-	AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey)
+	AEGfxSetColorToAdd(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey)
 	AEMtx33 playerMtx = createTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
 	AEGfxSetTransform(playerMtx.m);
 	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);

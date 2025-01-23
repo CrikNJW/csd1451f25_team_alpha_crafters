@@ -62,7 +62,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		UpdatePlayerPos(&diver, playerMesh);
 		
 		//Dummy Mesh/Object to test camera movement
-		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
+		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
 		AEGfxSetTransform(dummyMtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 
