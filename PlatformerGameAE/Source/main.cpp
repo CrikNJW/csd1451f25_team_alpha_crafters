@@ -32,10 +32,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Initialize variables
 	AEGfxVertexList *playerMesh = createSquareMesh();
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
-	AEVec2 playerCoord = { 0, 0 };
+	//AEVec2 playerCoord = { 0, 0 };
 
 	AEGfxVertexList* dummyMesh = createSquareMesh();
-	AEMtx33 dummyMtx = createTransformMtx(100.0f, 100.0f, 0, 200.0, 0);
+	AEMtx33 dummy1Mtx = createTransformMtx(100.0f, 100.0f, 0, 200.0, 0);
+	AEMtx33 dummy2Mtx = createTransformMtx(100.0f, 100.0f, 0, 300.0, 200);
+	AEMtx33 dummy3Mtx = createTransformMtx(100.0f, 100.0f, 0, 700.0, -200);
 
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
@@ -56,18 +58,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player
 		
 		// Tell the Alpha Engine to get ready to draw something.
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // to draw with color, use (AF_GFX_RM_COLOR), texture use (AF_GFX_RM_TEXTURE)
 		
 		//PLAYER RENDERING
 		UpdatePlayerPos(&diver, playerMesh);
 		
 		//Dummy Mesh/Object to test camera movement
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-		AEGfxSetTransform(dummyMtx.m);
+		AEGfxSetTransform(dummy1Mtx.m);
+		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
+
+		AEGfxSetColorToAdd(1.0f, 0.0f, 1.0f, 1.0f);
+		AEGfxSetTransform(dummy2Mtx.m);
+		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
+
+		AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
+		AEGfxSetTransform(dummy3Mtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 
 		//Debugging
-		std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
+		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 
 		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())

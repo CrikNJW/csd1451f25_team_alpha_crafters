@@ -105,25 +105,25 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh) {
 	player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate
 	f32 rotate_degree = 2.f; //rotation degree is set to 2 degree when trigerred
 
-	if (AEInputCheckCurr(AEVK_W)) {
+	if (AEInputCheckCurr(AEVK_UP) || AEInputCheckCurr(AEVK_W)) { //Forward Thrust
 		//alpha engine only takes input in radians for function sin, cos, tan
 		//Needs to manually convert the degree to radians
-		player->posY += player->speed * AESin(AEDegToRad(player->rotate_angle));
+		(*player).posY += player->speed * AESin(AEDegToRad(player->rotate_angle));
 		player->posX += player->speed * AECos(AEDegToRad(player->rotate_angle));
 	}
-	else if (AEInputCheckCurr(AEVK_S)) {
+	else if (AEInputCheckCurr(AEVK_DOWN) || AEInputCheckCurr(AEVK_S)) { //Backward Thrust
 		player->posY -= player->speed * AESin(AEDegToRad(player->rotate_angle));
 		player->posX -= player->speed * AECos(AEDegToRad(player->rotate_angle));
 	}
 
 
-	if (AEInputCheckCurr(AEVK_LEFT) || AEInputCheckCurr(AEVK_A)) {
+	if (AEInputCheckCurr(AEVK_Q) || AEInputCheckCurr(AEVK_LEFT)) { //Pivot Left
 		player->rotate_angle += rotate_degree;
 		if (player->rotate_angle >= 360.f) {
 			player->rotate_angle = 0.f;
 		}
 	}
-	else if (AEInputCheckCurr(AEVK_RIGHT) || AEInputCheckCurr(AEVK_D)) {
+	else if (AEInputCheckCurr(AEVK_E) || AEInputCheckCurr(AEVK_RIGHT)) { //Pivot Right
 		player->rotate_angle -= rotate_degree;
 		if (player->rotate_angle < 0) {
 			player->rotate_angle = 360.f;
