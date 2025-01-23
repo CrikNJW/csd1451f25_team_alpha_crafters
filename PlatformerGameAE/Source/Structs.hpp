@@ -23,6 +23,12 @@ typedef struct Floating_enemy {
 	int Health;
 };
 
+typedef struct Icicle {
+	AEVec2 icicleCoordinates;
+	AEVec2 icicleDropCoordinates;
+	float dropSpeed;
+};
+
 typedef struct Boundaries {
 	float PosX, PosY; 
 	float Width, Height;

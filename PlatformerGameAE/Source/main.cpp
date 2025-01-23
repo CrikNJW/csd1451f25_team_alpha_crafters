@@ -34,6 +34,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
 	AEVec2 playerCoord = { 0, 0 };
 
+	//Dummy icicle array that stores coordinates of each icicle.
+	f32 icicleDropOffset = 5.0f;
+	AEGfxVertexList* icicleMesh = createSquareMesh();
+	int icicleArraySize = 2; //If there was a level create system, to increment everytime a new icicle is added.
+
 	AEGfxVertexList* dummyMesh = createSquareMesh();
 	AEMtx33 dummyMtx = createTransformMtx(100.0f, 100.0f, 0, 200.0, 0);
 
@@ -60,11 +65,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		
 		//PLAYER RENDERING
 		UpdatePlayerPos(&diver, playerMesh);
+
+		//Loop through dummy icicle array and render each icicle
+		for (int i = 0; i < 2; i++) {
+			DrawIcicle(icicleCoords[i], icicleMesh);
+		}
 		
 		//Dummy Mesh/Object to test camera movement
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
 		AEGfxSetTransform(dummyMtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
+
+		//
 
 		//Debugging
 		std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
@@ -80,6 +92,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Free the Mesh
 	AEGfxMeshFree(playerMesh);
 	AEGfxMeshFree(dummyMesh);
+	AEGfxMeshFree(icicleMesh);
 	// free the system
 	AESysExit();
 }
