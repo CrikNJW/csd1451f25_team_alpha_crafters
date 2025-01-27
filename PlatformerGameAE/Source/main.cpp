@@ -31,19 +31,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	//Initialize variables
 	AEGfxVertexList *playerMesh = createSquareMesh();
-	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
 	f32 dt;
 
 	//Dummy icicle array that stores coordinates of each icicle.
-	f32 icicleDropOffset = 5.0f;
+	//f32 icicleDropOffset = 5.0f;
 	AEGfxVertexList* icicleMesh = createSquareMesh();
 	Icicle* icicle = new Icicle[2]{ {40,80}, {100,200} };
 
 
 	AEGfxVertexList* dummyMesh = createSquareMesh();
-	AEMtx33 dummy1Mtx = createTransformMtx(100.0f, 100.0f, 0, 200.0, 0);
-	AEMtx33 dummy2Mtx = createTransformMtx(100.0f, 100.0f, 0, 300.0, 200);
-	AEMtx33 dummy3Mtx = createTransformMtx(100.0f, 100.0f, 0, 700.0, -200);
+
+	//Spotlight effect Mesh
+	AEGfxVertexList* spotlightMesh = createCircleMesh();
 
 	
 	// Changing the window title
@@ -96,7 +95,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		// Informing the system about the loop's start
 		AESysFrameStart();
-		dt = AEFrameRateControllerGetFrameTime();
+		dt = f32(AEFrameRateControllerGetFrameTime());
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player
 		
@@ -111,13 +110,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			icicleCollision(diver, icicle[i]);
 			DrawIcicle(icicle[i].PosX, icicle[i].PosY, icicleMesh);
 			Draw_UpdateIcicleDrop(icicle[i], icicleMesh, dt);
-
 		}
 		
 		////Dummy Mesh/Object to test camera movement
-		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
-		//AEGfxSetTransform(dummyMtx.m);
-		//AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
+		//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
 
 		// Draw test wall
 		AEMtx33 wallMtx = createTransformMtx(testWall.Width, testWall.Height, 0, testWall.PosX, testWall.PosY);
@@ -147,6 +143,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//Debugging
 		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 
+
+		DrawBlackOverlay(playerMesh);
+		SpotLight(&diver, spotlightMesh);
+
+
+
 		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
 			gGameRunning = 0;
@@ -159,6 +161,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEGfxMeshFree(playerMesh);
 	AEGfxMeshFree(dummyMesh);
 	AEGfxMeshFree(icicleMesh);
+	AEGfxMeshFree(spotlightMesh);
 
 	//Free the icicle array
 	delete[] icicle;

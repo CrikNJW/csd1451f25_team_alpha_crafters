@@ -5,8 +5,8 @@
 
 //Marcos for the trigo functions that take input in degree 
 //cuz alpha engine only takes input in radians for function sin, cos, tan
-#define AESinDeg(x) AESin(AEDegToRad(x));
-#define AECosDeg(x) AESin(AEDegToRad(x));
+//#define AESinDeg(x) AESin(AEDegToRad(x));
+//#define AECosDeg(x) AESin(AEDegToRad(x));
 
 /*Creates a white square mesh, drawing from the center outwards in every direction, this is done to preserve the center coordinate*/
 AEGfxVertexList* createSquareMesh() {
@@ -17,16 +17,48 @@ AEGfxVertexList* createSquareMesh() {
 	// Draw square mesh
 	AEGfxTriAdd(
 		-0.5f, -0.5f, white, 0.0f, 1.0f,  // bottom-left: white
-		0.5f, -0.5f, red, 1.0f, 1.0f,   // bottom-right: white
+		0.5f, -0.5f, white, 1.0f, 1.0f,   // bottom-right: white
 		-0.5f, 0.5f, white, 0.0f, 0.0f);  // top-left: white
 
 	AEGfxTriAdd(
-		0.5f, -0.5f, red, 1.0f, 1.0f,   // bottom-right: white
-		0.5f, 0.5f, red, 1.0f, 0.0f,    // top-right: white
+		0.5f, -0.5f, white, 1.0f, 1.0f,   // bottom-right: white
+		0.5f, 0.5f, white, 1.0f, 0.0f,    // top-right: white
 		-0.5f, 0.5f, white, 0.0f, 0.0f);  // top-left: white
 	// Saving the mesh (list of triangles) in mesh
 	return AEGfxMeshEnd();
 	////END OF MESH
+}
+
+AEGfxVertexList* createCircleMesh() {
+	AEGfxMeshStart();
+	//Add the vertices for the circle
+	for (int i = 0; i < 36; ++i) {
+		//We want 36 triangles, 10 degrees per angle
+		//cos and sin funcs only accept radians. 360 degrees = 2PI radians, therefore we multiply them together
+		f32 CircleAngleInRadians = 2 * PI;
+		f32 AnglePerTriangle = CircleAngleInRadians / 36;
+
+		//We need to calculate 2 vertexes at the circumference of the circle
+		f32 angle1 = i * AnglePerTriangle; //This is for the first vertex
+		f32 angle2 = (i + 1) * AnglePerTriangle; //This is for the second vertex.
+
+		//The cosf and sinf gives us the x,y coordinates.
+		//We multiply it by the radius of the circle we have set.
+		f32 x1 = 1 * cosf(angle1);
+		f32 y1 = 1 * sinf(angle1);
+		f32 x2 = 1 * cosf(angle2);
+		f32 y2 = 1 * sinf(angle2);
+
+		//UV coordinates are NORMALIZED, so it is from 0 to 1
+		AEGfxTriAdd(
+			0.0f, 0.0f, 0xFFFFFFFF, 0.5f, 0.5f, // Center of the circle, UV is 0.5, 0.5
+			x1, y1, 0xFFFFFFFF, 0.5f + 0.5f * cosf(angle1), 0.5f + 0.5f * sinf(angle1), //First vertex, UV is calculated by the cos and sin of the angle
+			x2, y2, 0xFFFFFFFF, 0.5f + 0.5f * cosf(angle2), 0.5f + 0.5f * sinf(angle2) //Second vertex, UV is calculated by the cos and sin of the angle
+		);
+	}
+
+	// End creating the mesh and save it
+	return AEGfxMeshEnd();
 }
 
 /*Creates a 3x3 transformation matrix based on the scale, rotate and translate parameters provided.*/
@@ -53,40 +85,40 @@ AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, 
 	return transformMtx;
 }
 
-int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y)
-{
-	// Reason why use half width and height is because the rectangle button was drew from the middle
-	float half_width = area_width / 2.0;
-	float half_height = area_height / 2.0;
+//int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y)
+//{
+//	// Reason why use half width and height is because the rectangle button was drew from the middle
+//	float half_width = area_width / 2.0;
+//	float half_height = area_height / 2.0;
+//
+//	// Compute the boundaries of the button rectangle
+//	float left_bound = area_center_x - half_width;
+//	float right_bound = area_center_x + half_width;
+//	float top_bound = area_center_y - half_height;
+//	float bottom_bound = area_center_y + half_height;
+//
+//	// Check if the Mouse_Input is within the boundaries
+//	if (click_x >= left_bound && click_x <= right_bound && click_y >= top_bound && click_y <= bottom_bound) {
+//		return 1;
+//	}
+//	else {
+//		return 0;
+//	}
+//}
 
-	// Compute the boundaries of the button rectangle
-	float left_bound = area_center_x - half_width;
-	float right_bound = area_center_x + half_width;
-	float top_bound = area_center_y - half_height;
-	float bottom_bound = area_center_y + half_height;
-
-	// Check if the Mouse_Input is within the boundaries
-	if (click_x >= left_bound && click_x <= right_bound && click_y >= top_bound && click_y <= bottom_bound) {
-		return 1;
-	}
-	else {
-		return 0;
-	}
-}
-
-int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter, float click_x, float click_y)
-{
-	float radius = diameter / 2.0;
-	// distance = sgrt of [(X1 - X2)^2 + (Y1 - Y2)^2], we eliminate the sqrt by squaring the radius later
-	float distance_squared = (click_x - circle_center_x) * (click_x - circle_center_x) + (click_y - circle_center_y) * (click_y - circle_center_y);
-
-	if (distance_squared <= radius * radius) {
-		return 1;
-	}
-	else {
-		return 0;
-	}
-}
+//int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter, float click_x, float click_y)
+//{
+//	float radius = diameter / 2.0;
+//	// distance = sgrt of [(X1 - X2)^2 + (Y1 - Y2)^2], we eliminate the sqrt by squaring the radius later
+//	float distance_squared = (click_x - circle_center_x) * (click_x - circle_center_x) + (click_y - circle_center_y) * (click_y - circle_center_y);
+//
+//	if (distance_squared <= radius * radius) {
+//		return 1;
+//	}
+//	else {
+//		return 0;
+//	}
+//}
 
 int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c2_y, float r2)
 {
@@ -101,6 +133,29 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 }
 
 
+void DrawBlackOverlay(AEGfxVertexList* square_mesh) {
+	f32 rec_width = AEGfxGetWindowWidth();
+	f32 rec_height = AEGfxGetWindowHeight();
+	AEMtx33 black_overlayMtx = createTransformMtx(rec_width,rec_height,0,0,0);
+
+	//Dim the black colour rectangle
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.1f);
+	AEGfxSetTransform(black_overlayMtx.m);
+	AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
+}
+
+void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
+	f32 radius = 200.f;
+	AEMtx33 spotlightMtx = createTransformMtx(radius, radius, 0, player->posX, player->posY);
+
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 0.3f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransform(spotlightMtx.m);
+	AEGfxMeshDraw(circle_mesh, AE_GFX_MDM_TRIANGLES);
+	
+}
+
+
 void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 	if (player->lockMovement == true) {
 		player->lockTimeElapsed += dt;
@@ -109,10 +164,9 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 			player->lockTimeElapsed = 0;
 		}
 	}
-
 	else {
-		player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate
-		f32 rotate_degree = 2.f; //rotation degree is set to 2 degree when trigerred
+		player->speed = f32(AEFrameRateControllerGetFrameTime() * 300.f); //speed of player according to frame rate
+		f32 rotate_degree = 4.f; //rotation degree is set to 2 degree when trigerred
 
 		if (AEInputCheckCurr(AEVK_W)) {
 			//alpha engine only takes input in radians for function sin, cos, tan
@@ -149,7 +203,7 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 
 //Draw icicle at the given position
 void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 1.0f, 1.0f); // Icicle Colour (blue)
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
 	AEMtx33 icicleMtx = createTransformMtx(30.0f, 30.0f, 0, posX, posY);
 	AEGfxSetTransform(icicleMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
@@ -157,7 +211,7 @@ void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
 
 //Draw icicle child and make it repeatedly drop icicles.
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) {
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 1.0f, 1.0f); // Icicle Drop Colour (blue)
+	//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f); // Icicle Drop Colour (blue)
 	if (icicle.cooldownElapsed < icicle.cooldown) {
 		icicle.cooldownElapsed += dt;
 	}
@@ -189,15 +243,14 @@ bool icicleCollision(Player &player, Icicle &icicle) {
 }
 
 // player default WSAD controls
-void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
-	player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate
-	//player movement 
-	if (AEInputCheckCurr(AEVK_W)) player->posY -= player->speed;
-	if (AEInputCheckCurr(AEVK_S)) player->posY += player->speed;
-	if (AEInputCheckCurr(AEVK_A)) player->posX += player->speed;
-	if (AEInputCheckCurr(AEVK_D)) player->posX -= player->speed;
-	
-}
+//void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
+//	player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate
+//	//player movement 
+//	if (AEInputCheckCurr(AEVK_W)) player->posY -= player->speed;
+//	if (AEInputCheckCurr(AEVK_S)) player->posY += player->speed;
+//	if (AEInputCheckCurr(AEVK_A)) player->posX += player->speed;
+//	if (AEInputCheckCurr(AEVK_D)) player->posX -= player->speed;
+//}
 
 //collision for player and boundary 
 void CheckCollision(Player& player, const Boundaries& boundary) {

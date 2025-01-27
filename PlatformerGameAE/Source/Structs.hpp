@@ -4,10 +4,10 @@
 
 
 struct Player {
-	float posX, posY; // position of the player
+	f32 posX, posY; // position of the player
 	float width, height; // width and height of player
 	float rotate_angle; //in angle, not radians
-	float speed; //  speed of player
+	f32 speed; //  speed of player
 	int health; //health and
 
 	bool lockMovement = false; //Prevent player from moving and rotating
