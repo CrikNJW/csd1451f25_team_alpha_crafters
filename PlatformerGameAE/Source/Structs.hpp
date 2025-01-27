@@ -38,7 +38,13 @@ struct Floating_enemy {
 	int Health;
 };
 
-struct Boundaries {
+struct Floating_enemy {
+	float PosX, PosY;
+	float Width, Height;
+	int Health;
+};
+
+ struct Boundaries {
 	float PosX, PosY; 
 	float Width, Height;
 }; // this is for the boundaries / borders around map
