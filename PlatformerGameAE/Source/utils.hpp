@@ -24,11 +24,17 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh);
 void SpotLight(Player* player, AEGfxVertexList* circle_mesh);
 void UpdatePlayerPos(Player* player, AEGfxVertexList* player_mesh, f32 dt);
 
-//default player movement
-//void UpdatePlayerMovement(Player* player, AEGfxVertexList* player_mesh);
+void UpdatePlayerMovement(Player* player, AEGfxVertexList* player_mesh);
 
-//collision check for player and boundary
 void CheckCollision(Player& player, const Boundaries& boundary);
 
 void ElasticEnemyCollision(Player& player, Ground_enemy& enemy);
+
+void InitializePlatform(Platform& platform);
+
+void RenderPlatform(Platform& platform, AEGfxVertexList* mesh);
+
+void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt);
+
+void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh);
 
