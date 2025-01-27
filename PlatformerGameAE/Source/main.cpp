@@ -99,8 +99,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player
 		
 		// Tell the Alpha Engine to get ready to draw something.
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
-		
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture (AE_GFX_RM_TEXTURE)
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		//PLAYER RENDERING
 		UpdatePlayerPos(&diver, playerMesh, dt);
 
