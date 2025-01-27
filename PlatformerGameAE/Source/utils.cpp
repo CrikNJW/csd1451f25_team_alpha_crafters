@@ -230,7 +230,10 @@ void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) 
 
 bool icicleCollision(Player &player, Icicle &icicle) {
 	if (AreCirclesIntersecting(player.posX, player.posY, player.width / 2, icicle.childX, icicle.childY, 15)) {
-		player.lockMovement = true; //Lock player movement
+		if (!player.lockMovement) { // only take damage if not locked to imitate "invicibility"
+			player.takedamage(1); // Reduce health by 1 (can change)
+			player.lockMovement = true; // Lock movement after damage
+		}
 		icicle.childY = icicle.PosY; //Reset child icicle to the top
 		icicle.timeElapsed = 0; //Reset time elapsed for icicle child
 		icicle.cooldownElapsed = 0; //Reset cooldown elapsed for icicle drop
@@ -386,3 +389,54 @@ void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
+//health squares
+void RenderHealthBar(const Player& player) {
+	float squareSize = 20.0f;  // Size of each health square
+	float spacing = 5.0f;      // Spacing between squares
+	float totalWidth = (squareSize + spacing) * player.health - spacing;  // Total width for current health squares
+	float barPosX = player.posX - totalWidth / 2.0f;  // Start position (centered based on current health)
+	float barPosY = player.posY + player.height + 30.0f;  // Position above the player
+
+	// Render one square for each point of current health
+	for (int i = 0; i < player.health; ++i) {
+		float squarePosX = barPosX + i * (squareSize + spacing);
+
+		// Set color for current health (green)
+		AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f);
+
+		// Create and render the square
+		AEMtx33 squareTransform = createTransformMtx(squareSize, squareSize, 0.0f, squarePosX, barPosY);
+		AEGfxSetTransform(squareTransform.m);
+		AEGfxMeshDraw(createSquareMesh(), AE_GFX_MDM_TRIANGLES);
+	}
+}
+
+
+//health bar
+/*
+void RenderHealthBar(const Player& player) {
+	float barWidth = 200.0f; // Total width of the health bar
+	float barHeight = 20.0f; // Height of the health bar
+	float healthPercentage = static_cast<float>(player.health) / player.maxhealth;
+
+	// Health bar position (above the player)
+	float barPosX = player.posX;
+	float barPosY = player.posY + player.height + 20.0f;
+
+	//need help with the colour
+	/*
+	// Create the health bar background (red)
+	AEMtx33 backgroundTransform = createTransformMtx(barWidth, barHeight, 0.0f, barPosX, barPosY);
+	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red for background
+	AEGfxSetTransform(backgroundTransform.m);
+	AEGfxMeshDraw(createSquareMesh(), AE_GFX_MDM_TRIANGLES);
+	
+
+	// Create the current health bar (green)
+	float currentWidth = barWidth * healthPercentage;
+	AEMtx33 healthTransform = createTransformMtx(currentWidth, barHeight, 0.0f, barPosX - (barWidth - currentWidth) / 2, barPosY);
+	AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f); // Green for health
+	AEGfxSetTransform(healthTransform.m);
+	AEGfxMeshDraw(createSquareMesh(), AE_GFX_MDM_TRIANGLES);
+}
+*/

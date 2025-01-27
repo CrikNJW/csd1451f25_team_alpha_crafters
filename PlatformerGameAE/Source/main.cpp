@@ -51,8 +51,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 
 	//Initialisation of Player Variables 
- // Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health 
-	Player diver = { 0.f, 0.f, 50.f, 50.f, 0.f, 0.f, 3 };
+ // Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health, masxhealth
+	Player diver = { 0.f, 0.f, 50.f, 50.f, 0.f, 0.f, 5, 5};
 
 	//Initialisation of Boundary Variables 
 	Boundaries testWall = {
@@ -125,6 +125,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		//Dummy Mesh/Object to test camera movement
 		UpdatePlayerPos(&diver, playerMesh, dt);
+
+		// Render health bar
+		RenderHealthBar(diver);
 
 		//ICIRCLE RENDERING
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)

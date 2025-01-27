@@ -15,9 +15,13 @@ struct Player {
 	float rotate_angle; //in angle, not radians
 	f32 speed; //  speed of player
 	int health; //health and
-
+	int maxhealth; // player max health
 	bool lockMovement = false; //Prevent player from moving and rotating
 	f32 lockTimeElapsed = 0; //Time elapsed for icicle drop
+	void takedamage(int damage) {
+		health -= damage;
+		if (health < 0) health = 0; // make sure the health doesnt go below 0
+	}
 };
 
 struct Ground_enemy {
@@ -57,3 +61,4 @@ struct Boundaries {
 	float Width, Height;
 }; // this is for the boundaries / borders around map
 // Initialize with an array of structs
+
