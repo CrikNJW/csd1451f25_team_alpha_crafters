@@ -33,7 +33,7 @@ AEGfxVertexList* createSquareMesh() {
 void InitializePlatform(Platform& platform) {
 
 	AEMtx33 scaleMtx, translateMtx;
-	AEMtx33Scale(&scaleMtx, platform.width, platform.height);
+	AEMtx33Scale(&scaleMtx, platform.Width, platform.Height);
 	AEMtx33Trans(&translateMtx, platform.PosX, platform.PosY);
 	AEMtx33Concat(&platform.finalTransform, &translateMtx, &scaleMtx);
 }
@@ -47,10 +47,10 @@ void RenderPlatform(Platform& platform, AEGfxVertexList* mesh) {
 
 void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt) {
 	
-	float platformLeft = platform.PosX - (platform.width / 2) - (enemy.width / 2);
-	float platformRight = platform.PosX + (platform.width / 2) + (enemy.width / 2);
-	float platformTop = platform.PosY + (platform.height / 2) + (enemy.width / 2);
-	float platformBottom = platform.PosY - (platform.height / 2) - (enemy.width / 2);
+	float platformLeft = platform.PosX - (platform.Width / 2) - (enemy.Width / 2);
+	float platformRight = platform.PosX + (platform.Width / 2) + (enemy.Width / 2);
+	float platformTop = platform.PosY + (platform.Width / 2) + (enemy.Width / 2);
+	float platformBottom = platform.PosY - (platform.Width / 2) - (enemy.Width / 2);
 
 	switch (enemy.state) {
 	case MOVE_RIGHT:
@@ -103,12 +103,7 @@ void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh) {
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }
 
-	//Draw the player Mesh
-	AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey)
-	AEMtx33 playerMtx = createTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
-	AEGfxSetTransform(playerMtx.m);
-	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
-}
+	
 
 // player default WSAD controls
 void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {

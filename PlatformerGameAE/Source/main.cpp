@@ -102,7 +102,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		RenderGroundEnemy(enemy, GroundEnemyMesh);
 
 		RenderPlatform(platform, PlatformMesh);
-		UpdatePlayerPos(&diver, playerMesh);
+		//UpdatePlayerPos(&diver, playerMesh);
 		//UpdatePlayerMovement(&diver, playerMesh);
 		
 		////Dummy Mesh/Object to test camera movement

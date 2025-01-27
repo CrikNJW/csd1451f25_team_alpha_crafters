@@ -19,7 +19,7 @@ struct Player {
 
 struct Ground_enemy {
 	float PosX, PosY;
-	float width, height;
+	float Width, Height;
 	float angle;
 	float speed;
 	AEMtx33 finalTransform;
@@ -28,7 +28,7 @@ struct Ground_enemy {
 
 struct Platform {
 	float PosX, PosY;
-	float width, height;
+	float Width, Height;
 	AEMtx33 finalTransform;
 };
 
@@ -38,11 +38,7 @@ struct Floating_enemy {
 	int Health;
 };
 
-struct Floating_enemy {
-	float PosX, PosY;
-	float Width, Height;
-	int Health;
-};
+
 
  struct Boundaries {
 	float PosX, PosY; 
