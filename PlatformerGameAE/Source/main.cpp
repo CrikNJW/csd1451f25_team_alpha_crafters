@@ -32,11 +32,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Initialize variables
 	AEGfxVertexList *playerMesh = createSquareMesh();
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
+	f32 dt;
 
 	//Dummy icicle array that stores coordinates of each icicle.
 	f32 icicleDropOffset = 5.0f;
 	AEGfxVertexList* icicleMesh = createSquareMesh();
-	Icicle icicle[2] = { {40,80,20,1,40,80}, {100,200,20,1,100,200} };
+	Icicle* icicle = new Icicle[2]{ {40,80}, {100,200} };
+	//Icicle icicle[2] = { {40,80,20,1,40,80}, {100,200,20,1,100,200} };
 
 	AEGfxVertexList* dummyMesh = createSquareMesh();
 	AEMtx33 dummyMtx = createTransformMtx(100.0f, 100.0f, 0, 200.0, 0);
@@ -56,6 +58,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		// Informing the system about the loop's start
 		AESysFrameStart();
+		dt = AEFrameRateControllerGetFrameTime();
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player
 		
@@ -68,7 +71,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//Loop through icicle array and draw each icicle
 		for (int i = 0; i < 2; i++) {
 			DrawIcicle(icicle[i].PosX, icicle[i].PosY, icicleMesh);
-			Draw_UpdateIcicleDrop(icicle[i], icicleMesh);
+			Draw_UpdateIcicleDrop(icicle[i], icicleMesh, dt);
 		}
 		
 		//Dummy Mesh/Object to test camera movement
@@ -91,6 +94,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEGfxMeshFree(playerMesh);
 	AEGfxMeshFree(dummyMesh);
 	AEGfxMeshFree(icicleMesh);
+
+	//Free the icicle array
+	delete[] icicle;
 	// free the system
 	AESysExit();
 }

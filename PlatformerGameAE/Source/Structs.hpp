@@ -25,10 +25,11 @@ typedef struct Floating_enemy {
 
 typedef struct Icicle {
 	float PosX, PosY;
-	float dropOffsetY;
-	float dropSpeed;
+	float dropOffsetY = 0;
+	float dropSpeed = 70;
 	float childX = PosX;
 	float childY = PosY;
+	float timeElapsed = 0;
 };
 
 typedef struct Boundaries {
