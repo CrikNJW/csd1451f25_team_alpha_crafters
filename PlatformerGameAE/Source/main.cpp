@@ -32,7 +32,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Initialize variables
 	AEGfxVertexList *playerMesh = createSquareMesh();
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
-	//AEVec2 playerCoord = { 0, 0 };
+	f32 dt;
+
+	//Dummy icicle array that stores coordinates of each icicle.
+	f32 icicleDropOffset = 5.0f;
+	AEGfxVertexList* icicleMesh = createSquareMesh();
+	Icicle* icicle = new Icicle[2]{ {40,80}, {100,200} };
 
 
 	AEGfxVertexList* dummyMesh = createSquareMesh();
@@ -91,15 +96,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		// Informing the system about the loop's start
 		AESysFrameStart();
+		dt = AEFrameRateControllerGetFrameTime();
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player
 		
 		// Tell the Alpha Engine to get ready to draw something.
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // to draw with color, use (AF_GFX_RM_COLOR), texture use (AF_GFX_RM_TEXTURE)
-		
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture (AE_GFX_RM_TEXTURE)
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		//PLAYER RENDERING
-		UpdatePlayerPos(&diver, playerMesh);
-		//UpdatePlayerMovement(&diver, playerMesh);
+		UpdatePlayerPos(&diver, playerMesh, dt);
+
+		//Loop through icicle array and draw each icicle
+		for (int i = 0; i < 2; i++) {
+			icicleCollision(diver, icicle[i]);
+			DrawIcicle(icicle[i].PosX, icicle[i].PosY, icicleMesh);
+			Draw_UpdateIcicleDrop(icicle[i], icicleMesh, dt);
+
+		}
 		
 		////Dummy Mesh/Object to test camera movement
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
@@ -145,6 +158,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Free the Mesh
 	AEGfxMeshFree(playerMesh);
 	AEGfxMeshFree(dummyMesh);
+	AEGfxMeshFree(icicleMesh);
+
+	//Free the icicle array
+	delete[] icicle;
 	// free the system
 	AESysExit();
 }
