@@ -126,7 +126,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		//collision for all ground enemy
 		for (int i = 0; i < Ground_enemy_count; ++i) {
-			HandleEnemyCollision(diver, Ground_enemy_array[i]);
+			ElasticEnemyCollision(diver, Ground_enemy_array[i]);
 		}
 
 		//Debugging

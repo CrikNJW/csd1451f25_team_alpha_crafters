@@ -194,7 +194,7 @@ void CheckCollision(Player& player, const Boundaries& boundary) {
 }
 
 // for bounce collision between player and enemy
-void HandleEnemyCollision(Player& player, Ground_enemy& enemy) {
+void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
 	// Calculate the edges of the centered enemy rectangle
 	float enemyLeft = enemy.PosX - enemy.Width / 2;
 	float enemyRight = enemy.PosX + enemy.Width / 2;

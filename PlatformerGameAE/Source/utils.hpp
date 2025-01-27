@@ -24,5 +24,5 @@ void UpdatePlayerMovement(Player* player, AEGfxVertexList* player_mesh);
 //collision check for player and boundary
 void CheckCollision(Player& player, const Boundaries& boundary);
 
-void HandleEnemyCollision(Player& player, Ground_enemy& enemy);
+void ElasticEnemyCollision(Player& player, Ground_enemy& enemy);
 
