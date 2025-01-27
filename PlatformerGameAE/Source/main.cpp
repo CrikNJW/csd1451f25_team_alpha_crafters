@@ -34,11 +34,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
 	//AEVec2 playerCoord = { 0, 0 };
 
+
 	AEGfxVertexList* dummyMesh = createSquareMesh();
 	AEMtx33 dummy1Mtx = createTransformMtx(100.0f, 100.0f, 0, 200.0, 0);
 	AEMtx33 dummy2Mtx = createTransformMtx(100.0f, 100.0f, 0, 300.0, 200);
 	AEMtx33 dummy3Mtx = createTransformMtx(100.0f, 100.0f, 0, 700.0, -200);
 
+	
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
 
@@ -48,6 +50,41 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Initialisation of Player Variables
 	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health
 	Player diver = { 0.f, 0.f, 50.f, 50.f, 0.f, 0.f, 3 };
+
+	//Initialisation of Boundary Variables
+	Boundaries testWall = {
+	0.0f,   // X position (center)
+	-400.0f, // Y position (bottom of screen)
+	1600.0f, // Width
+	50.0f    // Height
+	};
+
+	Boundaries testWall2{
+	0.0f,   // X position (center)
+	425.0f, // Y position (top of screen)
+	1600.0f, // Width
+	50.0f    // Height
+
+	};
+
+	//Initialization of test ground_enemy
+	Ground_enemy ground_enemy1{
+		100.0f,
+		100.0f,
+		100.0f,
+		100.0f,
+		0
+
+	};
+
+	// Create array of boundaries
+	Boundaries boundaries_array[] = { testWall,  testWall2 };
+	// boundary count to calculate amount of boundaries we need to check collision for
+	int boundaryCount = sizeof(boundaries_array) / sizeof(Boundaries);
+
+	// Create array of ground enemys
+	Ground_enemy Ground_enemy_array[] = { ground_enemy1 };
+	int Ground_enemy_count = sizeof(Ground_enemy_array) / sizeof(Ground_enemy);
 
 	// Game Loop
 	while (gGameRunning)
@@ -62,19 +99,37 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		
 		//PLAYER RENDERING
 		UpdatePlayerPos(&diver, playerMesh);
+		//UpdatePlayerMovement(&diver, playerMesh);
 		
-		//Dummy Mesh/Object to test camera movement
-		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-		AEGfxSetTransform(dummy1Mtx.m);
+		////Dummy Mesh/Object to test camera movement
+		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
+		//AEGfxSetTransform(dummyMtx.m);
+		//AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
+
+		// Draw test wall
+		AEMtx33 wallMtx = createTransformMtx(testWall.Width, testWall.Height, 0, testWall.PosX, testWall.PosY);
+		AEGfxSetTransform(wallMtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 
-		AEGfxSetColorToAdd(1.0f, 0.0f, 1.0f, 1.0f);
-		AEGfxSetTransform(dummy2Mtx.m);
+		// Draw test wall 2
+		AEMtx33 wall2Mtx = createTransformMtx(testWall2.Width, testWall2.Height, 0, testWall2.PosX, testWall2.PosY);
+		AEGfxSetTransform(wall2Mtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 
-		AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
-		AEGfxSetTransform(dummy3Mtx.m);
+		// draw test ground enemy 1
+		AEMtx33 enemy1Mtx = createTransformMtx(ground_enemy1.Width, ground_enemy1.Height, 0, ground_enemy1.PosX, ground_enemy1.PosY);
+		AEGfxSetTransform(enemy1Mtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
+
+		// Check collisions with all boundaries
+		for (int i = 0; i < boundaryCount; ++i) {
+			CheckCollision(diver, boundaries_array[i]);
+		}
+
+		//collision for all ground enemy
+		for (int i = 0; i < Ground_enemy_count; ++i) {
+			ElasticEnemyCollision(diver, Ground_enemy_array[i]);
+		}
 
 		//Debugging
 		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';

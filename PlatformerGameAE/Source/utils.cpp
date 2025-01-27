@@ -136,3 +136,94 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh) {
 	AEGfxSetTransform(playerMtx.m);
 	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
 }
+
+// player default WSAD controls
+void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
+	player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate
+	//player movement 
+	if (AEInputCheckCurr(AEVK_W)) player->posY -= player->speed;
+	if (AEInputCheckCurr(AEVK_S)) player->posY += player->speed;
+	if (AEInputCheckCurr(AEVK_A)) player->posX += player->speed;
+	if (AEInputCheckCurr(AEVK_D)) player->posX -= player->speed;
+	
+}
+
+//collision for player and boundary 
+void CheckCollision(Player& player, const Boundaries& boundary) {
+
+	// Calculate bounds
+	float playerLeft = player.posX - player.width / 2;
+	float playerRight = player.posX + player.width / 2;
+	float playerBottom = player.posY - player.height / 2;
+	float playerTop = player.posY + player.height / 2;
+
+	float boundaryLeft = boundary.PosX - boundary.Width / 2;
+	float boundaryRight = boundary.PosX + boundary.Width / 2;
+	float boundaryBottom = boundary.PosY - boundary.Height / 2;
+	float boundaryTop = boundary.PosY + boundary.Height / 2;
+
+	// Check if there's a collision
+	if (playerLeft < boundaryRight && playerRight > boundaryLeft &&
+		playerBottom < boundaryTop && playerTop > boundaryBottom) {
+
+		// Calculate overlap in each direction
+		float overlapLeft = boundaryRight - playerLeft;
+		float overlapRight = playerRight - boundaryLeft;
+		float overlapTop = playerTop - boundaryBottom;
+		float overlapBottom = boundaryTop - playerBottom;
+
+		float minOverlap = overlapLeft;
+		if (overlapRight < minOverlap) minOverlap = overlapRight;
+		if (overlapTop < minOverlap) minOverlap = overlapTop;
+		if (overlapBottom < minOverlap) minOverlap = overlapBottom;
+
+		// Resolve collision by moving the player out of the boundary
+		if (minOverlap == overlapLeft) {
+			player.posX += overlapLeft;
+		}
+		else if (minOverlap == overlapRight) {
+			player.posX -= overlapRight;
+		}
+		else if (minOverlap == overlapTop) {
+			player.posY -= overlapTop;
+		}
+		else if (minOverlap == overlapBottom) {
+			player.posY += overlapBottom;
+		}
+	}
+}
+
+// for bounce collision between player and enemy
+void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
+	// Calculate the edges of the centered enemy rectangle
+	float enemyLeft = enemy.PosX - enemy.Width / 2;
+	float enemyRight = enemy.PosX + enemy.Width / 2;
+	float enemyTop = enemy.PosY - enemy.Height / 2;
+	float enemyBottom = enemy.PosY + enemy.Height / 2;
+
+	// Calculate the edges of the player rectangle 
+	float playerLeft = player.posX - player.width / 2;
+	float playerRight = player.posX + player.width / 2;
+	float playerTop = player.posY - player.height / 2;
+	float playerBottom = player.posY + player.height / 2;
+
+	// Check for collision
+	if (playerRight > enemyLeft && playerLeft < enemyRight &&
+		playerBottom > enemyTop && playerTop < enemyBottom) {
+
+		// Bounce back distance 
+		float bounceBackDistance = 40.0f; // Adjust this value to control bounce intensity
+
+		float moveDirectionMultiplier = 1.0f;
+		if (AEInputCheckCurr(AEVK_S)) { // only for moving backwards
+			// If moving backwards, reverse the bounce direction
+			moveDirectionMultiplier = -1.0f;
+		}
+
+		// Bounce the player back in the opposite direction of current movement
+		player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
+		player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
+
+		
+	}
+}
