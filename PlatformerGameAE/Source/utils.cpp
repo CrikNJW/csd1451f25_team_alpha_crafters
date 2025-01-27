@@ -131,19 +131,22 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh) {
 	AEMtx33 black_overlayMtx = createTransformMtx(rec_width,rec_height,0,0,0);
 
 	//Dim the black colour rectangle
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.1f);
+	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.8f);
 	AEGfxSetTransform(black_overlayMtx.m);
 	AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
 	f32 radius = 200.f;
 	AEMtx33 spotlightMtx = createTransformMtx(radius, radius, 0, player->posX, player->posY);
 
-	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 0.3f);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f);
+	AEGfxSetBlendMode(AE_GFX_BM_ADD);
 	AEGfxSetTransform(spotlightMtx.m);
 	AEGfxMeshDraw(circle_mesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 	
 }
 
@@ -186,23 +189,25 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 		}
 	}
 	//Draw the player Mesh
-	//AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey) 
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f); // PLayer Colour (white)
 	AEMtx33 playerMtx = createTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
 	AEGfxSetTransform(playerMtx.m); 
 	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 //Draw icicle at the given position
 void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
-	//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
+	AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Colour (blue)
 	AEMtx33 icicleMtx = createTransformMtx(30.0f, 30.0f, 0, posX, posY);
 	AEGfxSetTransform(icicleMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 //Draw icicle child and make it repeatedly drop icicles.
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) {
-	//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f); // Icicle Drop Colour (blue)
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f); // Icicle Drop Colour (blue)
 	if (icicle.cooldownElapsed < icicle.cooldown) {
 		icicle.cooldownElapsed += dt;
 	}
@@ -220,6 +225,7 @@ void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) 
 	//std::cout << "Icicle Child Position: " << icicle.childX << " " << icicle.childY << '\n';
 	AEGfxSetTransform(icicleChildMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 bool icicleCollision(Player &player, Icicle &icicle) {
@@ -314,9 +320,10 @@ void InitializePlatform(Platform& platform) {
 
 void RenderPlatform(Platform& platform, AEGfxVertexList* mesh) {
 
-	//AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f); // Green color
+	AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f); // Green color
 	AEGfxSetTransform(platform.finalTransform.m); // Apply precomputed transformation
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt) {
@@ -368,12 +375,14 @@ void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt) {
 	
 void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh) {
 	// Set enemy color
-	//AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red color
+	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f); // Red color
 
 	// Apply transformation matrix
 	AEGfxSetTransform(enemy.finalTransform.m);
 
 	// Draw enemy
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 

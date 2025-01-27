@@ -35,7 +35,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEGfxVertexList* icicleMesh = createSquareMesh();
 	Icicle* icicle = new Icicle[2]{ {-200,80}, {-320,100} };
 
-
 	AEGfxVertexList* dummyMesh = createSquareMesh();
 
 	//Spotlight effect Mesh
@@ -103,24 +102,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Informing the system about the loop's start
 		AESysFrameStart();
 		dt = f32(AEFrameRateControllerGetFrameTime());
-		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
-
-		float dt = AEFrameRateControllerGetFrameTime();
-		
 		// Tell the Alpha Engine to get ready to draw something.
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture (AE_GFX_RM_TEXTURE)
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		//PLAYER RENDERING
-		AEGfxSetColorToAdd(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey)
+		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
+		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+		float dt = AEFrameRateControllerGetFrameTime();
+		
 
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
 		UpdateGroundEnemy(enemy, platform, dt);
 		// Render enemy
-		AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red color
 		RenderGroundEnemy(enemy, GroundEnemyMesh);
 
-		AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f); // Green color
 		RenderPlatform(platform, PlatformMesh);
 
 		//CAMERA SYSTEM, PLAYER RENDERING
@@ -141,8 +136,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		
 		////Dummy Mesh/Object to test camera movement
-		//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f);
-
+		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
 		// Draw test wall
 		AEMtx33 wallMtx = createTransformMtx(testWall.Width, testWall.Height, 0, testWall.PosX, testWall.PosY);
 		AEGfxSetTransform(wallMtx.m);
@@ -162,6 +156,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		for (int i = 0; i < Ground_enemy_count; ++i) {
 			ElasticEnemyCollision(diver, Ground_enemy_array[i]);
 		}
+		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
 		//Debugging
 		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
