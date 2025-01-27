@@ -16,11 +16,3 @@ void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt);
 
 void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh);
 
-//default player movement
-void UpdatePlayerMovement(Player* player, AEGfxVertexList* player_mesh);
-
-//collision check for player and boundary
-void CheckCollision(Player& player, const Boundaries& boundary);
-
-void ElasticEnemyCollision(Player& player, Ground_enemy& enemy);
-
