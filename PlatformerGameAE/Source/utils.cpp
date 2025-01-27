@@ -146,9 +146,8 @@ void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
 
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 1.0f, 1.0f); // Icicle Drop Colour (blue)
-	icicle.childX = icicle.PosX;
-	icicle.childY = icicle.PosY - icicle.dropOffsetY;
-	AEMtx33 icicleChildMtx = createTransformMtx(10.0f, 10.0f, 0, icicle.childX, icicle.childY);
+	icicle.childY -= icicle.dropSpeed; 
+	AEMtx33 icicleChildMtx = createTransformMtx(10.0f, 10.0f, 0, icicle.childX, icicle.childY); 
 	std::cout << "Icicle Child Position: " << icicle.childX << " " << icicle.childY << '\n';
 	AEGfxSetTransform(icicleChildMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);

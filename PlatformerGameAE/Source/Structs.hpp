@@ -27,7 +27,8 @@ typedef struct Icicle {
 	float PosX, PosY;
 	float dropOffsetY;
 	float dropSpeed;
-	float childX, childY;
+	float childX = PosX;
+	float childY = PosY;
 };
 
 typedef struct Boundaries {
