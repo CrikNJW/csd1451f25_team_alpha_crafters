@@ -32,12 +32,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Initialize variables
 	AEGfxVertexList *playerMesh = createSquareMesh();
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
-	AEVec2 playerCoord = { 0, 0 };
 
 	//Dummy icicle array that stores coordinates of each icicle.
 	f32 icicleDropOffset = 5.0f;
 	AEGfxVertexList* icicleMesh = createSquareMesh();
-	int icicleArraySize = 2; //If there was a level create system, to increment everytime a new icicle is added.
+	Icicle icicle[2] = { {40,80,20,1,40,80}, {100,200,20,1,100,200} };
 
 	AEGfxVertexList* dummyMesh = createSquareMesh();
 	AEMtx33 dummyMtx = createTransformMtx(100.0f, 100.0f, 0, 200.0, 0);
@@ -66,9 +65,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//PLAYER RENDERING
 		UpdatePlayerPos(&diver, playerMesh);
 
-		//Loop through dummy icicle array and render each icicle
+		//Loop through icicle array and draw each icicle
 		for (int i = 0; i < 2; i++) {
-			DrawIcicle(icicleCoords[i], icicleMesh);
+			DrawIcicle(icicle[i].PosX, icicle[i].PosY, icicleMesh);
+			Draw_UpdateIcicleDrop(icicle[i], icicleMesh);
 		}
 		
 		//Dummy Mesh/Object to test camera movement
@@ -76,10 +76,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetTransform(dummyMtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 
-		//
-
 		//Debugging
-		std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
+		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 
 		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())

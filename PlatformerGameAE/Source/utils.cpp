@@ -137,20 +137,19 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh) {
 	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
 }
 
-void DrawIcicle(AEVec2 IcicleCoordinates[],int icicleArraySize, AEGfxVertexList* icicleMesh) {
+void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 1.0f, 1.0f); // Icicle Colour (blue)
-	for (int i = 0; i < icicleArraySize; i++) {
-		AEMtx33 icicleMtx = createTransformMtx(30.0f, 30.0f, 0, IcicleCoordinates[i].x, IcicleCoordinates[i].y);
-		AEGfxSetTransform(icicleMtx.m);
-		AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
-	}
+	AEMtx33 icicleMtx = createTransformMtx(30.0f, 30.0f, 0, posX, posY);
+	AEGfxSetTransform(icicleMtx.m);
+	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
 }
 
-void Draw_UpdateIcicleDrop(AEVec2 IcicleCoordinates[], int icicleArraySize, AEGfxVertexList* icicleMesh, f32 icicleDropDistance) {
+void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 1.0f, 1.0f); // Icicle Drop Colour (blue)
-	for (int i = 0; i < icicleArraySize; i++) {
-		AEMtx33 icicleMtx = createTransformMtx(10.0f, 10.0f, 0, IcicleCoordinates[i].x, IcicleCoordinates[i].y - icicleDropDistance);
-		AEGfxSetTransform(icicleMtx.m);
-		AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
-	}
+	icicle.childX = icicle.PosX;
+	icicle.childY = icicle.PosY - icicle.dropOffsetY;
+	AEMtx33 icicleChildMtx = createTransformMtx(10.0f, 10.0f, 0, icicle.childX, icicle.childY);
+	std::cout << "Icicle Child Position: " << icicle.childX << " " << icicle.childY << '\n';
+	AEGfxSetTransform(icicleChildMtx.m);
+	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
 }

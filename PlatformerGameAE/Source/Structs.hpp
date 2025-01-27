@@ -24,9 +24,10 @@ typedef struct Floating_enemy {
 };
 
 typedef struct Icicle {
-	AEVec2 icicleCoordinates;
-	AEVec2 icicleDropCoordinates;
+	float PosX, PosY;
+	float dropOffsetY;
 	float dropSpeed;
+	float childX, childY;
 };
 
 typedef struct Boundaries {
