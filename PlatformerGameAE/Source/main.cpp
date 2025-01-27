@@ -103,8 +103,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture (AE_GFX_RM_TEXTURE)
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		//PLAYER RENDERING
+		AEGfxSetColorToAdd(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey)
 		UpdatePlayerPos(&diver, playerMesh, dt);
 
+		//ICIRCLE RENDERING
+		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
 		//Loop through icicle array and draw each icicle
 		for (int i = 0; i < 2; i++) {
 			icicleCollision(diver, icicle[i]);

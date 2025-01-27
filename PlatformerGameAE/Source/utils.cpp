@@ -195,7 +195,6 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 	}
 
 	//Draw the player Mesh
-	AEGfxSetColorToAdd(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey)
 	AEMtx33 playerMtx = createTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
 	AEGfxSetTransform(playerMtx.m);
 	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
@@ -203,7 +202,7 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 
 //Draw icicle at the given position
 void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
-	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
+	//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
 	AEMtx33 icicleMtx = createTransformMtx(30.0f, 30.0f, 0, posX, posY);
 	AEGfxSetTransform(icicleMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
