@@ -38,7 +38,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	f32 icicleDropOffset = 5.0f;
 	AEGfxVertexList* icicleMesh = createSquareMesh();
 	Icicle* icicle = new Icicle[2]{ {40,80}, {100,200} };
-	//Icicle icicle[2] = { {40,80,20,1,40,80}, {100,200,20,1,100,200} };
 
 
 	AEGfxVertexList* dummyMesh = createSquareMesh();
@@ -103,12 +102,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
 		
 		//PLAYER RENDERING
-		UpdatePlayerPos(&diver, playerMesh);
+		UpdatePlayerPos(&diver, playerMesh, dt);
 
 		//Loop through icicle array and draw each icicle
 		for (int i = 0; i < 2; i++) {
+			icicleCollision(diver, icicle[i]);
 			DrawIcicle(icicle[i].PosX, icicle[i].PosY, icicleMesh);
 			Draw_UpdateIcicleDrop(icicle[i], icicleMesh, dt);
+
 		}
 		
 		////Dummy Mesh/Object to test camera movement
