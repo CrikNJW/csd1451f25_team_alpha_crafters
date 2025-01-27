@@ -224,9 +224,11 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 		 // Bounce back distance 
 		 float bounceBackDistance = 40.0f; // Adjust this value to control bounce intensity
 		 float moveDirectionMultiplier = 1.0f;  if (AEInputCheckCurr(AEVK_S)) { // only for moving backwards
-			 // If moving backwards, reverse the bounce direction   moveDirectionMultiplier = -1.0f;
+		 // If moving backwards, reverse the bounce direction  
+		 moveDirectionMultiplier = -1.0f;
 		 }
-	 // Bounce the player back in the opposite direction of current movement  player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
+	 // Bounce the player back in the opposite direction of current movement  
+	 player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
 	 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
    }
 }
