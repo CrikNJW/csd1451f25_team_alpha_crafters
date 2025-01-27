@@ -117,13 +117,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Update enemy transformation
 		UpdateGroundEnemy(enemy, platform, dt);
 		// Render enemy
+		AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red color
 		RenderGroundEnemy(enemy, GroundEnemyMesh);
+
+		AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f); // Green color
 		RenderPlatform(platform, PlatformMesh);
 
 		//CAMERA SYSTEM, PLAYER RENDERING
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player  
 		// Tell the Alpha Engine to get ready to draw something.  
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
+		//AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
 
 		//Dummy Mesh/Object to test camera movement
 		UpdatePlayerPos(&diver, playerMesh, dt);
@@ -144,9 +147,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEMtx33 wallMtx = createTransformMtx(testWall.Width, testWall.Height, 0, testWall.PosX, testWall.PosY);
 		AEGfxSetTransform(wallMtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
-		// Draw test wall  
-		AEMtx33 wallMtx = createTransformMtx(testWall.Width, testWall.Height, 0, testWall.PosX, testWall.PosY);
-		AEGfxSetTransform(wallMtx.m);  AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 		// Draw test wall 2
 		AEMtx33 wall2Mtx = createTransformMtx(testWall2.Width, testWall2.Height, 0, testWall2.PosX, testWall2.PosY); 
 		AEGfxSetTransform(wall2Mtx.m);

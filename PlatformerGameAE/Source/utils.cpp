@@ -314,7 +314,7 @@ void InitializePlatform(Platform& platform) {
 
 void RenderPlatform(Platform& platform, AEGfxVertexList* mesh) {
 
-	AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f); // Green color
+	//AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f); // Green color
 	AEGfxSetTransform(platform.finalTransform.m); // Apply precomputed transformation
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }
@@ -368,7 +368,7 @@ void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt) {
 	
 void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh) {
 	// Set enemy color
-	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red color
+	//AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red color
 
 	// Apply transformation matrix
 	AEGfxSetTransform(enemy.finalTransform.m);
