@@ -15,6 +15,9 @@ struct Player {
 	float rotate_angle; //in angle, not radians
 	float speed; //  speed of player
 	int health; //health and
+
+	bool lockMovement = false; //Prevent player from moving and rotating
+	f32 lockTimeElapsed = 0; //Time elapsed for icicle drop
 };
 
 struct Ground_enemy {
@@ -36,6 +39,17 @@ struct Floating_enemy {
 	float PosX, PosY;
 	float Width, Height;
 	int Health;
+};
+
+struct Icicle {
+	float PosX, PosY;
+	float dropOffsetY = 0;
+	float dropSpeed = 70;
+	float childX = PosX;
+	float childY = PosY;
+	float timeElapsed = 0;
+	float cooldown = 2;
+	float cooldownElapsed = 0;
 };
 
 struct Boundaries {

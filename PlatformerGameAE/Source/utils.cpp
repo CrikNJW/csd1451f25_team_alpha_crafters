@@ -83,34 +83,90 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 	}
 }
 
-void UpdatePlayerPos(Player* player, AEGfxVertexList* player_mesh) {
-	player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate
-	f32 rotate_degree = 2.f; //rotation degree is set to 2 degree when trigerred
-	if (AEInputCheckCurr(AEVK_W)) {  //alpha engine only takes input in radians for function sin, cos, tan
-		//Needs to manually convert the degree to radians  player->posY += player->speed * AESin(AEDegToRad(player->rotate_angle));
-		player->posX += player->speed * AECos(AEDegToRad(player->rotate_angle));
-	}
-	else if (AEInputCheckCurr(AEVK_S)) {
-		player->posY -= player->speed * AESin(AEDegToRad(player->rotate_angle));
-		player->posX -= player->speed * AECos(AEDegToRad(player->rotate_angle));
-	}
 
-	if (AEInputCheckCurr(AEVK_LEFT) || AEInputCheckCurr(AEVK_A)) {
-		player->rotate_angle += rotate_degree;
-		if (player->rotate_angle >= 360.f) {
-			player->rotate_angle = 0.f;
+void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
+	if (player->lockMovement == true) {
+		player->lockTimeElapsed += dt;
+		if (player->lockTimeElapsed >= 2.0f) {
+			player->lockMovement = false;
+			player->lockTimeElapsed = 0;
 		}
 	}
-	else if (AEInputCheckCurr(AEVK_RIGHT) || AEInputCheckCurr(AEVK_D)) {
-		player->rotate_angle -= rotate_degree;
-		if (player->rotate_angle < 0) {
-			player->rotate_angle = 360.f;
+
+	else {
+		player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate
+		f32 rotate_degree = 2.f; //rotation degree is set to 2 degree when trigerred
+
+		if (AEInputCheckCurr(AEVK_W)) {
+			//alpha engine only takes input in radians for function sin, cos, tan
+			//Needs to manually convert the degree to radians
+			player->posY += player->speed * AESin(AEDegToRad(player->rotate_angle));
+			player->posX += player->speed * AECos(AEDegToRad(player->rotate_angle));
+		}
+		else if (AEInputCheckCurr(AEVK_S)) {
+			player->posY -= player->speed * AESin(AEDegToRad(player->rotate_angle));
+			player->posX -= player->speed * AECos(AEDegToRad(player->rotate_angle));
+		}
+
+
+		if (AEInputCheckCurr(AEVK_LEFT) || AEInputCheckCurr(AEVK_A)) {
+			player->rotate_angle += rotate_degree;
+			if (player->rotate_angle >= 360.f) {
+				player->rotate_angle = 0.f;
+			}
+		}
+		else if (AEInputCheckCurr(AEVK_RIGHT) || AEInputCheckCurr(AEVK_D)) {
+			player->rotate_angle -= rotate_degree;
+			if (player->rotate_angle < 0) {
+				player->rotate_angle = 360.f;
+			}
 		}
 	}
 	//Draw the player Mesh
 	AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey) 
 	AEMtx33 playerMtx = createTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
 	AEGfxSetTransform(playerMtx.m); AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
+}
+
+//Draw icicle at the given position
+void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 1.0f, 1.0f); // Icicle Colour (blue)
+	AEMtx33 icicleMtx = createTransformMtx(30.0f, 30.0f, 0, posX, posY);
+	AEGfxSetTransform(icicleMtx.m);
+	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
+}
+
+//Draw icicle child and make it repeatedly drop icicles.
+void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) {
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 1.0f, 1.0f); // Icicle Drop Colour (blue)
+	if (icicle.cooldownElapsed < icicle.cooldown) {
+		icicle.cooldownElapsed += dt;
+	}
+
+	else {
+		icicle.childY -= icicle.dropSpeed * dt;
+		icicle.timeElapsed += dt;
+		if (icicle.timeElapsed >= 5.0f) {
+			icicle.childY = icicle.PosY;
+			icicle.timeElapsed = 0;
+		}
+	}
+
+	AEMtx33 icicleChildMtx = createTransformMtx(10.0f, 10.0f, 0, icicle.childX, icicle.childY); 
+	//std::cout << "Icicle Child Position: " << icicle.childX << " " << icicle.childY << '\n';
+	AEGfxSetTransform(icicleChildMtx.m);
+	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
+}
+
+bool icicleCollision(Player &player, Icicle &icicle) {
+	if (AreCirclesIntersecting(player.posX, player.posY, player.width / 2, icicle.childX, icicle.childY, 15)) {
+		player.lockMovement = true; //Lock player movement
+		icicle.childY = icicle.PosY; //Reset child icicle to the top
+		icicle.timeElapsed = 0; //Reset time elapsed for icicle child
+		icicle.cooldownElapsed = 0; //Reset cooldown elapsed for icicle drop
+		return true;
+	}
+	return false;
 }
 
 // player default WSAD controls
