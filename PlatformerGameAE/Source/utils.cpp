@@ -149,7 +149,7 @@ void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 	
 }
-
+//Hi Varick
 
 void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 	if (player->lockMovement == true) {
