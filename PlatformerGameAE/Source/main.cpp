@@ -33,7 +33,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Dummy icicle array that stores coordinates of each icicle.
 	f32 icicleDropOffset = 5.0f;
 	AEGfxVertexList* icicleMesh = createSquareMesh();
-	Icicle* icicle = new Icicle[2]{ {40,80}, {100,200} };
+	Icicle* icicle = new Icicle[2]{ {-200,80}, {-320,100} };
 
 
 	AEGfxVertexList* dummyMesh = createSquareMesh();
