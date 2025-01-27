@@ -103,6 +103,7 @@ void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh) {
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }
 
+<<<<<<< HEAD
 	
 
 // player default WSAD controls
@@ -195,3 +196,5 @@ void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
 		
 	}
 }
+=======
+>>>>>>> parent of c81e7e0 (Merge branch 'main' into Trisha-GroundEnemyAI)

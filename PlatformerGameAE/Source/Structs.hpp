@@ -38,9 +38,13 @@ struct Floating_enemy {
 	int Health;
 };
 
+<<<<<<< HEAD
 
 
  struct Boundaries {
+=======
+struct Boundaries {
+>>>>>>> parent of c81e7e0 (Merge branch 'main' into Trisha-GroundEnemyAI)
 	float PosX, PosY; 
 	float Width, Height;
 }; // this is for the boundaries / borders around map
