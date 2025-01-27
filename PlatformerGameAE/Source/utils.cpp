@@ -35,9 +35,11 @@ AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, 
 	AEMtx33 scaleMtx = { 0 };
 	AEMtx33Scale(&scaleMtx, scaleX, scaleY); // Create a rotation matrix that rotates by 90 degrees
 	// Note that PI in radians is 180 degrees. // Since 90 degrees is 180/2, 90 degrees in radians is PI/2
-	AEMtx33 rotateMtx = { 0 }; AEMtx33Rot(&rotateMtx, rotate_rad);
+	AEMtx33 rotateMtx = { 0 }; 
+	AEMtx33Rot(&rotateMtx, rotate_rad);
 	// Create a translation matrix that translates by // 200 in the x-axis and 100 in the y-axis
-	AEMtx33 translateMtx = { 0 }; AEMtx33Trans(&translateMtx, translX, translY);
+	AEMtx33 translateMtx = { 0 }; 
+	AEMtx33Trans(&translateMtx, translX, translY);
 	// Concatenate the matrices into the 'transform' variable. // We concatenate in the order of translation * rotation * scale
 	// i.e. this means we scale, then rotate, then translate. 
 	AEMtx33 transformMtx = { 0 };
@@ -125,7 +127,8 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 	//Draw the player Mesh
 	AEGfxSetColorToMultiply(0.5f, 0.5f, 0.5f, 1.0f); // PLayer Colour (grey) 
 	AEMtx33 playerMtx = createTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
-	AEGfxSetTransform(playerMtx.m); AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxSetTransform(playerMtx.m); 
+	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
 }
 
 //Draw icicle at the given position
@@ -189,8 +192,10 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 	 // Check if there's a collision 
 	if (playerLeft < boundaryRight && playerRight > boundaryLeft && playerBottom < boundaryTop&& playerTop > boundaryBottom) {
 		 // Calculate overlap in each direction
-		 float overlapLeft = boundaryRight - playerLeft;  float overlapRight = playerRight - boundaryLeft;
-		 float overlapTop = playerTop - boundaryBottom;  float overlapBottom = boundaryTop - playerBottom;
+		 float overlapLeft = boundaryRight - playerLeft;  
+		 float overlapRight = playerRight - boundaryLeft;
+		 float overlapTop = playerTop - boundaryBottom;  
+		 float overlapBottom = boundaryTop - playerBottom;
 		 float minOverlap = overlapLeft;
 		 if (overlapRight < minOverlap) minOverlap = overlapRight;  
 		 if (overlapTop < minOverlap) minOverlap = overlapTop;
@@ -213,19 +218,23 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
  void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
  // Calculate the edges of the centered enemy rectangle 
  float enemyLeft = enemy.PosX - enemy.Width / 2;
- float enemyRight = enemy.PosX + enemy.Width / 2; float enemyTop = enemy.PosY - enemy.Height / 2;
+ float enemyRight = enemy.PosX + enemy.Width / 2; 
+ float enemyTop = enemy.PosY - enemy.Height / 2;
  float enemyBottom = enemy.PosY + enemy.Height / 2;
  // Calculate the edges of the player rectangle  
  float playerLeft = player.posX - player.width / 2;
- float playerRight = player.posX + player.width / 2; float playerTop = player.posY - player.height / 2;
+ float playerRight = player.posX + player.width / 2; 
+ float playerTop = player.posY - player.height / 2;
  float playerBottom = player.posY + player.height / 2;
  // Check for collision 
 	 if (playerRight > enemyLeft && playerLeft < enemyRight && playerBottom > enemyTop&& playerTop < enemyBottom) {
 		 // Bounce back distance 
 		 float bounceBackDistance = 40.0f; // Adjust this value to control bounce intensity
-		 float moveDirectionMultiplier = 1.0f;  if (AEInputCheckCurr(AEVK_S)) { // only for moving backwards
+		 float moveDirectionMultiplier = 1.0f;  
+
+		 if (AEInputCheckCurr(AEVK_S)) { // only for moving backwards
 		 // If moving backwards, reverse the bounce direction  
-		 moveDirectionMultiplier = -1.0f;
+			moveDirectionMultiplier = -1.0f;
 		 }
 	 // Bounce the player back in the opposite direction of current movement  
 	 player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
