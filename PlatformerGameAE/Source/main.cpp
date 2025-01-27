@@ -154,8 +154,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		for (int i = 0; i < Ground_enemy_count; ++i) {
 			ElasticEnemyCollision(diver, Ground_enemy_array[i]);
 		}
-		//Debugging
-		std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
+
 		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed  
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
 		gGameRunning = 0;
