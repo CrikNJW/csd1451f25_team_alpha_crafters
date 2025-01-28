@@ -108,7 +108,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 		float dt = AEFrameRateControllerGetFrameTime();
-		
+
 
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
@@ -136,7 +136,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DrawIcicle(icicle[i].PosX, icicle[i].PosY, icicleMesh);
 			Draw_UpdateIcicleDrop(icicle[i], icicleMesh, dt);
 		}
-		
+
 		////Dummy Mesh/Object to test camera movement
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
 		// Draw test wall
@@ -144,7 +144,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetTransform(wallMtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 		// Draw test wall 2
-		AEMtx33 wall2Mtx = createTransformMtx(testWall2.Width, testWall2.Height, 0, testWall2.PosX, testWall2.PosY); 
+		AEMtx33 wall2Mtx = createTransformMtx(testWall2.Width, testWall2.Height, 0, testWall2.PosX, testWall2.PosY);
 		AEGfxSetTransform(wall2Mtx.m);
 		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
 		// draw test ground enemy 1  
@@ -170,8 +170,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed
-		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
-		gGameRunning = 0;
+		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist()) {
+			gGameRunning = 0;
+		}
 		// Informing the system about the loop's end  
 		AESysFrameEnd();
 	}

@@ -142,7 +142,7 @@ void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
 	f32 radius = 200.f;
 	AEMtx33 spotlightMtx = createTransformMtx(radius, radius, 0, player->posX, player->posY);
 
-	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f);
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.2f);
 	AEGfxSetBlendMode(AE_GFX_BM_ADD);
 	AEGfxSetTransform(spotlightMtx.m);
 	AEGfxMeshDraw(circle_mesh, AE_GFX_MDM_TRIANGLES);
