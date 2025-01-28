@@ -103,7 +103,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AESysFrameStart();
 		dt = f32(AEFrameRateControllerGetFrameTime());
 		// Tell the Alpha Engine to get ready to draw something.
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture (AE_GFX_RM_TEXTURE)
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Color (AE_GFX_RM_TEXTURE)
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
@@ -121,7 +121,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//CAMERA SYSTEM, PLAYER RENDERING
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player  
 		// Tell the Alpha Engine to get ready to draw something.  
-		//AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Texture /to draw with color, use (AF_GFX_RM_COLOR)
 
 		//Dummy Mesh/Object to test camera movement
 		UpdatePlayerPos(&diver, playerMesh, dt);

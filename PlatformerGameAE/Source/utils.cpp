@@ -207,7 +207,7 @@ void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
 
 //Draw icicle child and make it repeatedly drop icicles.
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) {
-	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.0f); // Icicle Drop Colour (blue)
+	AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Drop Colour (blue)
 	if (icicle.cooldownElapsed < icicle.cooldown) {
 		icicle.cooldownElapsed += dt;
 	}
@@ -230,7 +230,7 @@ void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) 
 
 bool icicleCollision(Player &player, Icicle &icicle) {
 	if (AreCirclesIntersecting(player.posX, player.posY, player.width / 2, icicle.childX, icicle.childY, 15)) {
-		if (!player.lockMovement) { // only take damage if not locked to imitate "invicibility"
+		if (!player.lockMovement) { // Only take damage if not locked to imitate "invincibility"
 			player.takedamage(1); // Reduce health by 1 (can change)
 			player.lockMovement = true; // Lock movement after damage
 		}
@@ -402,13 +402,14 @@ void RenderHealthBar(const Player& player) {
 		float squarePosX = barPosX + i * (squareSize + spacing);
 
 		// Set color for current health (green)
-		AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
 
 		// Create and render the square
 		AEMtx33 squareTransform = createTransformMtx(squareSize, squareSize, 0.0f, squarePosX, barPosY);
 		AEGfxSetTransform(squareTransform.m);
 		AEGfxMeshDraw(createSquareMesh(), AE_GFX_MDM_TRIANGLES);
 	}
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 
