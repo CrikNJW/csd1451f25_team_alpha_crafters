@@ -26,23 +26,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 
 	//Initialize variables 
-	AEGfxVertexList* playerMesh = createSquareMesh();
+	AEGfxVertexList* squareMesh = createSquareMesh();
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
 	f32 dt;
 
 	//Dummy icicle array that stores coordinates of each icicle.
 	//f32 icicleDropOffset = 5.0f;
-	AEGfxVertexList* icicleMesh = createSquareMesh();
+	//AEGfxVertexList* icicleMesh = createSquareMesh();
 	Icicle* icicle = new Icicle[2]{ {-200,80}, {-320,100} };
-
-	AEGfxVertexList* dummyMesh = createSquareMesh();
 
 	//Spotlight effect Mesh
 	AEGfxVertexList* spotlightMesh = createCircleMesh();
-
-	AEGfxVertexList* GroundEnemyMesh = createSquareMesh();
-
-	AEGfxVertexList* PlatformMesh = createSquareMesh();
+	//AEGfxVertexList* dummyMesh = createSquareMesh();
+	//AEGfxVertexList* GroundEnemyMesh = createSquareMesh();
+	//AEGfxVertexList* PlatformMesh = createSquareMesh();
 
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
@@ -114,16 +111,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Update enemy transformation
 		UpdateGroundEnemy(enemy, platform, dt);
 		// Render enemy
-		RenderGroundEnemy(enemy, GroundEnemyMesh);
+		RenderGroundEnemy(enemy, squareMesh);
 
-		RenderPlatform(platform, PlatformMesh);
+		RenderPlatform(platform, squareMesh);
 
 		//CAMERA SYSTEM, PLAYER RENDERING
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player  
 		// Tell the Alpha Engine to get ready to draw something.  
 
 		//Dummy Mesh/Object to test camera movement
-		UpdatePlayerPos(&diver, playerMesh, dt);
+		UpdatePlayerPos(&diver, squareMesh, dt);
 
 		// Render health bar
 		RenderHealthBar(diver);
@@ -133,8 +130,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//Loop through icicle array and draw each icicle
 		for (int i = 0; i < 2; i++) {
 			icicleCollision(diver, icicle[i]);
-			DrawIcicle(icicle[i].PosX, icicle[i].PosY, icicleMesh);
-			Draw_UpdateIcicleDrop(icicle[i], icicleMesh, dt);
+			DrawIcicle(icicle[i].PosX, icicle[i].PosY, squareMesh);
+			Draw_UpdateIcicleDrop(icicle[i], squareMesh, dt);
 		}
 
 		////Dummy Mesh/Object to test camera movement
@@ -142,14 +139,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Draw test wall
 		AEMtx33 wallMtx = createTransformMtx(testWall.Width, testWall.Height, 0, testWall.PosX, testWall.PosY);
 		AEGfxSetTransform(wallMtx.m);
-		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
+		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
 		// Draw test wall 2
 		AEMtx33 wall2Mtx = createTransformMtx(testWall2.Width, testWall2.Height, 0, testWall2.PosX, testWall2.PosY);
 		AEGfxSetTransform(wall2Mtx.m);
-		AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
+		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
 		// draw test ground enemy 1  
 		AEMtx33 enemy1Mtx = createTransformMtx(ground_enemy1.Width, ground_enemy1.Height, 0, ground_enemy1.PosX, ground_enemy1.PosY);
-		AEGfxSetTransform(enemy1Mtx.m);  AEGfxMeshDraw(dummyMesh, AE_GFX_MDM_TRIANGLES);
+		AEGfxSetTransform(enemy1Mtx.m);  AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
 		// Check collisions with all boundaries
 		for (int i = 0; i < boundaryCount; ++i) {
 			CheckCollision(diver, boundaries_array[i]);
@@ -164,7 +161,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 
 
-		DrawBlackOverlay(playerMesh);
+		//DrawBlackOverlay(squareMesh);
 		SpotLight(&diver, spotlightMesh);
 
 
@@ -177,11 +174,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AESysFrameEnd();
 	}
 	
-	AEGfxMeshFree(playerMesh);
-	AEGfxMeshFree(dummyMesh); // free the system
-	AEGfxMeshFree(GroundEnemyMesh);
-	AEGfxMeshFree(PlatformMesh);
-	AEGfxMeshFree(icicleMesh);
+	// free the system
+	AEGfxMeshFree(squareMesh);
 	AEGfxMeshFree(spotlightMesh);
 
 	//Free the icicle array
