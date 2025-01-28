@@ -38,4 +38,4 @@ void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt);
 
 void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh);
 
-void RenderHealthBar(const Player& player);
+void RenderHealthBar(const Player& player, AEGfxVertexList* mesh);

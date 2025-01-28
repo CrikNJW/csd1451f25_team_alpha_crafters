@@ -390,7 +390,7 @@ void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh) {
 }
 
 //health squares
-void RenderHealthBar(const Player& player) {
+void RenderHealthBar(const Player& player, AEGfxVertexList* mesh) {
 	float squareSize = 20.0f;  // Size of each health square
 	float spacing = 5.0f;      // Spacing between squares
 	float totalWidth = (squareSize + spacing) * player.health - spacing;  // Total width for current health squares
@@ -407,7 +407,7 @@ void RenderHealthBar(const Player& player) {
 		// Create and render the square
 		AEMtx33 squareTransform = createTransformMtx(squareSize, squareSize, 0.0f, squarePosX, barPosY);
 		AEGfxSetTransform(squareTransform.m);
-		AEGfxMeshDraw(createSquareMesh(), AE_GFX_MDM_TRIANGLES);
+		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 	}
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }

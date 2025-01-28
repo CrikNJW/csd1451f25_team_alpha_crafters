@@ -123,7 +123,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		UpdatePlayerPos(&diver, squareMesh, dt);
 
 		// Render health bar
-		RenderHealthBar(diver);
+		RenderHealthBar(diver, squareMesh);
 
 		//ICIRCLE RENDERING
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
