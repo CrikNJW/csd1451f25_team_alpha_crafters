@@ -100,19 +100,19 @@ AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, 
 //	}
 //}
 
-//int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter, float click_x, float click_y)
-//{
-//	float radius = diameter / 2.0;
-//	// distance = sgrt of [(X1 - X2)^2 + (Y1 - Y2)^2], we eliminate the sqrt by squaring the radius later
-//	float distance_squared = (click_x - circle_center_x) * (click_x - circle_center_x) + (click_y - circle_center_y) * (click_y - circle_center_y);
-//
-//	if (distance_squared <= radius * radius) {
-//		return 1;
-//	}
-//	else {
-//		return 0;
-//	}
-//}
+int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter, float click_x, float click_y)
+{
+	float radius = diameter / 2.0;
+	// distance = sgrt of [(X1 - X2)^2 + (Y1 - Y2)^2], we eliminate the sqrt by squaring the radius later
+	float distance_squared = (click_x - circle_center_x) * (click_x - circle_center_x) + (click_y - circle_center_y) * (click_y - circle_center_y);
+
+	if (distance_squared <= radius * radius) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
 
 int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c2_y, float r2) {
 	float collide_dist_sqr = (c1_x - c2_x) * (c1_x - c2_x) + (c1_y - c2_y) * (c1_y - c2_y);
@@ -125,23 +125,28 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 }
 
 
-void DrawBlackOverlay(AEGfxVertexList* square_mesh) {
+void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player* player) {
 	f32 rec_width = AEGfxGetWindowWidth();
 	f32 rec_height = AEGfxGetWindowHeight();
-	f32 square_size = 10.f;
+	f32 square_size = 5.f;
 	
-
-
 
 	//Dim the black colour rectangle
 	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY);
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.89f);
-
-	for (int y = 0; y < rec_height; y+= square_size){
-		for (int x = 0; x < rec_width; x += square_size) {
-			AEMtx33 black_overlayMtx = createTransformMtx(square_size, square_size, 0, 0, y);
-			AEGfxSetTransform(black_overlayMtx.m);
-			AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
+	//Adjust the opacity of the darkness
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.99f);
+	f32 x_pos = -(rec_width/2.0f);
+	f32 y_pos = -(rec_height/2.0f);
+	for (int y = 0; y_pos + (y* square_size) <= rec_height/2.0f; y++){
+		for (int x = 0; x_pos + (x * square_size) <= rec_width/2.0f; x++) {
+			f32 x_coord = x_pos + (x * square_size);
+			f32 y_coord = y_pos + (y * square_size);
+			//Only draw the squares if it is not inside the circle
+			if (!IsCircleClicked(player->posX, player->posY, 400.f, x_coord, y_coord)) {
+				AEMtx33 black_overlayMtx = createTransformMtx(square_size, square_size, 0, x_coord, y_coord);
+				AEGfxSetTransform(black_overlayMtx.m);
+				AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
+			}
 		}
 	}
 
@@ -200,25 +205,25 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 		}
 	}
 	//Draw the player Mesh
-	//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f); // PLayer Colour (white)
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f); // PLayer Colour (white)
 	AEMtx33 playerMtx = createTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
 	AEGfxSetTransform(playerMtx.m); 
 	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
-	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 //Draw icicle at the given position
 void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
-	//AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Colour (blue)
+	AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Colour (blue)
 	AEMtx33 icicleMtx = createTransformMtx(30.0f, 30.0f, 0, posX, posY);
 	AEGfxSetTransform(icicleMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
-	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 //Draw icicle child and make it repeatedly drop icicles.
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) {
-	//AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Drop Colour (blue)
+	AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Drop Colour (blue)
 	if (icicle.cooldownElapsed < icicle.cooldown) {
 		icicle.cooldownElapsed += dt;
 	}
@@ -236,7 +241,7 @@ void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) 
 	//std::cout << "Icicle Child Position: " << icicle.childX << " " << icicle.childY << '\n';
 	AEGfxSetTransform(icicleChildMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
-	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 bool icicleCollision(Player &player, Icicle &icicle) {
@@ -334,10 +339,10 @@ void InitializePlatform(Platform& platform) {
 
 void RenderPlatform(Platform& platform, AEGfxVertexList* mesh) {
 
-	//AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f); // Green color
+	AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f); // Green color
 	AEGfxSetTransform(platform.finalTransform.m); // Apply precomputed transformation
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt) {
@@ -397,7 +402,7 @@ void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh) {
 	// Draw enemy
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 
-	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 //health squares
@@ -413,14 +418,14 @@ void RenderHealthBar(const Player& player, AEGfxVertexList* mesh) {
 		float squarePosX = barPosX + i * (squareSize + spacing);
 
 		// Set color for current health (green)
-		//AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
 
 		// Create and render the square
 		AEMtx33 squareTransform = createTransformMtx(squareSize, squareSize, 0.0f, squarePosX, barPosY);
 		AEGfxSetTransform(squareTransform.m);
 		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 	}
-	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 
