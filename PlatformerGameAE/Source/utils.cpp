@@ -128,25 +128,36 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 void DrawBlackOverlay(AEGfxVertexList* square_mesh) {
 	f32 rec_width = AEGfxGetWindowWidth();
 	f32 rec_height = AEGfxGetWindowHeight();
-	AEMtx33 black_overlayMtx = createTransformMtx(rec_width,rec_height,0,0,0);
+	f32 square_size = 10.f;
+	
+
+
 
 	//Dim the black colour rectangle
 	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY);
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.8f);
-	AEGfxSetTransform(black_overlayMtx.m);
-	AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.89f);
+
+	for (int y = 0; y < rec_height; y+= square_size){
+		for (int x = 0; x < rec_width; x += square_size) {
+			AEMtx33 black_overlayMtx = createTransformMtx(square_size, square_size, 0, 0, y);
+			AEGfxSetTransform(black_overlayMtx.m);
+			AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
+		}
+	}
+
+	
+	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
 	f32 radius = 200.f;
 	AEMtx33 spotlightMtx = createTransformMtx(radius, radius, 0, player->posX, player->posY);
-
-	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.2f);
 	AEGfxSetBlendMode(AE_GFX_BM_ADD);
+	AEGfxSetColorToAdd(2.0f, 2.0f, 2.0f, 0.3f);
+	
 	AEGfxSetTransform(spotlightMtx.m);
 	AEGfxMeshDraw(circle_mesh, AE_GFX_MDM_TRIANGLES);
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 	
 }
 //Hi Varick
@@ -189,25 +200,25 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 		}
 	}
 	//Draw the player Mesh
-	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f); // PLayer Colour (white)
+	//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f); // PLayer Colour (white)
 	AEMtx33 playerMtx = createTransformMtx(player->width, player->height, AEDegToRad(player->rotate_angle), player->posX, player->posY);
 	AEGfxSetTransform(playerMtx.m); 
 	AEGfxMeshDraw(player_mesh, AE_GFX_MDM_TRIANGLES);
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 //Draw icicle at the given position
 void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
-	AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Colour (blue)
+	//AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Colour (blue)
 	AEMtx33 icicleMtx = createTransformMtx(30.0f, 30.0f, 0, posX, posY);
 	AEGfxSetTransform(icicleMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 //Draw icicle child and make it repeatedly drop icicles.
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) {
-	AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Drop Colour (blue)
+	//AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Drop Colour (blue)
 	if (icicle.cooldownElapsed < icicle.cooldown) {
 		icicle.cooldownElapsed += dt;
 	}
@@ -225,7 +236,7 @@ void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt) 
 	//std::cout << "Icicle Child Position: " << icicle.childX << " " << icicle.childY << '\n';
 	AEGfxSetTransform(icicleChildMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 bool icicleCollision(Player &player, Icicle &icicle) {
@@ -323,10 +334,10 @@ void InitializePlatform(Platform& platform) {
 
 void RenderPlatform(Platform& platform, AEGfxVertexList* mesh) {
 
-	AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f); // Green color
+	//AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f); // Green color
 	AEGfxSetTransform(platform.finalTransform.m); // Apply precomputed transformation
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt) {
@@ -386,7 +397,7 @@ void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh) {
 	// Draw enemy
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 //health squares
@@ -402,14 +413,14 @@ void RenderHealthBar(const Player& player, AEGfxVertexList* mesh) {
 		float squarePosX = barPosX + i * (squareSize + spacing);
 
 		// Set color for current health (green)
-		AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
+		//AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f);
 
 		// Create and render the square
 		AEMtx33 squareTransform = createTransformMtx(squareSize, squareSize, 0.0f, squarePosX, barPosY);
 		AEGfxSetTransform(squareTransform.m);
 		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 	}
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 

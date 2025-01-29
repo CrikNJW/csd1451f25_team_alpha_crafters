@@ -126,7 +126,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		RenderHealthBar(diver, squareMesh);
 
 		//ICIRCLE RENDERING
-		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
+		//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
 		//Loop through icicle array and draw each icicle
 		for (int i = 0; i < 2; i++) {
 			icicleCollision(diver, icicle[i]);
@@ -135,7 +135,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 
 		////Dummy Mesh/Object to test camera movement
-		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
+		//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
 		// Draw test wall
 		AEMtx33 wallMtx = createTransformMtx(testWall.Width, testWall.Height, 0, testWall.PosX, testWall.PosY);
 		AEGfxSetTransform(wallMtx.m);
@@ -155,13 +155,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		for (int i = 0; i < Ground_enemy_count; ++i) {
 			ElasticEnemyCollision(diver, Ground_enemy_array[i]);
 		}
-		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+		//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
 		//Debugging
 		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 
 
-		//DrawBlackOverlay(squareMesh);
+		DrawBlackOverlay(squareMesh);
 		SpotLight(&diver, spotlightMesh);
 
 
