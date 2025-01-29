@@ -100,9 +100,8 @@ AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, 
 //	}
 //}
 
-int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter, float click_x, float click_y)
+int IsCircleClicked(float circle_center_x, float circle_center_y, float radius, float click_x, float click_y)
 {
-	float radius = diameter / 2.0;
 	// distance = sgrt of [(X1 - X2)^2 + (Y1 - Y2)^2], we eliminate the sqrt by squaring the radius later
 	float distance_squared = (click_x - circle_center_x) * (click_x - circle_center_x) + (click_y - circle_center_y) * (click_y - circle_center_y);
 
@@ -126,32 +125,32 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 
 
 void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player* player) {
-	f32 rec_width = AEGfxGetWindowWidth();
-	f32 rec_height = AEGfxGetWindowHeight();
-	f32 square_size = 5.f;
+	f32 rec_width = f32(AEGfxGetWindowWidth());
+	f32 rec_height =f32(AEGfxGetWindowHeight());
+	f32 square_size = 20.f; //size of each square grid
+	f32 radius = 200.f; //diameter of the spotlight
 	
 
 	//Dim the black colour rectangle
 	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY);
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.99f);
-	f32 x_pos = -(rec_width/2.0f);
-	f32 y_pos = -(rec_height/2.0f);
-	for (int y = 0; y_pos + (y* square_size) <= rec_height/2.0f; y++){
-		for (int x = 0; x_pos + (x * square_size) <= rec_width/2.0f; x++) {
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.95f);
+	f32 buffer = 100.f; //to accomodate the rendering of squares at the side windows
+	f32 x_pos = player-> posX - (rec_width/2.0f) - buffer;
+	f32 y_pos = player-> posY - (rec_height/2.0f) - buffer;
+	for (int y = 0; y_pos + (y* square_size) <= player->posY + rec_height/2.0f + buffer; y++){
+		for (int x = 0; x_pos + (x * square_size) <= player->posX + rec_width/2.0f + buffer; x++) {
 			f32 x_coord = x_pos + (x * square_size);
 			f32 y_coord = y_pos + (y * square_size);
 			//Only draw the squares if it is not inside the circle
-			if (!IsCircleClicked(player->posX, player->posY, 400.f, x_coord, y_coord)) {
+			if (!IsCircleClicked(player->posX, player->posY, radius, x_coord, y_coord)) {
 				AEMtx33 black_overlayMtx = createTransformMtx(square_size, square_size, 0, x_coord, y_coord);
 				AEGfxSetTransform(black_overlayMtx.m);
 				AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
 			}
 		}
 	}
-
-	
-	//AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);//clear the colours
 }
 
 void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
@@ -260,7 +259,7 @@ bool icicleCollision(Player &player, Icicle &icicle) {
 
 // player default WSAD controls
 void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
-	player->speed = AEFrameRateControllerGetFrameTime() * 300.f; //speed of player according to frame rate //player movement 
+	player->speed = f32(AEFrameRateControllerGetFrameTime()) * 300.f; //speed of player according to frame rate //player movement 
 	if (AEInputCheckCurr(AEVK_W)) player->posY -= player->speed; 
 	if (AEInputCheckCurr(AEVK_S)) player->posY += player->speed;
 	if (AEInputCheckCurr(AEVK_A)) player->posX += player->speed; 
