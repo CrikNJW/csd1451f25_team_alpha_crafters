@@ -48,8 +48,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 
 	//Initialisation of Player Variables 
- // Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health, masxhealth
-	Player diver = { 0.f, 0.f, 50.f, 50.f, 0.f, 0.f, 5, 5};
+ // Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health, maxhealth
+	Player diver = {
+		0.f, // Pos X
+		0.f, // Pos Y
+		50.f, // Width 
+		50.f, // Height
+		0.f, // Rotation degree
+		0.f, // Speed
+		5, // Health
+		5, // Max health
+		false, // dash flag
+		1000.0f, // dash speed
+		0.2f, // dash duration
+		1.0f, // dash cooldown
+		0.0f, // current dash time
+		0.0f // dash cooldown time
+	};
 
 	//Initialisation of Boundary Variables 
 	Boundaries testWall = {
@@ -76,14 +91,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	 0
 	};
 
-	// Create array of boundaries 
-	Boundaries boundaries_array[] = { testWall,  testWall2 };
-	// boundary count to calculate amount of boundaries we need to check collision for 
-	int boundaryCount = sizeof(boundaries_array) / sizeof(Boundaries);
-
-	// Create array of ground enemys 
-	Ground_enemy Ground_enemy_array[] = { ground_enemy1 };
-	int Ground_enemy_count = sizeof(Ground_enemy_array) / sizeof(Ground_enemy);
+	
 
 	//Initialisation of Player Variables
 	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health
@@ -92,6 +100,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	Ground_enemy enemy = {platform.PosX - (platform.Width / 2) + (50.0f / 2),  // Start at platform left edge
 	platform.PosY + (platform.Height / 2) + (50.0f / 2), // Place on top of the platform
 	50.0f, 50.0f, 0.0f, 100.0f, MOVE_RIGHT};
+
+	// Create array of boundaries 
+	Boundaries boundaries_array[] = { testWall,  testWall2 };
+	// boundary count to calculate amount of boundaries we need to check collision for 
+	int boundaryCount = sizeof(boundaries_array) / sizeof(Boundaries);
+
+	// Create array of ground enemys 
+	Ground_enemy* Ground_enemy_array[] = { &ground_enemy1, &enemy };
+	int Ground_enemy_count = sizeof(Ground_enemy_array) / sizeof(Ground_enemy*);
 
 	// Game Loop
 	while (gGameRunning)
@@ -105,7 +122,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 		float dt = AEFrameRateControllerGetFrameTime();
-
 
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
@@ -121,6 +137,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		//Dummy Mesh/Object to test camera movement
 		UpdatePlayerPos(&diver, squareMesh, dt);
+
+		//Player Dash ability
+		PlayerDash(&diver, squareMesh, dt);
 
 		// Render health bar
 		RenderHealthBar(diver, squareMesh);
@@ -153,7 +172,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		//collision for all ground enemy  
 		for (int i = 0; i < Ground_enemy_count; ++i) {
-			ElasticEnemyCollision(diver, Ground_enemy_array[i]);
+			ElasticEnemyCollision(diver, *Ground_enemy_array[i]);
 		}
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -161,7 +180,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 
 
-		DrawBlackOverlay(squareMesh, &diver);
+		//DrawBlackOverlay(squareMesh, &diver);
 		//SpotLight(&diver, spotlightMesh);
 
 

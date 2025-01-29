@@ -16,6 +16,13 @@ struct Player {
 	f32 speed; //  speed of player
 	int health; //health and
 	int maxhealth; // player max health
+	//for player dash properties
+	bool isDashing; // Flag to check if player is currently dashing
+	float dashSpeed; // How fast the dash moves
+	float dashDuration; // How long the dash lasts
+	float dashCooldown; // Time before player can dash again
+	float currentDashTime; // Track current dash duration
+	float dashCooldownTimer; // Track cooldown time
 	bool lockMovement = false; //Prevent player from moving and rotating
 	f32 lockTimeElapsed = 0; //Time elapsed for icicle drop
 	void takedamage(int damage) {

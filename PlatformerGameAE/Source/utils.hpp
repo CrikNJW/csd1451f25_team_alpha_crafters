@@ -26,6 +26,8 @@ void UpdatePlayerPos(Player* player, AEGfxVertexList* player_mesh, f32 dt);
 
 void UpdatePlayerMovement(Player* player, AEGfxVertexList* player_mesh);
 
+void PlayerDash(Player* player, AEGfxVertexList* CooldownMesh, f32 dt);
+
 void CheckCollision(Player& player, const Boundaries& boundary);
 
 void ElasticEnemyCollision(Player& player, Ground_enemy& enemy);

@@ -212,6 +212,64 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
+void PlayerDash(Player* player, AEGfxVertexList* CooldownMesh, f32 dt) { // player dash movement
+	// Don't allow dashing if movement is locked
+	if (player->lockMovement) {
+		return;
+	}
+	// Constants for the cooldown bar appearance
+	const float BAR_WIDTH = 100.0f;
+	const float BAR_HEIGHT = 10.0f;
+	const float OFFSET_Y = 50.0f;  // Distance above player
+
+	// Update dash cooldown
+	if (player->dashCooldownTimer > 0) {
+		player->dashCooldownTimer -= dt;
+		// Draw cooldown background (grey bar)
+		AEMtx33 backgroundMtx = createTransformMtx(BAR_WIDTH, BAR_HEIGHT, 0.0f,
+			player->posX,
+			player->posY + OFFSET_Y);
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetColorToAdd(0.5f, 0.5f, 0.5f, 1.0f);  // Grey color
+		AEGfxSetTransform(backgroundMtx.m);
+		AEGfxMeshDraw(CooldownMesh, AE_GFX_MDM_TRIANGLES);
+
+		// Draw cooldown fill (blue bar)
+		float fillPercentage = (player->dashCooldownTimer / player->dashCooldown);
+		AEMtx33 fillMtx = createTransformMtx(BAR_WIDTH * fillPercentage, BAR_HEIGHT, 0.0f,
+			player->posX - (BAR_WIDTH * (1 - fillPercentage)) / 2,
+			player->posY + OFFSET_Y);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 1.0f, 1.0f);  // Blue color
+		AEGfxSetTransform(fillMtx.m);
+		AEGfxMeshDraw(CooldownMesh, AE_GFX_MDM_TRIANGLES);
+	}
+
+	// Check for dash input (SPACE key) and if we can dash
+	if (AEInputCheckTriggered(AEVK_SPACE) && player->dashCooldownTimer <= 0 && !player->isDashing) {
+		player->isDashing = true;
+		player->currentDashTime = player->dashDuration;
+		player->dashCooldownTimer = player->dashCooldown;
+	}
+
+	// Handle the actual dash movement
+	if (player->isDashing) {
+		// Move player in direction they're facing
+		float dashDistance = player->dashSpeed * dt;
+		player->posX += dashDistance * AECos(AEDegToRad(player->rotate_angle));
+		player->posY += dashDistance * AESin(AEDegToRad(player->rotate_angle));
+
+		//add animation here >;
+
+		// Update dash duration
+		player->currentDashTime -= dt;
+		if (player->currentDashTime <= 0) {
+			player->isDashing = false;
+		}
+
+		
+	}
+}
+
 //Draw icicle at the given position
 void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
 	AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Colour (blue)
@@ -304,29 +362,55 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 
  // for bounce collision between player and enemy
  void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
- // Calculate the edges of the centered enemy rectangle 
- float enemyLeft = enemy.PosX - enemy.Width / 2;
- float enemyRight = enemy.PosX + enemy.Width / 2; 
- float enemyTop = enemy.PosY - enemy.Height / 2;
- float enemyBottom = enemy.PosY + enemy.Height / 2;
- // Calculate the edges of the player rectangle  
- float playerLeft = player.posX - player.width / 2;
- float playerRight = player.posX + player.width / 2; 
- float playerTop = player.posY - player.height / 2;
- float playerBottom = player.posY + player.height / 2;
- // Check for collision 
-	 if (playerRight > enemyLeft && playerLeft < enemyRight && playerBottom > enemyTop&& playerTop < enemyBottom) {
-		 // Bounce back distance 
-		 float bounceBackDistance = 60.0f; // Adjust this value to control bounce intensity
-		 float moveDirectionMultiplier = 1.0f; 
-		 if (AEInputCheckCurr(AEVK_S)) { // only for moving backwards
-		 // If moving backwards, reverse the bounce direction  
-			moveDirectionMultiplier = -1.0f;
+// need a flag for checking if player dashing D:
+	 if (!player.isDashing) {
+		 // Calculate the edges of the centered enemy rectangle 
+		 float enemyLeft = enemy.PosX - enemy.Width / 2;
+		 float enemyRight = enemy.PosX + enemy.Width / 2;
+		 float enemyTop = enemy.PosY - enemy.Height / 2;
+		 float enemyBottom = enemy.PosY + enemy.Height / 2;
+		 // Calculate the edges of the player rectangle  
+		 float playerLeft = player.posX - player.width / 2;
+		 float playerRight = player.posX + player.width / 2;
+		 float playerTop = player.posY - player.height / 2;
+		 float playerBottom = player.posY + player.height / 2;
+		 // Check for collision 
+		 if (playerRight > enemyLeft && playerLeft < enemyRight && playerBottom > enemyTop && playerTop < enemyBottom) {
+			 // Bounce back distance 
+			 float bounceBackDistance = 60.0f; // Adjust this value to control bounce intensity
+			 float moveDirectionMultiplier = 1.0f;
+			 if (AEInputCheckCurr(AEVK_S)) { // only for moving backwards
+				 // If moving backwards, reverse the bounce direction  
+				 moveDirectionMultiplier = -1.0f;
+			 }
+			 // Bounce the player back in the opposite direction of current movement  
+			 player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
+			 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
+			 player.health -= 1;
 		 }
-	 // Bounce the player back in the opposite direction of current movement  
-	 player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
-	 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
-   }
+	 }
+	 else {
+		 // During dash, check for collision but don't bounce
+		 // Calculate the edges of the centered enemy rectangle 
+		 float enemyLeft = enemy.PosX - enemy.Width / 2;
+		 float enemyRight = enemy.PosX + enemy.Width / 2;
+		 float enemyTop = enemy.PosY - enemy.Height / 2;
+		 float enemyBottom = enemy.PosY + enemy.Height / 2;
+		 // Calculate the edges of the player rectangle  
+		 float playerLeft = player.posX - player.width / 2;
+		 float playerRight = player.posX + player.width / 2;
+		 float playerTop = player.posY - player.height / 2;
+		 float playerBottom = player.posY + player.height / 2;
+
+		 // Check for collision during dash
+		 if (playerRight > enemyLeft && playerLeft < enemyRight &&
+			 playerBottom > enemyTop && playerTop < enemyBottom) {
+			 
+			 //add enemy taken damage
+			 //maybe add animation to signify enemy was killed
+		 }
+	 }
+	 
 }
 
 
