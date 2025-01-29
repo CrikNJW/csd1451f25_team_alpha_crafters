@@ -193,6 +193,7 @@ void CheckCollision(Player& player, const Boundaries& boundary) {
 	}
 }
 
+<<<<<<< Updated upstream
 // for bounce collision between player and enemy
 void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
 	// Calculate the edges of the centered enemy rectangle
@@ -200,6 +201,25 @@ void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
 	float enemyRight = enemy.PosX + enemy.Width / 2;
 	float enemyTop = enemy.PosY - enemy.Height / 2;
 	float enemyBottom = enemy.PosY + enemy.Height / 2;
+=======
+ // for bounce collision between player and enemy
+ void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
+ // Calculate the edges of the centered enemy rectangle 
+ float enemyLeft = enemy.PosX - enemy.Width / 2;
+ float enemyRight = enemy.PosX + enemy.Width / 2; 
+ float enemyTop = enemy.PosY - enemy.Height / 2;
+ float enemyBottom = enemy.PosY + enemy.Height / 2;
+ // Calculate the edges of the player rectangle  
+ float playerLeft = player.posX - player.width / 2;
+ float playerRight = player.posX + player.width / 2; 
+ float playerTop = player.posY - player.height / 2;
+ float playerBottom = player.posY + player.height / 2;
+ // Check for collision 
+	 if (playerRight > enemyLeft && playerLeft < enemyRight && playerBottom > enemyTop&& playerTop < enemyBottom) {
+		 // Bounce back distance 
+		 float bounceBackDistance = 60.0f; // Adjust this value to control bounce intensity
+		 float moveDirectionMultiplier = 1.0f;  
+>>>>>>> Stashed changes
 
 	// Calculate the edges of the player rectangle 
 	float playerLeft = player.posX - player.width / 2;
