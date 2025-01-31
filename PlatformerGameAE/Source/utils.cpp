@@ -134,7 +134,7 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player* player) {
 	//Dim the black colour rectangle
 	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY);
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.95f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.9f);
 	f32 buffer = 100.f; //to accomodate the rendering of squares at the side windows
 	f32 x_pos = player-> posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player-> posY - (rec_height/2.0f) - buffer;
@@ -427,6 +427,63 @@ void RenderHealthBar(const Player& player, AEGfxVertexList* mesh) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
+void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt) {
+	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); 
+
+	if (lavaSpout.cooldownElapsed < lavaSpout.cooldown) {
+		lavaSpout.cooldownElapsed += dt;
+	}
+	else {
+		// If lava has just reset, assign a new random direction
+		if (!lavaSpout.isActive) {
+			float randomOffset = (rand() % 31 + 30) * (rand() % 2 == 0 ? 1 : -1); // change to adjust the range the lava shoots out (x coord)
+			lavaSpout.velocityX = randomOffset; // Assign to X velocity
+			lavaSpout.velocityY = 100.0f;  // Initial upward velocity (adjustable)
+			lavaSpout.isActive = true; // Lava is now active
+		}
+
+		// Apply velocity for parabolic movement
+		lavaSpout.lavaX += lavaSpout.velocityX * dt;
+		lavaSpout.lavaY += lavaSpout.velocityY * dt;
+
+		// Apply gravity effect
+		lavaSpout.velocityY -= 200.0f * dt; // Gravity effect (adjustable)
+
+		lavaSpout.timeElapsed += dt;
+
+		// Reset lava if it falls too low
+		if (lavaSpout.lavaY <= lavaSpout.PosY - 300.0f) {
+			lavaSpout.lavaX = lavaSpout.PosX; // Reset to original position
+			lavaSpout.lavaY = lavaSpout.PosY;
+			lavaSpout.timeElapsed = 0;
+			lavaSpout.cooldownElapsed = 0.0f;
+			lavaSpout.isActive = false; // Ready for next drop
+		}
+	}
+
+	// Render the lava drop only if active
+	if (lavaSpout.isActive) {
+		AEMtx33 lavaTransform = createTransformMtx(15.0f, 15.0f, 0, lavaSpout.lavaX, lavaSpout.lavaY);
+		AEGfxSetTransform(lavaTransform.m);
+		AEGfxMeshDraw(lavaMesh, AE_GFX_MDM_TRIANGLES);
+	}
+
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+bool lavaCollision(Player& player, LavaSpout& lavaSpout) {
+	if (lavaSpout.isActive && AreCirclesIntersecting(player.posX, player.posY, player.width / 2, lavaSpout.lavaX, lavaSpout.lavaY, 15)) {
+		player.takedamage(1); // Reduce health by 1
+
+		// Hide the lava drop but keep the cooldown running
+		lavaSpout.isActive = false;
+		lavaSpout.timeElapsed = 0;
+		lavaSpout.cooldownElapsed = 0.0f;
+
+		return true; // Return true to indicate collision happened
+	}
+	return false;
+}
 
 //health bar
 /*

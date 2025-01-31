@@ -39,3 +39,7 @@ void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt);
 void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh);
 
 void RenderHealthBar(const Player& player, AEGfxVertexList* mesh);
+
+bool lavaCollision(Player& player, LavaSpout& lavaSpout);
+
+void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt);

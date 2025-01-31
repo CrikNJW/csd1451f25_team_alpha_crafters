@@ -76,6 +76,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	 0
 	};
 
+
+	LavaSpout volcano = { 500.0f, 150.0f }; // Volcano at (500,150)
+	Platform volcanoPlatform = { 500.0f, 130.0f, 200.0f, 20.0f }; // platform under the volcano
+	InitializePlatform(volcanoPlatform);
+
+
 	// Create array of boundaries 
 	Boundaries boundaries_array[] = { testWall,  testWall2 };
 	// boundary count to calculate amount of boundaries we need to check collision for 
@@ -114,7 +120,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		RenderGroundEnemy(enemy, squareMesh);
 
 		RenderPlatform(platform, squareMesh);
-
+		RenderPlatform(volcanoPlatform, squareMesh);
 		//CAMERA SYSTEM, PLAYER RENDERING
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player  
 		// Tell the Alpha Engine to get ready to draw something.  
@@ -133,6 +139,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DrawIcicle(icicle[i].PosX, icicle[i].PosY, squareMesh);
 			Draw_UpdateIcicleDrop(icicle[i], squareMesh, dt);
 		}
+
+		for (int i = 0; i < 2; i++) {	
+			lavaCollision(diver, volcano);
+			Draw_UpdateLavaDrop(volcano, squareMesh, dt);
+		}
+
+
 
 		////Dummy Mesh/Object to test camera movement
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);

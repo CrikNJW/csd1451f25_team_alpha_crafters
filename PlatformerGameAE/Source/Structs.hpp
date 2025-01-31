@@ -56,6 +56,27 @@ struct Icicle {
 	float cooldownElapsed = 0;
 };
 
+struct LavaSpout {
+	float PosX, PosY;   // Volcano position
+	float lavaX, lavaY; // Lava drop position
+	float velocityX, velocityY; 
+	float dropSpeed = 100.0f; // change for speed of lavadrop
+	float cooldown = 2.0f;
+	float cooldownElapsed = 0.0f;
+	float timeElapsed = 0.0f;
+	bool isActive = false; 
+
+	LavaSpout(float x, float y) {
+		PosX = x;
+		PosY = y;
+		lavaX = PosX;
+		lavaY = PosY;
+		velocityX = 0;
+		velocityY = 0;
+		isActive = false;
+	}
+};
+
 struct Boundaries {
 	float PosX, PosY; 
 	float Width, Height;
