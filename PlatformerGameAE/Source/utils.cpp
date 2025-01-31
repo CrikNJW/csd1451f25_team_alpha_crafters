@@ -428,37 +428,41 @@ void RenderHealthBar(const Player& player, AEGfxVertexList* mesh) {
 }
 
 void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt) {
-	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); 
+	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red for lava
 
-	if (lavaSpout.cooldownElapsed < lavaSpout.cooldown) {
-		lavaSpout.cooldownElapsed += dt;
-	}
-	else {
-		// If lava has just reset, assign a new random direction
-		if (!lavaSpout.isActive) {
-			float randomOffset = (rand() % 31 + 30) * (rand() % 2 == 0 ? 1 : -1); // change to adjust the range the lava shoots out (x coord)
-			lavaSpout.velocityX = randomOffset; // Assign to X velocity
-			lavaSpout.velocityY = 100.0f;  // Initial upward velocity (adjustable)
-			lavaSpout.isActive = true; // Lava is now active
+	// Handle cooldown before respawn
+	if (!lavaSpout.isActive) {
+		if (lavaSpout.cooldownElapsed < lavaSpout.cooldown) {
+			lavaSpout.cooldownElapsed += dt;
+			return;  // Exit function while waiting for cooldown
 		}
-
-		// Apply velocity for parabolic movement
-		lavaSpout.lavaX += lavaSpout.velocityX * dt;
-		lavaSpout.lavaY += lavaSpout.velocityY * dt;
-
-		// Apply gravity effect
-		lavaSpout.velocityY -= 200.0f * dt; // Gravity effect (adjustable)
-
-		lavaSpout.timeElapsed += dt;
-
-		// Reset lava if it falls too low
-		if (lavaSpout.lavaY <= lavaSpout.PosY - 300.0f) {
-			lavaSpout.lavaX = lavaSpout.PosX; // Reset to original position
+		else {
+			// Respawn lava at volcano position with new random direction
+			lavaSpout.lavaX = lavaSpout.PosX;
 			lavaSpout.lavaY = lavaSpout.PosY;
+
+			// Random horizontal velocity between -30 to -60 or 30 to 60
+			lavaSpout.velocityX = (rand() % 31 + 30) * (rand() % 2 == 0 ? 1 : -1);
+			lavaSpout.velocityY = 120.0f;  // Initial upward velocity
+
 			lavaSpout.timeElapsed = 0;
 			lavaSpout.cooldownElapsed = 0.0f;
-			lavaSpout.isActive = false; // Ready for next drop
+			lavaSpout.isActive = true;
 		}
+	}
+
+	// Apply movement to lava (parabolic arc)
+	lavaSpout.lavaX += lavaSpout.velocityX * dt;
+	lavaSpout.lavaY += lavaSpout.velocityY * dt;
+
+	// Apply gravity effect
+	lavaSpout.velocityY -= 200.0f * dt;  // Gravity pulls lava down
+
+	lavaSpout.timeElapsed += dt;
+
+	// Reset lava if it falls too low
+	if (lavaSpout.lavaY <= lavaSpout.PosY - 300.0f) {
+		lavaSpout.isActive = false;  // Hide lava and start cooldown
 	}
 
 	// Render the lava drop only if active
@@ -471,19 +475,20 @@ void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float 
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
+
 bool lavaCollision(Player& player, LavaSpout& lavaSpout) {
 	if (lavaSpout.isActive && AreCirclesIntersecting(player.posX, player.posY, player.width / 2, lavaSpout.lavaX, lavaSpout.lavaY, 15)) {
 		player.takedamage(1); // Reduce health by 1
 
 		// Hide the lava drop but keep the cooldown running
 		lavaSpout.isActive = false;
-		lavaSpout.timeElapsed = 0;
-		lavaSpout.cooldownElapsed = 0.0f;
+		lavaSpout.cooldownElapsed = 0.0f; // Start cooldown timer
 
-		return true; // Return true to indicate collision happened
+		return true; // Collision happened
 	}
 	return false;
 }
+
 
 //health bar
 /*

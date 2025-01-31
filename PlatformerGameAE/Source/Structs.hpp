@@ -68,11 +68,11 @@ struct LavaSpout {
 	float PosX, PosY;   // Volcano position
 	float lavaX, lavaY;  // Lava drop position
 	float velocityX, velocityY; // For parabolic motion
-	float dropSpeed = 120.0f; // <-- Increase this for a faster fall
+	float dropSpeed = 120.0f; // Speed of falling lava
 	float cooldown = 2.0f; // Time before respawning
 	float cooldownElapsed = 0.0f;
 	float timeElapsed = 0.0f;
-	bool isActive = false;
+	bool isActive = false;  // Controls visibility and movement
 
 	LavaSpout(float x, float y) {
 		PosX = x;
@@ -83,4 +83,5 @@ struct LavaSpout {
 		velocityY = 0;
 	}
 };
+
 
