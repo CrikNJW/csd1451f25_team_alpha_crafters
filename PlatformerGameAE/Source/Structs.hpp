@@ -18,6 +18,7 @@ struct Player {
 	int maxhealth; // player max health
 	bool lockMovement = false; //Prevent player from moving and rotating
 	f32 lockTimeElapsed = 0; //Time elapsed for icicle drop
+	f32 lockTime = 1; //Time to lock player movement
 	void takedamage(int damage) {
 		health -= damage;
 		if (health < 0) health = 0; // make sure the health doesnt go below 0
@@ -45,6 +46,12 @@ struct Floating_enemy {
 	int Health;
 };
 
+struct Boundaries {
+	float PosX, PosY; 
+	float Width, Height;
+}; // this is for the boundaries / borders around map
+// Initialize with an array of structs
+
 struct Icicle {
 	float PosX, PosY;
 	float dropOffsetY = 0;
@@ -54,11 +61,5 @@ struct Icicle {
 	float timeElapsed = 0;
 	float cooldown = 2;
 	float cooldownElapsed = 0;
+	Boundaries boundaries = {PosX, PosY, 40, 40};
 };
-
-struct Boundaries {
-	float PosX, PosY; 
-	float Width, Height;
-}; // this is for the boundaries / borders around map
-// Initialize with an array of structs
-

@@ -169,7 +169,7 @@ void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
 void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 	if (player->lockMovement == true) {
 		player->lockTimeElapsed += dt;
-		if (player->lockTimeElapsed >= 2.0f) {
+		if (player->lockTimeElapsed >= player->lockTime) {
 			player->lockMovement = false;
 			player->lockTimeElapsed = 0;
 		}
@@ -212,9 +212,9 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 }
 
 //Draw icicle at the given position
-void DrawIcicle(f32 posX, f32 posY , AEGfxVertexList* icicleMesh) {
+void DrawIcicle(Icicle &icicle , AEGfxVertexList* icicleMesh) {
 	AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Colour (blue)
-	AEMtx33 icicleMtx = createTransformMtx(30.0f, 30.0f, 0, posX, posY);
+	AEMtx33 icicleMtx = createTransformMtx(icicle.boundaries.Width, icicle.boundaries.Height, 0, icicle.PosX, icicle.PosY);
 	AEGfxSetTransform(icicleMtx.m);
 	AEGfxMeshDraw(icicleMesh, AE_GFX_MDM_TRIANGLES);
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);

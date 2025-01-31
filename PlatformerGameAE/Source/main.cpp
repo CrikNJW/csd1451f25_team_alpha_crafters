@@ -34,6 +34,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//f32 icicleDropOffset = 5.0f;
 	//AEGfxVertexList* icicleMesh = createSquareMesh();
 	Icicle* icicle = new Icicle[2]{ {-200,80}, {-320,100} };
+	int icicleCount = sizeof(*icicle) / sizeof(Icicle);
 
 	//Spotlight effect Mesh
 	AEGfxVertexList* spotlightMesh = createCircleMesh();
@@ -128,10 +129,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//ICIRCLE RENDERING
 		//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
 		//Loop through icicle array and draw each icicle
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < icicleCount; i++) {
 			icicleCollision(diver, icicle[i]);
-			DrawIcicle(icicle[i].PosX, icicle[i].PosY, squareMesh);
+			DrawIcicle(icicle[i], squareMesh);
 			Draw_UpdateIcicleDrop(icicle[i], squareMesh, dt);
+			CheckCollision(diver, icicle[i].boundaries);
 		}
 
 		////Dummy Mesh/Object to test camera movement
