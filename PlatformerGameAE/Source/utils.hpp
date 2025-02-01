@@ -3,12 +3,14 @@
 #include "AEEngine.h"
 #include <iostream>
 #include "Structs.hpp"
+#include <vector>
 
 
 
 AEGfxVertexList* createSquareMesh();
 AEGfxVertexList* createCircleMesh();
 AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, f32 translY);
+std::vector<GridCoordinate> initializeGridSystem(f32 squareGridLength);
 
 void DrawIcicle(Icicle &icicle, AEGfxVertexList* icicleMesh);
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt);

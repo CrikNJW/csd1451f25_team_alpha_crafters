@@ -6,6 +6,7 @@
 #include <iostream>
 #include "utils.hpp"
 #include "Structs.hpp"
+#include <vector>
 
 // ---------------------------------------------------------------------------
 // main
@@ -99,6 +100,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	Ground_enemy enemy = {platform.PosX - (platform.Width / 2) + (50.0f / 2),  // Start at platform left edge
 	platform.PosY + (platform.Height / 2) + (50.0f / 2), // Place on top of the platform
 	50.0f, 50.0f, 0.0f, 100.0f, MOVE_RIGHT};
+
+	//Initialize grid system
+	std::vector<GridCoordinate> fullGrid = initializeGridSystem(50.0f);
+	
 
 	// Game Loop
 	while (gGameRunning)

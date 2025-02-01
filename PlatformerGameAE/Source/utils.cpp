@@ -2,13 +2,86 @@
 #include "AEEngine.h"
 #include <iostream>
 #include "Structs.hpp"
+#include <vector>
 
 //Marcos for the trigo functions that take input in degree 
 //cuz alpha engine only takes input in radians for function sin, cos, tan
 //#define AESinDeg(x) AESin(AEDegToRad(x));
 //#define AECosDeg(x) AESin(AEDegToRad(x));
 
-//------------------ square mesh ------------------------------
+/************************************
+*									*
+*	LEVEL CREATION SYSTEM			*
+*									*
+*************************************/
+std::vector<GridCoordinate> initializeGridSystem(f32 squareGridLength) {
+	//Create a vector to store the grid coordinates
+	std::vector<GridCoordinate> lineGridCoordinates;
+
+	f32 currLength = 0;
+	f32 currHeight = squareGridLength;
+	f32 middleY = squareGridLength / 2;
+	/*Get the coordinate of each grid, this loop basically
+	stores a horizontal line of grid coordinates in the vector
+	We will multiply/add to the Y coordinate for all elements
+	to get a bigger area.*/
+	while (currLength < 4800){
+		f32 prevLength = currLength;
+
+		currLength += squareGridLength;
+
+		//Get the middle of the grid
+		f32 middleX = (currLength + prevLength) / 2;
+
+		//Store the grid coordinate in the vector
+		lineGridCoordinates.push_back({ middleX, middleY });
+	}
+
+	// Create a vector to store the full grid coordinates
+	std::vector<GridCoordinate> fullGridCoordinates;
+
+	// Number of rows and columns
+	int numRows = 10; // Number of horizontal grid lines
+	int numCols = lineGridCoordinates.size();
+
+	// Generate the full grid
+	for (int row = -numRows; row < numRows; ++row) {
+		for (int col = 0; col < numCols; ++col) {
+			GridCoordinate coord = lineGridCoordinates[col];
+			coord.y += row * squareGridLength;
+			fullGridCoordinates.push_back(coord);
+		}
+	}
+
+	/*// Print the grid coordinates
+	for (GridCoordinate coord : fullGridCoordinates) {
+		std::cout << "X: " << coord.x << " Y: " << coord.y << '\n';
+	}*/
+
+	return fullGridCoordinates;
+}
+
+GridCoordinate getClosestGridCoordinate(const std::vector<GridCoordinate>& grid, f32 x, f32 y) {
+	// Initialize the closest coordinate to the first grid coordinate
+	GridCoordinate closestCoord = grid[0];
+	f32 closestDist = sqrt((closestCoord.x - x) * (closestCoord.x - x) + (closestCoord.y - y) * (closestCoord.y - y));
+
+	// Iterate through the grid coordinates to find the closest one
+	for (GridCoordinate coord : grid) {
+		f32 dist = sqrt((coord.x - x) * (coord.x - x) + (coord.y - y) * (coord.y - y));
+		if (dist < closestDist) {
+			closestDist = dist;
+			closestCoord = coord;
+		}
+	}
+
+	return closestCoord;
+}
+/************************************
+*									*
+*	END OF LEVEL CREATION SYSTEM	*
+*									*
+*************************************/
 
 AEGfxVertexList* createSquareMesh() {
 	u32 white = 0xFFFFFFFF;
