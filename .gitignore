@@ -6,9 +6,6 @@
 *.db-wal
 *.vsidx
 *.opendb
-/PlatformerGameAE/.vs
-/PlatformerGameAE/.tmp
-/PlatformerGameAE/bin
 /Thalassa/.tmp
 /Thalassa/.vs
 /Thalassa/bin
