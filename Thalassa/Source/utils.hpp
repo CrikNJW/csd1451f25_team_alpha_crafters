@@ -29,8 +29,6 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player);
 void SpotLight(Player* player, AEGfxVertexList* circle_mesh);
 void UpdatePlayerPos(Player* player, AEGfxVertexList* player_mesh, f32 dt);
 
-void UpdatePlayerMovement(Player* player, AEGfxVertexList* player_mesh);
-
 void PlayerDash(Player* player, AEGfxVertexList* CooldownMesh, f32 dt);
 
 void CheckCollision(Player& player, const Boundaries& boundary);
@@ -49,7 +47,7 @@ bool lavaCollision(Player& player, LavaSpout& lavaSpout);
 
 void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt);
 
-void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, AEGfxVertexList* lavaMesh, float dt);
+void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, float dt);
 
 void RenderBurrowingEnemy(Burrowing_enemy& enemy, AEGfxVertexList* mesh);
 

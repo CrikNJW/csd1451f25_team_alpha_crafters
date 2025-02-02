@@ -26,7 +26,6 @@ std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength) {
 	std::vector<GridCoordinate> lineGridCoordinates;
 
 	s32 currLength = 0;
-	s32 currHeight = squareGridLength;
 	s32 middleY = squareGridLength / 2;
 	/*Get the coordinate of each grid, this loop basically
 	stores a horizontal line of grid coordinates in the vector
@@ -416,15 +415,6 @@ bool icicleCollision(Player &player, Icicle &icicle) {
 	return false;
 }
 
-// player default WSAD controls
-void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
-	player->speed = f32(AEFrameRateControllerGetFrameTime()) * 300.f; //speed of player according to frame rate //player movement 
-	if (AEInputCheckCurr(AEVK_W)) player->posY -= player->speed; 
-	if (AEInputCheckCurr(AEVK_S)) player->posY += player->speed;
-	if (AEInputCheckCurr(AEVK_A)) player->posX += player->speed; 
-	if (AEInputCheckCurr(AEVK_D)) player->posX -= player->speed;
- }
-
  //collision for player and boundary 
  void CheckCollision(Player& player, const Boundaries& boundary) {
 	 // Calculate bounds
@@ -693,12 +683,11 @@ bool lavaCollision(Player& player, LavaSpout& lavaSpout) {
 	return false;
 }
 
-void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, AEGfxVertexList* lavaMesh, float dt) {
+void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, float dt) {
 	float dx = playerX - enemy.PosX;
 	float dy = playerY - enemy.PosY;
 	float distanceSquared = dx * dx + dy * dy;
 
-	float attackOffset = 60.0f;  // How far the enemy should pop out
 	float originalOffset = 0.0f; // Default position (inside boundary)
 
 	switch (enemy.State) {

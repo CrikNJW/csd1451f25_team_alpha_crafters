@@ -183,7 +183,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Render enemy
 		RenderGroundEnemy(enemy, squareMesh);
 
-		UpdateBurrowingEnemy(burrowingEnemy1, diver.posX, diver.posY, squareMesh, dt);
+		UpdateBurrowingEnemy(burrowingEnemy1, diver.posX, diver.posY, dt);
 		RenderBurrowingEnemy(burrowingEnemy1, burrowingEnemyMesh);
 		RenderBoundary(burrowingBoundary, squareMesh);
 		RenderBoundary(testWall4, squareMesh);
