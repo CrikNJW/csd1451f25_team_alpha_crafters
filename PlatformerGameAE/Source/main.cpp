@@ -61,7 +61,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		false, // dash flag
 		1000.0f, // dash speed
 		0.2f, // dash duration
-		1.0f, // dash cooldown
+		5.0f, // dash cooldown
 		0.0f, // current dash time
 		0.0f // dash cooldown time
 	};
@@ -180,7 +180,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 
 
-		//DrawBlackOverlay(squareMesh, &diver);
+		DrawBlackOverlay(squareMesh, &diver);
 		//SpotLight(&diver, spotlightMesh);
 
 

@@ -128,13 +128,13 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player* player) {
 	f32 rec_width = AEGfxGetWindowWidth();
 	f32 rec_height = AEGfxGetWindowHeight();
-	f32 square_size = 5.f;
+	f32 square_size = 30.f;
 	
 
 	//Dim the black colour rectangle
 	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY);
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.99f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.9f);
 	f32 x_pos = -(rec_width/2.0f);
 	f32 y_pos = -(rec_height/2.0f);
 	for (int y = 0; y_pos + (y* square_size) <= rec_height/2.0f; y++){
@@ -158,7 +158,7 @@ void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
 	f32 radius = 200.f;
 	AEMtx33 spotlightMtx = createTransformMtx(radius, radius, 0, player->posX, player->posY);
 	AEGfxSetBlendMode(AE_GFX_BM_ADD);
-	AEGfxSetColorToAdd(2.0f, 2.0f, 2.0f, 0.3f);
+	AEGfxSetColorToAdd(2.0f, 2.0f, 2.0f, 0.5f);
 	
 	AEGfxSetTransform(spotlightMtx.m);
 	AEGfxMeshDraw(circle_mesh, AE_GFX_MDM_TRIANGLES);
@@ -364,6 +364,8 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
  void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
 // need a flag for checking if player dashing D:
 	 if (!player.isDashing) {
+		 //flag for collision
+		 bool isBouncing = false;
 		 // Calculate the edges of the centered enemy rectangle 
 		 float enemyLeft = enemy.PosX - enemy.Width / 2;
 		 float enemyRight = enemy.PosX + enemy.Width / 2;
@@ -376,17 +378,40 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 		 float playerBottom = player.posY + player.height / 2;
 		 // Check for collision 
 		 if (playerRight > enemyLeft && playerLeft < enemyRight && playerBottom > enemyTop && playerTop < enemyBottom) {
+			 isBouncing = true;
 			 // Bounce back distance 
-			 float bounceBackDistance = 60.0f; // Adjust this value to control bounce intensity
-			 float moveDirectionMultiplier = 1.0f;
-			 if (AEInputCheckCurr(AEVK_S)) { // only for moving backwards
-				 // If moving backwards, reverse the bounce direction  
-				 moveDirectionMultiplier = -1.0f;
+			 float bounceBackDistance = 160.0f; // Adjust this value to control bounce intensity
+			 float moveDirectionMultiplier = 0.0f;
+
+			 // Check movement input states
+			 bool movingForward = AEInputCheckCurr(AEVK_W);
+			 bool movingBackward = AEInputCheckCurr(AEVK_S);
+
+			 if (movingForward && movingBackward) {
+				 // Conflict: Player presses both W and S
+				 moveDirectionMultiplier = 1.0f; // update player pos always priotises w 
+				 std::cout << "movement conflict detected: W and S pressed together\n";
 			 }
-			 // Bounce the player back in the opposite direction of current movement  
-			 player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
-			 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
+			 else if (movingBackward) {
+				 moveDirectionMultiplier = -1.0f;
+				 std::cout << "movement currently: backwards\n";
+			 }
+			 else if (movingForward) {
+				 moveDirectionMultiplier = 1.0f;
+				 std::cout << "movement currently: forwards\n";
+			 }
+
+			 // Apply bounce effect 
+			 if (isBouncing) {
+				 bounceBackDistance -= 50.0f;
+				 player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
+				 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
+				 if (bounceBackDistance <= 0) isBouncing = false;
+			 }
+			 
 			 player.health -= 1;
+			 // Bounce the player back in the opposite direction of current movement  
+			
 		 }
 	 }
 	 else {
