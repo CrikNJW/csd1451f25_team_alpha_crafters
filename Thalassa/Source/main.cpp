@@ -249,7 +249,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//Reset all colours to 0
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
-		DrawBlackOverlay(squareMesh, diver);
+		DrawBlackOverlay(squareMesh, diver, volcano);
 		//SpotLight(&diver, spotlightMesh);
 
 		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed

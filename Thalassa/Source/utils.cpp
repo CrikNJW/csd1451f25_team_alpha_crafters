@@ -217,17 +217,17 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 }
 
 
-void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player) {
+void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player, LavaSpout& lava) {
 	f32 rec_width = f32(AEGfxGetWindowWidth());
 	f32 rec_height =f32(AEGfxGetWindowHeight());
 	f32 square_size = 20.f; //size of each square grid
-	f32 radius = 200.f; //radius of the spotlight
+	f32 radius = 100.f; //radius of the spotlight
 	f32 buffer = 100.f; //to accomodate the rendering of squares at the side windows
 
 	//Dim the black colour rectangle
 	//AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.95f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.99f);
 	
 	f32 x_pos = player.posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player.posY - (rec_height/2.0f) - buffer;
@@ -236,7 +236,7 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player) {
 			f32 x_coord = x_pos + (x * square_size);
 			f32 y_coord = y_pos + (y * square_size);
 			//Only draw the squares if it is not inside the circle
-			if (!IsCircleClicked(player.posX, player.posY, radius, x_coord, y_coord)) {
+			if (!IsCircleClicked(player.posX, player.posY, radius, x_coord, y_coord) && !IsCircleClicked(lava.lavaX, lava.lavaY, radius, x_coord, y_coord)) {
 				AEMtx33 black_overlayMtx = createTransformMtx(square_size, square_size, 0, x_coord, y_coord);
 				AEGfxSetTransform(black_overlayMtx.m);
 				AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
