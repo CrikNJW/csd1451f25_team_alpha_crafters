@@ -111,7 +111,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
-		float dt = AEFrameRateControllerGetFrameTime();
+		//float dt = AEFrameRateControllerGetFrameTime();
 
 
 		//GROUND CIRCLING ENEMY SYSTEM
@@ -176,7 +176,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 
 
-		DrawBlackOverlay(squareMesh, &diver);
+		DrawBlackOverlay(squareMesh, diver);
 		//SpotLight(&diver, spotlightMesh);
 
 
