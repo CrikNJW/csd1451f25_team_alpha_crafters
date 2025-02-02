@@ -2,6 +2,7 @@
 #include "AEEngine.h"
 #include <iostream>
 #include "Structs.hpp"
+#include <cmath>
 
 //Marcos for the trigo functions that take input in degree 
 //cuz alpha engine only takes input in radians for function sin, cos, tan
@@ -132,9 +133,9 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player* player) {
 	
 
 	//Dim the black colour rectangle
-	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY);
+	/*AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY);*/
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.9f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 	f32 buffer = 100.f; //to accomodate the rendering of squares at the side windows
 	f32 x_pos = player-> posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player-> posY - (rec_height/2.0f) - buffer;
@@ -351,36 +352,36 @@ void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt) {
 	float platformTop = platform.PosY + (platform.Height / 2) + (enemy.Width / 2);
 	float platformBottom = platform.PosY - (platform.Height / 2) - (enemy.Width / 2);
 
-	switch (enemy.state) {
-	case MOVE_RIGHT:
+	switch (enemy.MovementState) {
+	case Ground_enemy::MOVE_RIGHT:
 		enemy.PosX += enemy.speed * dt;
 		if (enemy.PosX >= platformRight) {
 			enemy.PosX = platformRight;  // Stop at edge
-			enemy.state = MOVE_DOWN;     // Change direction
+			enemy.MovementState = Ground_enemy::MOVE_DOWN;     // Change direction
 		}
 		break;
 
-	case MOVE_DOWN:
+	case Ground_enemy::MOVE_DOWN:
 		enemy.PosY -= enemy.speed * dt;
 		if (enemy.PosY <= platformBottom) {
 			enemy.PosY = platformBottom;
-			enemy.state = MOVE_LEFT;
+			enemy.MovementState = Ground_enemy::MOVE_LEFT;
 		}
 		break;
 
-	case MOVE_LEFT:
+	case Ground_enemy::MOVE_LEFT:
 		enemy.PosX -= enemy.speed * dt;
 		if (enemy.PosX <= platformLeft) {
 			enemy.PosX = platformLeft;
-			enemy.state = MOVE_UP;
+			enemy.MovementState = Ground_enemy::MOVE_UP;
 		}
 		break;
 
-	case MOVE_UP:
+	case Ground_enemy::MOVE_UP:
 		enemy.PosY += enemy.speed * dt;
 		if (enemy.PosY >= platformTop) {
 			enemy.PosY = platformTop;
-			enemy.state = MOVE_RIGHT;
+			enemy.MovementState = Ground_enemy::MOVE_RIGHT;
 		}
 		break;
 	}
@@ -475,7 +476,6 @@ void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float 
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-
 bool lavaCollision(Player& player, LavaSpout& lavaSpout) {
 	if (lavaSpout.isActive && AreCirclesIntersecting(player.posX, player.posY, player.width / 2, lavaSpout.lavaX, lavaSpout.lavaY, 15)) {
 		player.takedamage(1); // Reduce health by 1
@@ -489,6 +489,97 @@ bool lavaCollision(Player& player, LavaSpout& lavaSpout) {
 	return false;
 }
 
+void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, AEGfxVertexList* lavaMesh, float dt) {
+	float dx = playerX - enemy.PosX;
+	float dy = playerY - enemy.PosY;
+	float distanceSquared = dx * dx + dy * dy;
+
+	float attackOffset = 60.0f;  // How far the enemy should pop out
+	float originalOffset = 0.0f; // Default position (inside boundary)
+
+	switch (enemy.State) {
+		case Burrowing_enemy::IDLE:
+		enemy.PosX = enemy.boundary->PosX + originalOffset; // Ensure it's inside the boundary
+		if (sqrt(distanceSquared) < enemy.detectionRadius) {
+			enemy.State = Burrowing_enemy::ALERT;
+			enemy.alertTimer = 0.3f;  // Small delay before popping out
+			enemy.isVisible = true;
+		}
+		break;
+
+        case Burrowing_enemy::ALERT:
+            if (enemy.alertTimer > 0) {
+                enemy.alertTimer -= dt;
+				//enemy.dirtParticles.velocityY = 50.0f;
+				//enemy.dirtParticles.velocityX = (rand() % 21 - 10);
+				//enemy.dirtParticles.cooldown = 0.8f;
+				//AEGfxSetColorToMultiply(0.6f, 0.3f, 0.0f, 1.0f); // Brown for dirt effect
+				//Draw_UpdateLavaDrop(enemy.dirtParticles, lavaMesh, dt);  // Use the existing function
+			} else {
+				enemy.State = Burrowing_enemy::ATTACKING;
+				enemy.attackCooldown = 0.3f; // Stays out for a short moment
+				enemy.Width = 100.0f; // Instantly stretch out fully
+				enemy.PosX = enemy.boundary->PosX - (enemy.Width / 2.0f); // Adjust position instantly
+			}
+			break;
+
+		case Burrowing_enemy::ATTACKING:
+			if (enemy.attackCooldown > 0) {
+				enemy.attackCooldown -= dt;
+				enemy.Width += 300.0f * dt;  
+				if (enemy.Width > 100.0f) enemy.Width = 100.0f; // Cap width
+			}
+			else {
+				enemy.State = Burrowing_enemy::RETREATING;
+			}
+			break;
+
+		case Burrowing_enemy::RETREATING:
+			enemy.Width -= 1200.0f * dt;  // Shrink back
+			if (enemy.Width < 40.0f) {
+				enemy.Width = 40.0f;
+				enemy.PosX = enemy.boundary->PosX; // Reset position
+				enemy.isVisible = false;
+				enemy.State = Burrowing_enemy::WAITING;
+				enemy.alertTimer = 1.5f; // Delay before popping out again
+			}
+			break;
+
+		case Burrowing_enemy::WAITING:
+			if (sqrt(distanceSquared) > enemy.detectionRadius) { // Player moved away
+				enemy.State = Burrowing_enemy::IDLE; // Ready to pop out again
+			}
+			break;
+	}
+}
+
+void RenderBurrowingEnemy(Burrowing_enemy& enemy, AEGfxVertexList* BurrowingEnemymesh) {
+	if (!enemy.isVisible) return; // Only render if the enemy has emerged
+
+	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f); // Red color for the enemy
+
+	float renderPosX = enemy.boundary->PosX - (enemy.Width / 2.0f); // Keep left-aligned
+	float renderPosY = enemy.boundary->PosY;
+
+	// Create transformation matrix for positioning
+	AEMtx33 enemyTransform = createTransformMtx(enemy.Width, enemy.Height, 0.0f, renderPosX, renderPosY);
+	AEGfxSetTransform(enemyTransform.m);
+
+	// Draw enemy mesh
+	AEGfxMeshDraw(BurrowingEnemymesh, AE_GFX_MDM_TRIANGLES);
+
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh) {
+	AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f); // Green for platform
+
+	AEMtx33 boundaryTransform = createTransformMtx(boundary.Width, boundary.Height, 0.0f, boundary.PosX, boundary.PosY);
+	AEGfxSetTransform(boundaryTransform.m);
+	AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+}
 
 //health bar
 /*

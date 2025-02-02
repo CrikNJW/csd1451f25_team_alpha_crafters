@@ -98,7 +98,32 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	InitializePlatform(platform);
 	Ground_enemy enemy = {platform.PosX - (platform.Width / 2) + (50.0f / 2),  // Start at platform left edge
 	platform.PosY + (platform.Height / 2) + (50.0f / 2), // Place on top of the platform
-	50.0f, 50.0f, 0.0f, 100.0f, MOVE_RIGHT};
+	50.0f, 50.0f, 0.0f, 100.0f, Ground_enemy::MOVE_RIGHT};
+
+	// Burrowing Enemy Initialization
+	Boundaries burrowingBoundary = {
+	-400.0f, 200.0f,   // PosX, PosY
+	50.0f, 150.0f     // Width, Height
+	};
+
+	Burrowing_enemy burrowingEnemy = {
+	-400.0f, 200.0f,   // PosX, PosY (same as boundary for now)
+	40.0f, 40.0f,     // Width, Height
+	10.0f,           // Speed
+	150.0f,           // Detection Radius
+	0.0f,             // Attack Cooldown
+	false,            // isVisible
+	0.0f,             // alertTimer
+	false,            // spawningParticles
+	Burrowing_enemy::IDLE,  // Initial state
+	&burrowingBoundary //  Assign the boundary
+	};
+
+	burrowingEnemy.PosY = burrowingBoundary.PosY;
+	burrowingEnemy.PosX = burrowingBoundary.PosX;
+
+	// Create an enemy mesh for rendering
+	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh();
 
 	// Game Loop
 	while (gGameRunning)
@@ -119,6 +144,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		UpdateGroundEnemy(enemy, platform, dt);
 		// Render enemy
 		RenderGroundEnemy(enemy, squareMesh);
+
+		UpdateBurrowingEnemy(burrowingEnemy, diver.posX, diver.posY, squareMesh, dt);
+		RenderBurrowingEnemy(burrowingEnemy, burrowingEnemyMesh);
+		RenderBoundary(burrowingBoundary, squareMesh);
 
 		RenderPlatform(platform, squareMesh);
 		RenderPlatform(volcanoPlatform, squareMesh);

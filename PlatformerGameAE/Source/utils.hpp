@@ -43,3 +43,9 @@ void RenderHealthBar(const Player& player, AEGfxVertexList* mesh);
 bool lavaCollision(Player& player, LavaSpout& lavaSpout);
 
 void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt);
+
+void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, AEGfxVertexList* lavaMesh, float dt);
+
+void RenderBurrowingEnemy(Burrowing_enemy& enemy, AEGfxVertexList* mesh);
+
+void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh);
