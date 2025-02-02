@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PlatformerGameAE", "PlatformerGameAE\PlatformerGameAE.vcxproj", "{60B1ECC0-1157-4511-AAAF-72A5C96D5AD0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Thalassa", "Thalassa\Thalassa.vcxproj", "{60B1ECC0-1157-4511-AAAF-72A5C96D5AD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
