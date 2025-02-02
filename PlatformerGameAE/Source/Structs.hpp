@@ -26,11 +26,7 @@ struct Player {
 	}
 };
 
-struct Platform {
-	float PosX, PosY;
-	float Width, Height;
-	AEMtx33 finalTransform;
-};
+
 
 struct Floating_enemy {
 	float PosX, PosY;
@@ -41,6 +37,7 @@ struct Floating_enemy {
 struct Boundaries {
 	float PosX, PosY; 
 	float Width, Height;
+	AEMtx33 finalTransform;
 }; // this is for the boundaries / borders around map
 // Initialize with an array of structs
 

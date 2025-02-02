@@ -34,13 +34,11 @@ void PlayerDash(Player* player, AEGfxVertexList* CooldownMesh, f32 dt);
 
 void CheckCollision(Player& player, const Boundaries& boundary);
 
-void ElasticEnemyCollision(Player& player, Ground_enemy& enemy);
+void ElasticEnemyCollision(Player& player, f32 enemy_x, f32 enemy_y, f32 enemy_width, f32 enemy_height);
 
-void InitializePlatform(Platform& platform);
+void InitializeBoundary(Boundaries& platform);
 
-void RenderPlatform(Platform& platform, AEGfxVertexList* mesh);
-
-void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt);
+void UpdateGroundEnemy(Ground_enemy& enemy, Boundaries& boundary, float dt);
 
 void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh);
 

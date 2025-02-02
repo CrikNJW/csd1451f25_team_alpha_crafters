@@ -244,9 +244,9 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player) {
 	f32 buffer = 100.f; //to accomodate the rendering of squares at the side windows
 
 	//Dim the black colour rectangle
-	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
+	//AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.8f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.987f);
 	
 	f32 x_pos = player.posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player.posY - (rec_height/2.0f) - buffer;
@@ -472,16 +472,16 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 
 
  // for bounce collision between player and enemy
- void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
+ void ElasticEnemyCollision(Player& player, f32 enemy_x, f32 enemy_y, f32 enemy_width, f32 enemy_height) {
 // need a flag for checking if player dashing D:
 	 if (!player.isDashing) {
 		 //flag for collision
 		 bool isBouncing = false;
 		 // Calculate the edges of the centered enemy rectangle 
-		 float enemyLeft = enemy.PosX - enemy.Width / 2;
-		 float enemyRight = enemy.PosX + enemy.Width / 2;
-		 float enemyTop = enemy.PosY - enemy.Height / 2;
-		 float enemyBottom = enemy.PosY + enemy.Height / 2;
+		 float enemyLeft = enemy_x - enemy_width / 2;
+		 float enemyRight = enemy_x + enemy_width / 2;
+		 float enemyTop = enemy_y - enemy_height / 2;
+		 float enemyBottom = enemy_y + enemy_height / 2;
 		 // Calculate the edges of the player rectangle  
 		 float playerLeft = player.posX - player.width / 2;
 		 float playerRight = player.posX + player.width / 2;
@@ -527,11 +527,11 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 	 }
 	 else {
 		 // During dash, check for collision but don't bounce
-		 // Calculate the edges of the centered enemy rectangle 
-		 float enemyLeft = enemy.PosX - enemy.Width / 2;
-		 float enemyRight = enemy.PosX + enemy.Width / 2;
-		 float enemyTop = enemy.PosY - enemy.Height / 2;
-		 float enemyBottom = enemy.PosY + enemy.Height / 2;
+		  // Calculate the edges of the centered enemy rectangle 
+		 float enemyLeft = enemy_x - enemy_width / 2;
+		 float enemyRight = enemy_x + enemy_width / 2;
+		 float enemyTop = enemy_y - enemy_height / 2;
+		 float enemyBottom = enemy_y + enemy_height / 2;
 		 // Calculate the edges of the player rectangle  
 		 float playerLeft = player.posX - player.width / 2;
 		 float playerRight = player.posX + player.width / 2;
@@ -550,7 +550,7 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 }
 
 
-void InitializePlatform(Platform& platform) {
+void InitializeBoundary(Boundaries& platform) {
 
 	AEMtx33 scaleMtx, translateMtx;
 	AEMtx33Scale(&scaleMtx, platform.Width, platform.Height);
@@ -558,20 +558,14 @@ void InitializePlatform(Platform& platform) {
 	AEMtx33Concat(&platform.finalTransform, &translateMtx, &scaleMtx);
 }
 
-void RenderPlatform(Platform& platform, AEGfxVertexList* mesh) {
 
-	AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f); // Green color
-	AEGfxSetTransform(platform.finalTransform.m); // Apply precomputed transformation
-	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
-}
 
-void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt) {
+void UpdateGroundEnemy(Ground_enemy& enemy, Boundaries &boundary, float dt) {
 	
-	float platformLeft = platform.PosX - (platform.Width / 2) - (enemy.Width / 2);
-	float platformRight = platform.PosX + (platform.Width / 2) + (enemy.Width / 2);
-	float platformTop = platform.PosY + (platform.Height / 2) + (enemy.Width / 2);
-	float platformBottom = platform.PosY - (platform.Height / 2) - (enemy.Width / 2);
+	float platformLeft = boundary.PosX - (boundary.Width / 2) - (enemy.Width / 2);
+	float platformRight = boundary.PosX + (boundary.Width / 2) + (enemy.Width / 2);
+	float platformTop = boundary.PosY + (boundary.Height / 2) + (enemy.Width / 2);
+	float platformBottom = boundary.PosY - (boundary.Height / 2) - (enemy.Width / 2);
 
 	switch (enemy.MovementState) {
 	case Ground_enemy::MOVE_RIGHT:
@@ -793,7 +787,7 @@ void RenderBurrowingEnemy(Burrowing_enemy& enemy, AEGfxVertexList* BurrowingEnem
 }
 
 void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh) {
-	AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f); // Green for platform
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f); // Green for platform
 
 	AEMtx33 boundaryTransform = createTransformMtx(boundary.Width, boundary.Height, 0.0f, boundary.PosX, boundary.PosY);
 	AEGfxSetTransform(boundaryTransform.m);

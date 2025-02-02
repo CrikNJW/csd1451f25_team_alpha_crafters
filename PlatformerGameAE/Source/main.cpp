@@ -80,8 +80,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	425.0f, // Y position (top of screen) 
 	1600.0f, // Width 
 	50.0f    // Height 
+	};
+
+	Boundaries testWall3{
+	-800.0f,   // X position (center) 
+	0.0f, // Y position (top of screen) 
+	50.0f, // Width 
+	900.0f    // Height 
+	};
+	InitializeBoundary(testWall3);
+
+	Boundaries testWall4{
+	800.0f,   // X position (center) 
+	0.0f, // Y position 
+	50.0f, // Width 
+	900.0f    // Height 
 
 	};
+	InitializeBoundary(testWall4);
 
 	//Initialization of test ground_enemy 
 	Ground_enemy ground_enemy1{
@@ -92,15 +108,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	 0
 	};
 
-
 	LavaSpout volcano = { 500.0f, 150.0f }; // Volcano at (500,150)
-	Platform volcanoPlatform = { 500.0f, 130.0f, 200.0f, 20.0f }; // platform under the volcano
-	InitializePlatform(volcanoPlatform);
+	Boundaries volcanoPlatform = { 500.0f, 130.0f, 200.0f, 20.0f }; // platform under the volcano
+	InitializeBoundary(volcanoPlatform);
 
-	//Initialisation of Player Variables
-	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health
-	Platform platform = {400.0f, 300.0f, 500.0f, 70.0f};
-	InitializePlatform(platform);
+	
+	Boundaries platform = {400.0f, 300.0f, 500.0f, 70.0f};
+	InitializeBoundary(platform);
 	Ground_enemy enemy = {platform.PosX - (platform.Width / 2) + (50.0f / 2),  // Start at platform left edge
 	platform.PosY + (platform.Height / 2) + (50.0f / 2), // Place on top of the platform
 	50.0f, 50.0f, 0.0f, 100.0f, Ground_enemy::MOVE_RIGHT};
@@ -111,7 +125,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	50.0f, 150.0f     // Width, Height
 	};
 
-	Burrowing_enemy burrowingEnemy = {
+	Burrowing_enemy burrowingEnemy1 = {
 	-400.0f, 200.0f,   // PosX, PosY (same as boundary for now)
 	40.0f, 40.0f,     // Width, Height
 	10.0f,           // Speed
@@ -124,8 +138,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	&burrowingBoundary //  Assign the boundary
 	};
 
-	burrowingEnemy.PosY = burrowingBoundary.PosY;
-	burrowingEnemy.PosX = burrowingBoundary.PosX;
+	burrowingEnemy1.PosY = burrowingBoundary.PosY;
+	burrowingEnemy1.PosX = burrowingBoundary.PosX;
 
 	// Create an enemy mesh for rendering
 	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh();
@@ -135,13 +149,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	
 
 	// Create array of boundaries 
-	Boundaries boundaries_array[] = { testWall,  testWall2 };
+	Boundaries boundaries_array[] = { testWall,  testWall2, burrowingBoundary, volcanoPlatform, platform, testWall4 , testWall3 };
 	// boundary count to calculate amount of boundaries we need to check collision for 
 	int boundaryCount = sizeof(boundaries_array) / sizeof(Boundaries);
 
 	// Create array of ground enemys 
-	Ground_enemy* Ground_enemy_array[] = { &ground_enemy1, &enemy };
-	int Ground_enemy_count = sizeof(Ground_enemy_array) / sizeof(Ground_enemy*);
+	Ground_enemy* ground_enemy_array[] = { &ground_enemy1, &enemy };
+	int ground_enemy_count = sizeof(ground_enemy_array) / sizeof(Ground_enemy*);
+
+	// Create array of burrowing enemys
+	Burrowing_enemy* burrowing_enemy_array[] = { &burrowingEnemy1 };
+	int burrowing_enemy_count = sizeof(burrowing_enemy_array) / sizeof(Burrowing_enemy*);
+
 
 	// Game Loop
 	while (gGameRunning)
@@ -167,12 +186,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Render enemy
 		RenderGroundEnemy(enemy, squareMesh);
 
-		UpdateBurrowingEnemy(burrowingEnemy, diver.posX, diver.posY, squareMesh, dt);
-		RenderBurrowingEnemy(burrowingEnemy, burrowingEnemyMesh);
+		UpdateBurrowingEnemy(burrowingEnemy1, diver.posX, diver.posY, squareMesh, dt);
+		RenderBurrowingEnemy(burrowingEnemy1, burrowingEnemyMesh);
 		RenderBoundary(burrowingBoundary, squareMesh);
+		RenderBoundary(testWall4, squareMesh);
+		RenderBoundary(testWall3, squareMesh);
+		RenderBoundary(platform, squareMesh);
+		RenderBoundary(volcanoPlatform, squareMesh);
 
-		RenderPlatform(platform, squareMesh);
-		RenderPlatform(volcanoPlatform, squareMesh);
 		//CAMERA SYSTEM, PLAYER RENDERING
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player  
 		// Tell the Alpha Engine to get ready to draw something.  
@@ -221,9 +242,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			CheckCollision(diver, boundaries_array[i]);
 		}
 		//collision for all ground enemy  
-		for (int i = 0; i < Ground_enemy_count; ++i) {
-			ElasticEnemyCollision(diver, *Ground_enemy_array[i]);
+		for (int i = 0; i < ground_enemy_count; ++i) {
+			ElasticEnemyCollision(diver, ground_enemy_array[i]->PosX, ground_enemy_array[i]->PosY, ground_enemy_array[i]->Width, ground_enemy_array[i]->Height);
 		}
+		//collision for all burrowing enemy
+		for (int i = 0; i < burrowing_enemy_count; ++i) {
+			ElasticEnemyCollision(diver, burrowing_enemy_array[i]->PosX, burrowing_enemy_array[i]->PosY, burrowing_enemy_array[i]->Width, burrowing_enemy_array[i]->Height);
+		}
+
+
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
 		//Debugging
