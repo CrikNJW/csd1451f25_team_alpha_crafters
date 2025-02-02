@@ -6,6 +6,7 @@
 #include <iostream>
 #include "utils.hpp"
 #include "Structs.hpp"
+#include <vector>
 
 // ---------------------------------------------------------------------------
 // main
@@ -91,7 +92,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	 0
 	};
 
-	
+
+	LavaSpout volcano = { 500.0f, 150.0f }; // Volcano at (500,150)
+	Platform volcanoPlatform = { 500.0f, 130.0f, 200.0f, 20.0f }; // platform under the volcano
+	InitializePlatform(volcanoPlatform);
 
 	//Initialisation of Player Variables
 	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health
@@ -99,7 +103,36 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	InitializePlatform(platform);
 	Ground_enemy enemy = {platform.PosX - (platform.Width / 2) + (50.0f / 2),  // Start at platform left edge
 	platform.PosY + (platform.Height / 2) + (50.0f / 2), // Place on top of the platform
-	50.0f, 50.0f, 0.0f, 100.0f, MOVE_RIGHT};
+	50.0f, 50.0f, 0.0f, 100.0f, Ground_enemy::MOVE_RIGHT};
+
+	// Burrowing Enemy Initialization
+	Boundaries burrowingBoundary = {
+	-400.0f, 200.0f,   // PosX, PosY
+	50.0f, 150.0f     // Width, Height
+	};
+
+	Burrowing_enemy burrowingEnemy = {
+	-400.0f, 200.0f,   // PosX, PosY (same as boundary for now)
+	40.0f, 40.0f,     // Width, Height
+	10.0f,           // Speed
+	150.0f,           // Detection Radius
+	0.0f,             // Attack Cooldown
+	false,            // isVisible
+	0.0f,             // alertTimer
+	false,            // spawningParticles
+	Burrowing_enemy::IDLE,  // Initial state
+	&burrowingBoundary //  Assign the boundary
+	};
+
+	burrowingEnemy.PosY = burrowingBoundary.PosY;
+	burrowingEnemy.PosX = burrowingBoundary.PosX;
+
+	// Create an enemy mesh for rendering
+	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh();
+
+	//Initialize grid system
+	std::vector<GridCoordinate> fullGrid = initializeGridSystem(50.0f);
+	
 
 	// Create array of boundaries 
 	Boundaries boundaries_array[] = { testWall,  testWall2 };
@@ -115,13 +148,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		// Informing the system about the loop's start
 		AESysFrameStart();
+
+		//Level Creation System Testing
+		GridCoordinate clickPos = handle_LMouseClickInEditor(fullGrid, diver);
+
+
 		dt = f32(AEFrameRateControllerGetFrameTime());
 		// Tell the Alpha Engine to get ready to draw something.
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Color (AE_GFX_RM_TEXTURE)
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
-		float dt = AEFrameRateControllerGetFrameTime();
+		//float dt = AEFrameRateControllerGetFrameTime();
 
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
@@ -129,8 +167,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Render enemy
 		RenderGroundEnemy(enemy, squareMesh);
 
-		RenderPlatform(platform, squareMesh);
+		UpdateBurrowingEnemy(burrowingEnemy, diver.posX, diver.posY, squareMesh, dt);
+		RenderBurrowingEnemy(burrowingEnemy, burrowingEnemyMesh);
+		RenderBoundary(burrowingBoundary, squareMesh);
 
+		RenderPlatform(platform, squareMesh);
+		RenderPlatform(volcanoPlatform, squareMesh);
 		//CAMERA SYSTEM, PLAYER RENDERING
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player  
 		// Tell the Alpha Engine to get ready to draw something.  
@@ -149,9 +191,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//Loop through icicle array and draw each icicle
 		for (int i = 0; i < 2; i++) {
 			icicleCollision(diver, icicle[i]);
-			DrawIcicle(icicle[i].PosX, icicle[i].PosY, squareMesh);
+			DrawIcicle(icicle[i], squareMesh);
 			Draw_UpdateIcicleDrop(icicle[i], squareMesh, dt);
+			CheckCollision(diver, icicle[i].boundaries);
 		}
+
+		for (int i = 0; i < 2; i++) {	
+			lavaCollision(diver, volcano);
+			Draw_UpdateLavaDrop(volcano, squareMesh, dt);
+		}
+
+
 
 		////Dummy Mesh/Object to test camera movement
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
@@ -180,7 +230,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
 
 
-		DrawBlackOverlay(squareMesh, &diver);
+		DrawBlackOverlay(squareMesh, diver);
 		//SpotLight(&diver, spotlightMesh);
 
 
