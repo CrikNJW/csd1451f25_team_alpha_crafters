@@ -134,7 +134,7 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player* player) {
 	//Dim the black colour rectangle
 	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY);
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.9f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.99f);
 	f32 x_pos = -(rec_width/2.0f);
 	f32 y_pos = -(rec_height/2.0f);
 	for (int y = 0; y_pos + (y* square_size) <= rec_height/2.0f; y++){
@@ -380,7 +380,7 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 		 if (playerRight > enemyLeft && playerLeft < enemyRight && playerBottom > enemyTop && playerTop < enemyBottom) {
 			 isBouncing = true;
 			 // Bounce back distance 
-			 float bounceBackDistance = 160.0f; // Adjust this value to control bounce intensity
+			 float bounceBackDistance = 75.0f; // Adjust this value to control bounce intensity
 			 float moveDirectionMultiplier = 0.0f;
 
 			 // Check movement input states
@@ -403,7 +403,7 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 
 			 // Apply bounce effect 
 			 if (isBouncing) {
-				 bounceBackDistance -= 50.0f;
+				 bounceBackDistance -= 25.0f;
 				 player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
 				 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
 				 if (bounceBackDistance <= 0) isBouncing = false;
