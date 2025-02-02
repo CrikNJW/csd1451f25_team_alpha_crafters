@@ -14,24 +14,30 @@
 *	LEVEL CREATION SYSTEM			*
 *									*
 *************************************/
-std::vector<GridCoordinate> initializeGridSystem(f32 squareGridLength) {
+
+/*
+* Creates a vector of grid coordinates for the level.
+* @param squareGridLength: The length of each square grid.
+* @return: A vector of grid coordinates for the level.
+*/
+std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength) {
 	//Create a vector to store the grid coordinates
 	std::vector<GridCoordinate> lineGridCoordinates;
 
-	f32 currLength = 0;
-	f32 currHeight = squareGridLength;
-	f32 middleY = squareGridLength / 2;
+	s32 currLength = 0;
+	s32 currHeight = squareGridLength;
+	s32 middleY = squareGridLength / 2;
 	/*Get the coordinate of each grid, this loop basically
 	stores a horizontal line of grid coordinates in the vector
 	We will multiply/add to the Y coordinate for all elements
 	to get a bigger area.*/
 	while (currLength < 4800){
-		f32 prevLength = currLength;
+		s32 prevLength = currLength;
 
 		currLength += squareGridLength;
 
 		//Get the middle of the grid
-		f32 middleX = (currLength + prevLength) / 2;
+		s32 middleX = (currLength + prevLength) / 2;
 
 		//Store the grid coordinate in the vector
 		lineGridCoordinates.push_back({ middleX, middleY });
@@ -41,7 +47,7 @@ std::vector<GridCoordinate> initializeGridSystem(f32 squareGridLength) {
 	std::vector<GridCoordinate> fullGridCoordinates;
 
 	// Number of rows and columns
-	int numRows = 10; // Number of horizontal grid lines
+	int numRows = 50; // Number of horizontal grid lines
 	int numCols = lineGridCoordinates.size();
 
 	// Generate the full grid
@@ -61,21 +67,53 @@ std::vector<GridCoordinate> initializeGridSystem(f32 squareGridLength) {
 	return fullGridCoordinates;
 }
 
-GridCoordinate getClosestGridCoordinate(const std::vector<GridCoordinate>& grid, f32 x, f32 y) {
-	// Initialize the closest coordinate to the first grid coordinate
+/*
+* Gets the closest grid coordinate in std::vector grid to the mouse position
+* @param grid: The vector of grid coordinates to check
+* @param mouseX: The x position of the mouse
+* @param mouseY: The y position of the mouse
+* @return: The closest grid coordinate to the mouse
+*/
+GridCoordinate getClosestGridCoordinate(const std::vector<GridCoordinate>& grid, s32 mouseX, s32 mouseY, s32 playerX, s32 playerY) {
+	//mouseX and mouseY currently SCREEN SPACE, we need to convert them to WORLD SPACE to account for player position.
+	//We will do this by adding the player's position to the mouse position
+	s32 adjustedMouseX = mouseX + playerX;
+	s32 adjustedMouseY = mouseY + playerY;
+	
+	// Initialize the closest coordinate to the first grid, this is just a starting point so it doesn't matter
 	GridCoordinate closestCoord = grid[0];
-	f32 closestDist = sqrt((closestCoord.x - x) * (closestCoord.x - x) + (closestCoord.y - y) * (closestCoord.y - y));
 
-	// Iterate through the grid coordinates to find the closest one
+	// Use the novel pythagorean theorem to get the distance between the closest coordinate and the mouse, this is just a starting point so it doesn't matter
+	s32 closestDist = sqrt((closestCoord.x - adjustedMouseX) * (closestCoord.x - adjustedMouseX) + (closestCoord.y - adjustedMouseY) * (closestCoord.y - adjustedMouseY));
+
+	// For each grid coordinate, check if it is closer to the mouse than the current closest coordinate
 	for (GridCoordinate coord : grid) {
-		f32 dist = sqrt((coord.x - x) * (coord.x - x) + (coord.y - y) * (coord.y - y));
+		s32 dist = sqrt((coord.x - adjustedMouseX) * (coord.x - adjustedMouseX) + (coord.y - adjustedMouseY) * (coord.y - adjustedMouseY));
+		
+		// If the distance is smaller, update the closest coordinate and distance
 		if (dist < closestDist) {
-			closestDist = dist;
-			closestCoord = coord;
+			closestDist = dist; // Update the closest distance
+			closestCoord = coord; // Update the closest coordinate
 		}
 	}
 
 	return closestCoord;
+}
+
+GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& grid, Player& diver) {
+	if (AEInputCheckReleased(AEVK_LBUTTON)) {
+		s32 mouseX, mouseY;
+		AEInputGetCursorPosition(&mouseX, &mouseY);
+
+		//Get the closest grid coordinate to the mouse
+		GridCoordinate closestCoord = getClosestGridCoordinate(grid, mouseX, mouseY, diver.posX, diver.posY);
+
+		//Debugging
+		std::cout << "Closest Coordinate " << closestCoord.x << " " << closestCoord.y << '\n';
+
+		//Return the closest grid coordinate
+		return closestCoord;
+	}
 }
 /************************************
 *									*

@@ -85,6 +85,6 @@ struct LavaSpout {
 };
 
 struct GridCoordinate {
-	f32 x, y;
+	s32 x, y;
 };
 

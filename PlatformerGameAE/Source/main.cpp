@@ -35,7 +35,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//f32 icicleDropOffset = 5.0f;
 	//AEGfxVertexList* icicleMesh = createSquareMesh();
 	Icicle* icicle = new Icicle[2]{ {-200,80}, {-320,100} };
-	int icicleCount = sizeof(*icicle) / sizeof(Icicle);
 
 	//Spotlight effect Mesh
 	AEGfxVertexList* spotlightMesh = createCircleMesh();
@@ -110,6 +109,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		// Informing the system about the loop's start
 		AESysFrameStart();
+
+		//Level Creation System Testing
+		GridCoordinate clickPos = handle_LMouseClickInEditor(fullGrid, diver);
+
+
 		dt = f32(AEFrameRateControllerGetFrameTime());
 		// Tell the Alpha Engine to get ready to draw something.
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Color (AE_GFX_RM_TEXTURE)
@@ -140,7 +144,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//ICIRCLE RENDERING
 		//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
 		//Loop through icicle array and draw each icicle
-		for (int i = 0; i < icicleCount; i++) {
+		for (int i = 0; i < 2; i++) {
 			icicleCollision(diver, icicle[i]);
 			DrawIcicle(icicle[i], squareMesh);
 			Draw_UpdateIcicleDrop(icicle[i], squareMesh, dt);

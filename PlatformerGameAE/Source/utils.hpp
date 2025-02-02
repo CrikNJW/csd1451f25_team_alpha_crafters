@@ -10,7 +10,9 @@
 AEGfxVertexList* createSquareMesh();
 AEGfxVertexList* createCircleMesh();
 AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, f32 translY);
-std::vector<GridCoordinate> initializeGridSystem(f32 squareGridLength);
+std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength);
+GridCoordinate getClosestGridCoordinate(const std::vector<GridCoordinate>& grid, s32 mouseX, s32 mouseY, s32 playerX, s32 playerY);
+GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& grid, Player& diver);
 
 void DrawIcicle(Icicle &icicle, AEGfxVertexList* icicleMesh);
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt);
