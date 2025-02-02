@@ -32,18 +32,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	f32 dt;
 
 	//Dummy icicle array that stores coordinates of each icicle.
-	//f32 icicleDropOffset = 5.0f;
-	//AEGfxVertexList* icicleMesh = createSquareMesh();
 	Icicle* icicle = new Icicle[2]{ {-400,200}, {-300,200} };
 	for (int i = 0; i < 2; i++) {
 		initIcicle(icicle[i]);
 	}
 
 	//Spotlight effect Mesh
-	AEGfxVertexList* spotlightMesh = createCircleMesh();
-	//AEGfxVertexList* dummyMesh = createSquareMesh();
-	//AEGfxVertexList* GroundEnemyMesh = createSquareMesh();
-	//AEGfxVertexList* PlatformMesh = createSquareMesh();
+	//AEGfxVertexList* spotlightMesh = createCircleMesh();
 
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
@@ -52,7 +47,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 
 	//Initialisation of Player Variables 
- // Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health, maxhealth
+	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health, maxhealth
 	Player diver = {
 		0.f, // Pos X
 		0.f, // Pos Y
@@ -73,7 +68,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Initialisation of Boundary Variables 
 	Boundaries testWall = {
 	0.0f,   // X position (center) 
-	-400.0f, // Y position (bottom of screen) 
+	-425.0f, // Y position (bottom of screen) 
 	1600.0f, // Width 
 	50.0f    // Height 
 	};
@@ -129,7 +124,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	};
 
 	Burrowing_enemy burrowingEnemy1 = {
-	-400.0f, 200.0f,   // PosX, PosY (same as boundary for now)
+	-400.0f, 200.0f,   // PosX, PosY
 	40.0f, 40.0f,     // Width, Height
 	10.0f,           // Speed
 	150.0f,           // Detection Radius
@@ -148,7 +143,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh();
 
 	//Initialize grid system
-	std::vector<GridCoordinate> fullGrid = initializeGridSystem(50.0);
+	std::vector<GridCoordinate> fullGrid = initializeGridSystem(50);
 	
 
 	// Create array of boundaries 
@@ -181,7 +176,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
-		//float dt = AEFrameRateControllerGetFrameTime();
 
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
@@ -189,7 +183,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Render enemy
 		RenderGroundEnemy(enemy, squareMesh);
 
-		UpdateBurrowingEnemy(burrowingEnemy1, diver.posX, diver.posY, squareMesh, dt);
+		UpdateBurrowingEnemy(burrowingEnemy1, diver.posX, diver.posY, dt);
 		RenderBurrowingEnemy(burrowingEnemy1, burrowingEnemyMesh);
 		RenderBoundary(burrowingBoundary, squareMesh);
 		RenderBoundary(testWall4, squareMesh);
@@ -210,8 +204,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Render health bar
 		RenderHealthBar(diver, squareMesh);
 
-		//ICIRCLE RENDERING
-		//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
+		//ICICLE RENDERING
 		//Loop through icicle array and draw each icicle
 		for (int i = 0; i < 2; i++) {
 			icicleCollision(diver, icicle[i]);
@@ -227,7 +220,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 
-		////Dummy Mesh/Object to test camera movement
+		//Dummy Mesh/Object to test camera movement
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
 		// Draw test wall
 		AEMtx33 wallMtx = createTransformMtx(testWall.Width, testWall.Height, 0, testWall.PosX, testWall.PosY);
@@ -253,17 +246,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			ElasticEnemyCollision(diver, burrowing_enemy_array[i]->PosX, burrowing_enemy_array[i]->PosY, burrowing_enemy_array[i]->Width, burrowing_enemy_array[i]->Height);
 		}
 
-
+		//Reset all colours to 0
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
-
-		//Debugging
-		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
-
 
 		DrawBlackOverlay(squareMesh, diver);
 		//SpotLight(&diver, spotlightMesh);
-
-
 
 		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist()) {
@@ -275,10 +262,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	
 	// free the system
 	AEGfxMeshFree(squareMesh);
-	AEGfxMeshFree(spotlightMesh);
+	//AEGfxMeshFree(spotlightMesh);
+	AEGfxMeshFree(burrowingEnemyMesh);
 
 	//Free the icicle array
 	delete[] icicle;
+	fullGrid.clear();
 
 	// free the system
 	AESysExit();
