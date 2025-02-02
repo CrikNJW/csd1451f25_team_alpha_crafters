@@ -25,7 +25,7 @@ std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength) {
 	//Create a vector to store the grid coordinates
 	std::vector<GridCoordinate> lineGridCoordinates;
 
-	s32 currLength = 0;
+	s32 currLength = -4800;
 	s32 middleY = squareGridLength / 2;
 	/*Get the coordinate of each grid, this loop basically
 	stores a horizontal line of grid coordinates in the vector
@@ -498,8 +498,9 @@ bool icicleCollision(Player &player, Icicle &icicle) {
 				 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
 				 if (bounceBackDistance <= 0) isBouncing = false;
 			 }
-			 
+
 			 player.health -= 1;
+
 			 // Bounce the player back in the opposite direction of current movement  
 			
 		 }
