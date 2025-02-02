@@ -115,5 +115,7 @@ struct Burrowing_enemy {
 	Boundaries* boundary;
 
 	/*LavaSpout dirtParticles;*/
+struct GridCoordinate {
+	s32 x, y;
 };
 
