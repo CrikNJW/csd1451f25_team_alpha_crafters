@@ -49,7 +49,7 @@ std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength) {
 
 	// Number of rows and columns
 	int numRows = 50; // Number of horizontal grid lines
-	int numCols = lineGridCoordinates.size();
+	int numCols = (int)lineGridCoordinates.size();
 
 	// Generate the full grid
 	for (int row = -numRows; row < numRows; ++row) {
@@ -85,11 +85,11 @@ GridCoordinate getClosestGridCoordinate(const std::vector<GridCoordinate>& grid,
 	GridCoordinate closestCoord = grid[0];
 
 	// Use the novel pythagorean theorem to get the distance between the closest coordinate and the mouse, this is just a starting point so it doesn't matter
-	s32 closestDist = sqrt((closestCoord.x - adjustedMouseX) * (closestCoord.x - adjustedMouseX) + (closestCoord.y - adjustedMouseY) * (closestCoord.y - adjustedMouseY));
+	double closestDist = sqrt((closestCoord.x - adjustedMouseX) * (closestCoord.x - adjustedMouseX) + (closestCoord.y - adjustedMouseY) * (closestCoord.y - adjustedMouseY));
 
 	// For each grid coordinate, check if it is closer to the mouse than the current closest coordinate
 	for (GridCoordinate coord : grid) {
-		s32 dist = sqrt((coord.x - adjustedMouseX) * (coord.x - adjustedMouseX) + (coord.y - adjustedMouseY) * (coord.y - adjustedMouseY));
+		double dist = sqrt((coord.x - adjustedMouseX) * (coord.x - adjustedMouseX) + (coord.y - adjustedMouseY) * (coord.y - adjustedMouseY));
 		
 		// If the distance is smaller, update the closest coordinate and distance
 		if (dist < closestDist) {
@@ -107,7 +107,7 @@ GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& gri
 		AEInputGetCursorPosition(&mouseX, &mouseY);
 
 		//Get the closest grid coordinate to the mouse
-		GridCoordinate closestCoord = getClosestGridCoordinate(grid, mouseX, mouseY, diver.posX, diver.posY);
+		GridCoordinate closestCoord = getClosestGridCoordinate(grid, mouseX, mouseY, (s32)diver.posX, (s32)diver.posY);
 
 		//Debugging
 		std::cout << "Closest Coordinate " << closestCoord.x << " " << closestCoord.y << '\n';
@@ -115,6 +115,9 @@ GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& gri
 		//Return the closest grid coordinate
 		return closestCoord;
 	}
+
+	return { 0,0 };
+
 }
 /************************************
 *									*
@@ -630,7 +633,7 @@ void RenderHealthBar(const Player& player, AEGfxVertexList* mesh) {
 }
 
 void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt) {
-	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red for lava
+	AEGfxSetColorToAdd(1.0f, 0.61f, 0.0f, 1.0f); // Red for lava
 
 	// Handle cooldown before respawn
 	if (!lavaSpout.isActive) {
