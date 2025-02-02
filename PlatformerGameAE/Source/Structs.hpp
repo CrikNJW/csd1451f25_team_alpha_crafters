@@ -42,15 +42,16 @@ struct Boundaries {
 // Initialize with an array of structs
 
 struct Icicle {
-	float PosX, PosY;
+	f32 PosX = 0;
+	f32 PosY = 0;
 	float dropOffsetY = 0;
 	float dropSpeed = 70;
-	float childX = PosX;
-	float childY = PosY;
+	float childX = 0;
+	float childY = 0;
 	float timeElapsed = 0;
 	float cooldown = 2;
 	float cooldownElapsed = 0;
-	Boundaries boundaries = {PosX, PosY, 40, 40};
+	Boundaries boundaries = { 0, 0, 40, 40};
 };
 
 struct LavaSpout {

@@ -191,27 +191,6 @@ AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, 
 	return transformMtx;
 }
 
-//int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y)
-//{
-//	// Reason why use half width and height is because the rectangle button was drew from the middle
-//	float half_width = area_width / 2.0;
-//	float half_height = area_height / 2.0;
-//
-//	// Compute the boundaries of the button rectangle
-//	float left_bound = area_center_x - half_width;
-//	float right_bound = area_center_x + half_width;
-//	float top_bound = area_center_y - half_height;
-//	float bottom_bound = area_center_y + half_height;
-//
-//	// Check if the Mouse_Input is within the boundaries
-//	if (click_x >= left_bound && click_x <= right_bound && click_y >= top_bound && click_y <= bottom_bound) {
-//		return 1;
-//	}
-//	else {
-//		return 0;
-//	}
-//}
-
 int IsCircleClicked(float circle_center_x, float circle_center_y, float radius, float click_x, float click_y)
 {
 	// distance = sgrt of [(X1 - X2)^2 + (Y1 - Y2)^2], we eliminate the sqrt by squaring the radius later
@@ -246,7 +225,7 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player) {
 	//Dim the black colour rectangle
 	//AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.1f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.95f);
 	
 	f32 x_pos = player.posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player.posY - (rec_height/2.0f) - buffer;
@@ -379,6 +358,13 @@ void PlayerDash(Player* player, AEGfxVertexList* CooldownMesh, f32 dt) { // play
 
 		
 	}
+}
+
+void initIcicle(Icicle& icicle) {
+	icicle.childX = icicle.PosX;
+	icicle.childY = icicle.PosY;
+	icicle.boundaries.PosX = icicle.PosX;
+	icicle.boundaries.PosY = icicle.PosY;
 }
 
 //Draw icicle at the given position
@@ -658,7 +644,7 @@ void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float 
 			lavaSpout.lavaY = lavaSpout.PosY;
 
 			// Random horizontal velocity between -30 to -60 or 30 to 60
-			lavaSpout.velocityX = (rand() % 31 + 30) * (rand() % 2 == 0 ? 1 : -1);
+			lavaSpout.velocityX = (f32)((rand() % 31 + 30) * (rand() % 2 == 0 ? 1 : -1));
 			lavaSpout.velocityY = 120.0f;  // Initial upward velocity
 
 			lavaSpout.timeElapsed = 0;
@@ -725,11 +711,7 @@ void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, 
         case Burrowing_enemy::ALERT:
             if (enemy.alertTimer > 0) {
                 enemy.alertTimer -= dt;
-				//enemy.dirtParticles.velocityY = 50.0f;
-				//enemy.dirtParticles.velocityX = (rand() % 21 - 10);
-				//enemy.dirtParticles.cooldown = 0.8f;
-				//AEGfxSetColorToMultiply(0.6f, 0.3f, 0.0f, 1.0f); // Brown for dirt effect
-				//Draw_UpdateLavaDrop(enemy.dirtParticles, lavaMesh, dt);  // Use the existing function
+
 			} else {
 				enemy.State = Burrowing_enemy::ATTACKING;
 				enemy.attackCooldown = 0.3f; // Stays out for a short moment
@@ -795,32 +777,3 @@ void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh) {
 
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
-
-//health bar
-/*
-void RenderHealthBar(const Player& player) {
-	float barWidth = 200.0f; // Total width of the health bar
-	float barHeight = 20.0f; // Height of the health bar
-	float healthPercentage = static_cast<float>(player.health) / player.maxhealth;
-
-	// Health bar position (above the player)
-	float barPosX = player.posX;
-	float barPosY = player.posY + player.height + 20.0f;
-
-	//need help with the colour
-	/*
-	// Create the health bar background (red)
-	AEMtx33 backgroundTransform = createTransformMtx(barWidth, barHeight, 0.0f, barPosX, barPosY);
-	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red for background
-	AEGfxSetTransform(backgroundTransform.m);
-	AEGfxMeshDraw(createSquareMesh(), AE_GFX_MDM_TRIANGLES);
-	
-
-	// Create the current health bar (green)
-	float currentWidth = barWidth * healthPercentage;
-	AEMtx33 healthTransform = createTransformMtx(currentWidth, barHeight, 0.0f, barPosX - (barWidth - currentWidth) / 2, barPosY);
-	AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f); // Green for health
-	AEGfxSetTransform(healthTransform.m);
-	AEGfxMeshDraw(createSquareMesh(), AE_GFX_MDM_TRIANGLES);
-}
-*/

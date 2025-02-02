@@ -35,6 +35,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//f32 icicleDropOffset = 5.0f;
 	//AEGfxVertexList* icicleMesh = createSquareMesh();
 	Icicle* icicle = new Icicle[2]{ {-500,200}, {-400,200} };
+	for (int i = 0; i < 2; i++) {
+		initIcicle(icicle[i]);
+	}
 
 	//Spotlight effect Mesh
 	AEGfxVertexList* spotlightMesh = createCircleMesh();
@@ -145,7 +148,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh();
 
 	//Initialize grid system
-	std::vector<GridCoordinate> fullGrid = initializeGridSystem(50.0f);
+	std::vector<GridCoordinate> fullGrid = initializeGridSystem(50.0);
 	
 
 	// Create array of boundaries 

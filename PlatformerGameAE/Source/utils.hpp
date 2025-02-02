@@ -17,6 +17,7 @@ GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& gri
 void DrawIcicle(Icicle &icicle, AEGfxVertexList* icicleMesh);
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt);
 bool icicleCollision(Player& player, Icicle& icicle);
+void initIcicle(Icicle& icicle);
 
 //int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y);
 int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter, float click_x, float click_y);
