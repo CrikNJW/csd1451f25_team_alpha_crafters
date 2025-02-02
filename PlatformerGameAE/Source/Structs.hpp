@@ -113,9 +113,9 @@ struct Burrowing_enemy {
 	BurrowingEnemyState State;
 
 	Boundaries* boundary;
+};
 
-	/*LavaSpout dirtParticles;*/
+/*LavaSpout dirtParticles;*/
 struct GridCoordinate {
 	s32 x, y;
 };
-
