@@ -23,7 +23,7 @@ int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter
 
 int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c2_y, float r2);
 
-void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player* player);
+void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player);
 
 void SpotLight(Player* player, AEGfxVertexList* circle_mesh);
 void UpdatePlayerPos(Player* player, AEGfxVertexList* player_mesh, f32 dt);
