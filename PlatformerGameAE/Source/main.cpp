@@ -34,7 +34,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Dummy icicle array that stores coordinates of each icicle.
 	//f32 icicleDropOffset = 5.0f;
 	//AEGfxVertexList* icicleMesh = createSquareMesh();
-	Icicle* icicle = new Icicle[2]{ {-200,80}, {-320,100} };
+	Icicle* icicle = new Icicle[2]{ {-500,200}, {-400,200} };
 
 	//Spotlight effect Mesh
 	AEGfxVertexList* spotlightMesh = createCircleMesh();
@@ -101,19 +101,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	//Initialization of test ground_enemy 
 	Ground_enemy ground_enemy1{
-	 100.0f,
-	 100.0f,
+	 -200.0f,
+	 200.0f,
 	 100.0f,
 	 100.0f,
 	 0
 	};
 
-	LavaSpout volcano = { 500.0f, 150.0f }; // Volcano at (500,150)
-	Boundaries volcanoPlatform = { 500.0f, 130.0f, 200.0f, 20.0f }; // platform under the volcano
+	LavaSpout volcano = { -200.0f, -180.0f }; // Volcano at (500,150)
+	Boundaries volcanoPlatform = { -200.0f, -200.0f, 200.0f, 20.0f }; // platform under the volcano
 	InitializeBoundary(volcanoPlatform);
 
 	
-	Boundaries platform = {400.0f, 300.0f, 500.0f, 70.0f};
+	Boundaries platform = {400.0f, 0.0f, 500.0f, 70.0f};
 	InitializeBoundary(platform);
 	Ground_enemy enemy = {platform.PosX - (platform.Width / 2) + (50.0f / 2),  // Start at platform left edge
 	platform.PosY + (platform.Height / 2) + (50.0f / 2), // Place on top of the platform
@@ -121,7 +121,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Burrowing Enemy Initialization
 	Boundaries burrowingBoundary = {
-	-400.0f, 200.0f,   // PosX, PosY
+	-600.0f, 0.0f,   // PosX, PosY
 	50.0f, 150.0f     // Width, Height
 	};
 

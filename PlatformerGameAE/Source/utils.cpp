@@ -246,7 +246,7 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player) {
 	//Dim the black colour rectangle
 	//AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.987f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.1f);
 	
 	f32 x_pos = player.posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player.posY - (rec_height/2.0f) - buffer;
