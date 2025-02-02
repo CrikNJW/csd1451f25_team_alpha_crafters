@@ -34,7 +34,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Dummy icicle array that stores coordinates of each icicle.
 	//f32 icicleDropOffset = 5.0f;
 	//AEGfxVertexList* icicleMesh = createSquareMesh();
-	Icicle* icicle = new Icicle[2]{ {-500,200}, {-400,200} };
+	Icicle* icicle = new Icicle[2]{ {-400,200}, {-300,200} };
 	for (int i = 0; i < 2; i++) {
 		initIcicle(icicle[i]);
 	}
@@ -124,7 +124,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Burrowing Enemy Initialization
 	Boundaries burrowingBoundary = {
-	-600.0f, 0.0f,   // PosX, PosY
+	-500.0f, 0.0f,   // PosX, PosY
 	50.0f, 150.0f     // Width, Height
 	};
 

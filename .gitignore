@@ -6,6 +6,6 @@
 *.db-wal
 *.vsidx
 *.opendb
-/Thalassa/.vs
 /Thalassa/.tmp
+/Thalassa/.vs
 /Thalassa/bin
