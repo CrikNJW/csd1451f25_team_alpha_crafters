@@ -10,120 +10,6 @@
 //#define AESinDeg(x) AESin(AEDegToRad(x));
 //#define AECosDeg(x) AESin(AEDegToRad(x));
 
-/************************************
-*									*
-*	LEVEL CREATION SYSTEM			*
-*									*
-*************************************/
-
-/*
-* Creates a vector of grid coordinates for the level.
-* @param squareGridLength: The length of each square grid.
-* @return: A vector of grid coordinates for the level.
-*/
-std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength) {
-	//Create a vector to store the grid coordinates
-	std::vector<GridCoordinate> lineGridCoordinates;
-
-	s32 currLength = -4800;
-	s32 middleY = squareGridLength / 2;
-	/*Get the coordinate of each grid, this loop basically
-	stores a horizontal line of grid coordinates in the vector
-	We will multiply/add to the Y coordinate for all elements
-	to get a bigger area.*/
-	while (currLength < 4800){
-		s32 prevLength = currLength;
-
-		currLength += squareGridLength;
-
-		//Get the middle of the grid
-		s32 middleX = (currLength + prevLength) / 2;
-
-		//Store the grid coordinate in the vector
-		lineGridCoordinates.push_back({ middleX, middleY });
-	}
-
-	// Create a vector to store the full grid coordinates
-	std::vector<GridCoordinate> fullGridCoordinates;
-
-	// Number of rows and columns
-	int numRows = 50; // Number of horizontal grid lines
-	int numCols = (int)lineGridCoordinates.size();
-
-	// Generate the full grid
-	for (int row = -numRows; row < numRows; ++row) {
-		for (int col = 0; col < numCols; ++col) {
-			GridCoordinate coord = lineGridCoordinates[col];
-			coord.y += row * squareGridLength;
-			fullGridCoordinates.push_back(coord);
-		}
-	}
-
-	/*// Print the grid coordinates
-	for (GridCoordinate coord : fullGridCoordinates) {
-		std::cout << "X: " << coord.x << " Y: " << coord.y << '\n';
-	}*/
-
-	return fullGridCoordinates;
-}
-
-/*
-* Gets the closest grid coordinate in std::vector grid to the mouse position
-* @param grid: The vector of grid coordinates to check
-* @param mouseX: The x position of the mouse
-* @param mouseY: The y position of the mouse
-* @return: The closest grid coordinate to the mouse
-*/
-GridCoordinate getClosestGridCoordinate(const std::vector<GridCoordinate>& grid, s32 mouseX, s32 mouseY, s32 playerX, s32 playerY) {
-	//mouseX and mouseY currently SCREEN SPACE, we need to convert them to WORLD SPACE to account for player position.
-	//We will do this by adding the player's position to the mouse position
-	s32 adjustedMouseX = mouseX + playerX;
-	s32 adjustedMouseY = mouseY + playerY;
-	
-	// Initialize the closest coordinate to the first grid, this is just a starting point so it doesn't matter
-	GridCoordinate closestCoord = grid[0];
-
-	// Use the novel pythagorean theorem to get the distance between the closest coordinate and the mouse, this is just a starting point so it doesn't matter
-	double closestDist = sqrt((closestCoord.x - adjustedMouseX) * (closestCoord.x - adjustedMouseX) + (closestCoord.y - adjustedMouseY) * (closestCoord.y - adjustedMouseY));
-
-	// For each grid coordinate, check if it is closer to the mouse than the current closest coordinate
-	for (GridCoordinate coord : grid) {
-		double dist = sqrt((coord.x - adjustedMouseX) * (coord.x - adjustedMouseX) + (coord.y - adjustedMouseY) * (coord.y - adjustedMouseY));
-		
-		// If the distance is smaller, update the closest coordinate and distance
-		if (dist < closestDist) {
-			closestDist = dist; // Update the closest distance
-			closestCoord = coord; // Update the closest coordinate
-		}
-	}
-
-	return closestCoord;
-}
-
-GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& grid, Player& diver) {
-	if (AEInputCheckReleased(AEVK_LBUTTON)) {
-		s32 mouseX, mouseY;
-		AEInputGetCursorPosition(&mouseX, &mouseY);
-
-		//Get the closest grid coordinate to the mouse
-		GridCoordinate closestCoord = getClosestGridCoordinate(grid, mouseX, mouseY, (s32)diver.posX, (s32)diver.posY);
-
-		//Debugging
-		std::cout << "Closest Coordinate " << closestCoord.x << " " << closestCoord.y << '\n';
-
-		//Return the closest grid coordinate
-		return closestCoord;
-	}
-
-	return { 0,0 };
-
-}
-/************************************
-*									*
-*	END OF LEVEL CREATION SYSTEM	*
-*									*
-*************************************/
-
 AEGfxVertexList* createSquareMesh() {
 	u32 white = 0xFFFFFFFF;
 
@@ -216,7 +102,6 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 	}
 }
 
-
 void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player, LavaSpout& lava) {
 	f32 rec_width = f32(AEGfxGetWindowWidth());
 	f32 rec_height =f32(AEGfxGetWindowHeight());
@@ -227,7 +112,7 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player, LavaSpout& l
 	//Dim the black colour rectangle
 	//AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.95f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.1f);
 	
 	f32 x_pos = player.posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player.posY - (rec_height/2.0f) - buffer;
@@ -770,3 +655,91 @@ void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh) {
 
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
+
+/************************************
+*									*
+*	LEVEL CREATION SYSTEM			*
+*									*
+*************************************/
+
+/*
+* Gets the closest grid coordinate in std::vector grid to the mouse position
+* @param grid: The vector of grid coordinates to check
+* @param mouseX: The x position of the mouse
+* @param mouseY: The y position of the mouse
+* @return: The closest grid coordinate to the mouse
+*/
+GridCoordinate getClosestGridCoordinate(s32 mouseX, s32 mouseY, s32 playerX, s32 playerY, s32 squareGridLength) {
+	s32 screenWidth = AEGfxGetWindowWidth();
+	s32 screenHeight = AEGfxGetWindowHeight();
+	s32 screenCenterX = screenWidth / 2;
+	s32 screenCenterY = screenHeight / 2;
+
+	/*Convert screen-space mouse coordinates to world-space coordinates
+
+	E.g. If player is at world-space 0,0, clicking the center of the screen
+	would give us screen-space 800,450. We want to convert this to world-space 0,0 as it
+	accurately reflects the player's position.
+
+	Solution to get adjusted X: ScreenspaceX(800) - screenCenterX(800) + playerworldspaceX(0) = worldspaceX(0)
+	Solution to get adjusted Y: screenCenterY(450) - ScreenspaceY(450) + playerworldspaceY(0) = worldspaceY(0)
+
+	Y-axis is inverted in world-space, screen-space goes from top to bottom, world-space goes from center to top/to bottom.
+
+	E.g. If player is at worldspace (300,200), clicking the center of the screen will give us screenspace(800,450)
+
+	adjustedX = 800 - 800 + 300 = 300
+	adjustedY = 450 - 450 + 200 = 200
+	*/
+	s32 worldMouseX = mouseX - screenCenterX + playerX;
+	s32 worldMouseY = screenCenterY - mouseY + playerY;
+
+	/*Snap to the nearest grid coordinate by rounding up or down, this is more performant than
+	abusing vectors and iterating through them*/
+	s32 gridX = round((float)worldMouseX / squareGridLength) * squareGridLength;
+	s32 gridY = round((float)worldMouseY / squareGridLength) * squareGridLength;
+
+	//Create a coordinate to store the closest grid coordinate
+	GridCoordinate closestGrid = { gridX, gridY };
+	return closestGrid;
+}
+
+GridCoordinate handle_LMouseClickInEditor(Player& diver, s32 squareGridLength, std::vector<ObjectToPlace>& placedObjects, AEGfxVertexList* mesh) {
+	if (AEInputCheckReleased(AEVK_LBUTTON)) {
+		s32 mouseX, mouseY;
+		AEInputGetCursorPosition(&mouseX, &mouseY);
+
+		//Get the closest grid coordinate to the mouse
+		GridCoordinate closestCoord = getClosestGridCoordinate(mouseX, mouseY, (s32)diver.posX, (s32)diver.posY, squareGridLength);
+
+		ObjectToPlace object;
+		object.mesh = mesh;
+		object.gridPos.x = closestCoord.x;
+		object.gridPos.y = closestCoord.y;
+
+		//Add the closest grid coordinate to the vector
+		placedObjects.push_back(object);
+
+		//Debugging
+		std::cout << "Closest Coordinate " << closestCoord.x << " " << closestCoord.y << '\n';
+
+		//Return the closest grid coordinate
+		return closestCoord;
+	}
+
+	return { 0,0 };
+}
+
+void PlaceObject(s32 worldSpaceX, s32 worldSpaceY, AEGfxVertexList* mesh) {
+	//Create a transform matrix to place the object at the specified world-space coordinates
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f); // White colour
+	AEMtx33 transformMtx = createTransformMtx(50, 50, 0, worldSpaceX, worldSpaceY);
+	AEGfxSetTransform(transformMtx.m);
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxSetColorToMultiply(0, 0, 0, 0);
+}
+/************************************
+*									*
+*	END OF LEVEL CREATION SYSTEM	*
+*									*
+*************************************/

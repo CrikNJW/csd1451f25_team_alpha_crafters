@@ -142,10 +142,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Create an enemy mesh for rendering
 	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh();
 
-	//Initialize grid system
-	std::vector<GridCoordinate> fullGrid = initializeGridSystem(50);
-	
-
 	// Create array of boundaries 
 	Boundaries boundaries_array[] = { testWall,  testWall2, burrowingBoundary, volcanoPlatform, platform, testWall4 , testWall3 };
 	// boundary count to calculate amount of boundaries we need to check collision for 
@@ -158,7 +154,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Create array of burrowing enemys
 	Burrowing_enemy* burrowing_enemy_array[] = { &burrowingEnemy1 };
 	int burrowing_enemy_count = sizeof(burrowing_enemy_array) / sizeof(Burrowing_enemy*);
-
+	
+	//Vector to store objects placed in the level
+	std::vector<ObjectToPlace> placedObjects;
 
 	// Game Loop
 	while (gGameRunning)
@@ -166,16 +164,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Informing the system about the loop's start
 		AESysFrameStart();
 
-		//Level Creation System Testing
-		GridCoordinate clickPos = handle_LMouseClickInEditor(fullGrid, diver);
-
-
 		dt = f32(AEFrameRateControllerGetFrameTime());
 		// Tell the Alpha Engine to get ready to draw something.
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Color (AE_GFX_RM_TEXTURE)
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+
+		//Level Creation System Testing
+		GridCoordinate clickPos = handle_LMouseClickInEditor(diver, 50, placedObjects, squareMesh);
+		std::cout << "Placed Objects: " << placedObjects.size() << '\n';
+		//Loop through placed objects and draw them
+		for (int i = 0; i < placedObjects.size(); i++) {
+			PlaceObject(placedObjects[i].gridPos.x, placedObjects[i].gridPos.y, placedObjects[i].mesh);
+		}
 
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
@@ -267,7 +269,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	//Free the icicle array
 	delete[] icicle;
-	fullGrid.clear();
 
 	// free the system
 	AESysExit();
