@@ -32,15 +32,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	f32 dt;
 
 	//Dummy icicle array that stores coordinates of each icicle.
-	//f32 icicleDropOffset = 5.0f;
-	//AEGfxVertexList* icicleMesh = createSquareMesh();
-	Icicle* icicle = new Icicle[2]{ {-200,80}, {-320,100} };
+	Icicle* icicle = new Icicle[2]{ {-400,200}, {-300,200} };
+	for (int i = 0; i < 2; i++) {
+		initIcicle(icicle[i]);
+	}
 
 	//Spotlight effect Mesh
-	AEGfxVertexList* spotlightMesh = createCircleMesh();
-	//AEGfxVertexList* dummyMesh = createSquareMesh();
-	//AEGfxVertexList* GroundEnemyMesh = createSquareMesh();
-	//AEGfxVertexList* PlatformMesh = createSquareMesh();
+	//AEGfxVertexList* spotlightMesh = createCircleMesh();
 
 	// Changing the window title
 	AESysSetWindowTitle("Thalassa");
@@ -49,13 +47,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysReset();
 
 	//Initialisation of Player Variables 
- // Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health, masxhealth
-	Player diver = { 0.f, 0.f, 50.f, 50.f, 0.f, 0.f, 5, 5};
+	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health, maxhealth
+	Player diver = {
+		0.f, // Pos X
+		0.f, // Pos Y
+		50.f, // Width 
+		50.f, // Height
+		0.f, // Rotation degree
+		0.f, // Speed
+		5, // Health
+		5, // Max health
+		false, // dash flag
+		1000.0f, // dash speed
+		0.2f, // dash duration
+		5.0f, // dash cooldown
+		0.0f, // current dash time
+		0.0f // dash cooldown time
+	};
 
 	//Initialisation of Boundary Variables 
 	Boundaries testWall = {
 	0.0f,   // X position (center) 
-	-400.0f, // Y position (bottom of screen) 
+	-425.0f, // Y position (bottom of screen) 
 	1600.0f, // Width 
 	50.0f    // Height 
 	};
@@ -65,44 +78,87 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	425.0f, // Y position (top of screen) 
 	1600.0f, // Width 
 	50.0f    // Height 
+	};
+
+	Boundaries testWall3{
+	-800.0f,   // X position (center) 
+	0.0f, // Y position (top of screen) 
+	50.0f, // Width 
+	900.0f    // Height 
+	};
+	InitializeBoundary(testWall3);
+
+	Boundaries testWall4{
+	800.0f,   // X position (center) 
+	0.0f, // Y position 
+	50.0f, // Width 
+	900.0f    // Height 
 
 	};
+	InitializeBoundary(testWall4);
 
 	//Initialization of test ground_enemy 
 	Ground_enemy ground_enemy1{
-	 100.0f,
-	 100.0f,
+	 -200.0f,
+	 200.0f,
 	 100.0f,
 	 100.0f,
 	 0
 	};
 
+	LavaSpout volcano = { -200.0f, -180.0f }; // Volcano at (500,150)
+	Boundaries volcanoPlatform = { -200.0f, -200.0f, 200.0f, 20.0f }; // platform under the volcano
+	InitializeBoundary(volcanoPlatform);
 
-	LavaSpout volcano = { 500.0f, 150.0f }; // Volcano at (500,150)
-	Platform volcanoPlatform = { 500.0f, 130.0f, 200.0f, 20.0f }; // platform under the volcano
-	InitializePlatform(volcanoPlatform);
+	
+	Boundaries platform = {400.0f, 0.0f, 500.0f, 70.0f};
+	InitializeBoundary(platform);
+	Ground_enemy enemy = {platform.PosX - (platform.Width / 2) + (50.0f / 2),  // Start at platform left edge
+	platform.PosY + (platform.Height / 2) + (50.0f / 2), // Place on top of the platform
+	50.0f, 50.0f, 0.0f, 100.0f, Ground_enemy::MOVE_RIGHT};
 
+	// Burrowing Enemy Initialization
+	Boundaries burrowingBoundary = {
+	-500.0f, 0.0f,   // PosX, PosY
+	50.0f, 150.0f     // Width, Height
+	};
+
+	Burrowing_enemy burrowingEnemy1 = {
+	-400.0f, 200.0f,   // PosX, PosY
+	40.0f, 40.0f,     // Width, Height
+	10.0f,           // Speed
+	150.0f,           // Detection Radius
+	0.0f,             // Attack Cooldown
+	false,            // isVisible
+	0.0f,             // alertTimer
+	false,            // spawningParticles
+	Burrowing_enemy::IDLE,  // Initial state
+	&burrowingBoundary //  Assign the boundary
+	};
+
+	burrowingEnemy1.PosY = burrowingBoundary.PosY;
+	burrowingEnemy1.PosX = burrowingBoundary.PosX;
+
+	// Create an enemy mesh for rendering
+	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh();
+
+	//Initialize grid system
+	std::vector<GridCoordinate> fullGrid = initializeGridSystem(50);
+	
 
 	// Create array of boundaries 
-	Boundaries boundaries_array[] = { testWall,  testWall2 };
+	Boundaries boundaries_array[] = { testWall,  testWall2, burrowingBoundary, volcanoPlatform, platform, testWall4 , testWall3 };
 	// boundary count to calculate amount of boundaries we need to check collision for 
 	int boundaryCount = sizeof(boundaries_array) / sizeof(Boundaries);
 
 	// Create array of ground enemys 
-	Ground_enemy Ground_enemy_array[] = { ground_enemy1 };
-	int Ground_enemy_count = sizeof(Ground_enemy_array) / sizeof(Ground_enemy);
+	Ground_enemy* ground_enemy_array[] = { &ground_enemy1, &enemy };
+	int ground_enemy_count = sizeof(ground_enemy_array) / sizeof(Ground_enemy*);
 
-	//Initialisation of Player Variables
-	// Pos X, Pox Y, Width, Height, Rotation degree, Speed, Health
-	Platform platform = {400.0f, 300.0f, 500.0f, 70.0f};
-	InitializePlatform(platform);
-	Ground_enemy enemy = {platform.PosX - (platform.Width / 2) + (50.0f / 2),  // Start at platform left edge
-	platform.PosY + (platform.Height / 2) + (50.0f / 2), // Place on top of the platform
-	50.0f, 50.0f, 0.0f, 100.0f, MOVE_RIGHT};
+	// Create array of burrowing enemys
+	Burrowing_enemy* burrowing_enemy_array[] = { &burrowingEnemy1 };
+	int burrowing_enemy_count = sizeof(burrowing_enemy_array) / sizeof(Burrowing_enemy*);
 
-	//Initialize grid system
-	std::vector<GridCoordinate> fullGrid = initializeGridSystem(50.0f);
-	
 
 	// Game Loop
 	while (gGameRunning)
@@ -120,8 +176,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
-		//float dt = AEFrameRateControllerGetFrameTime();
-
 
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
@@ -129,8 +183,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// Render enemy
 		RenderGroundEnemy(enemy, squareMesh);
 
-		RenderPlatform(platform, squareMesh);
-		RenderPlatform(volcanoPlatform, squareMesh);
+		UpdateBurrowingEnemy(burrowingEnemy1, diver.posX, diver.posY, dt);
+		RenderBurrowingEnemy(burrowingEnemy1, burrowingEnemyMesh);
+		RenderBoundary(burrowingBoundary, squareMesh);
+		RenderBoundary(testWall4, squareMesh);
+		RenderBoundary(testWall3, squareMesh);
+		RenderBoundary(platform, squareMesh);
+		RenderBoundary(volcanoPlatform, squareMesh);
+
 		//CAMERA SYSTEM, PLAYER RENDERING
 		AEGfxSetCamPosition(diver.posX, diver.posY); //Camera follows the player  
 		// Tell the Alpha Engine to get ready to draw something.  
@@ -138,11 +198,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//Dummy Mesh/Object to test camera movement
 		UpdatePlayerPos(&diver, squareMesh, dt);
 
+		//Player Dash ability
+		PlayerDash(&diver, squareMesh, dt);
+
 		// Render health bar
 		RenderHealthBar(diver, squareMesh);
 
-		//ICIRCLE RENDERING
-		//AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 0.1f); // Icicle Colour (blue)
+		//ICICLE RENDERING
 		//Loop through icicle array and draw each icicle
 		for (int i = 0; i < 2; i++) {
 			icicleCollision(diver, icicle[i]);
@@ -158,7 +220,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 
-		////Dummy Mesh/Object to test camera movement
+		//Dummy Mesh/Object to test camera movement
 		AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
 		// Draw test wall
 		AEMtx33 wallMtx = createTransformMtx(testWall.Width, testWall.Height, 0, testWall.PosX, testWall.PosY);
@@ -176,19 +238,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			CheckCollision(diver, boundaries_array[i]);
 		}
 		//collision for all ground enemy  
-		for (int i = 0; i < Ground_enemy_count; ++i) {
-			ElasticEnemyCollision(diver, Ground_enemy_array[i]);
+		for (int i = 0; i < ground_enemy_count; ++i) {
+			ElasticEnemyCollision(diver, ground_enemy_array[i]->PosX, ground_enemy_array[i]->PosY, ground_enemy_array[i]->Width, ground_enemy_array[i]->Height);
 		}
+		//collision for all burrowing enemy
+		for (int i = 0; i < burrowing_enemy_count; ++i) {
+			ElasticEnemyCollision(diver, burrowing_enemy_array[i]->PosX, burrowing_enemy_array[i]->PosY, burrowing_enemy_array[i]->Width, burrowing_enemy_array[i]->Height);
+		}
+
+		//Reset all colours to 0
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
-		//Debugging
-		//std::cout << "Player Location" << playerCoord.x << " " << playerCoord.y << '\n';
-
-
-		DrawBlackOverlay(squareMesh, diver);
+		DrawBlackOverlay(squareMesh, diver, volcano);
 		//SpotLight(&diver, spotlightMesh);
-
-
 
 		// Basic way to trigger exiting the application when ESCAPE is hit or when the window is closed
 		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist()) {
@@ -200,10 +262,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	
 	// free the system
 	AEGfxMeshFree(squareMesh);
-	AEGfxMeshFree(spotlightMesh);
+	//AEGfxMeshFree(spotlightMesh);
+	AEGfxMeshFree(burrowingEnemyMesh);
 
 	//Free the icicle array
 	delete[] icicle;
+	fullGrid.clear();
 
 	// free the system
 	AESysExit();

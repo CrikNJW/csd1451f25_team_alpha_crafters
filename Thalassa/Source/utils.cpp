@@ -2,6 +2,7 @@
 #include "AEEngine.h"
 #include <iostream>
 #include "Structs.hpp"
+#include <cmath>
 #include <vector>
 
 //Marcos for the trigo functions that take input in degree 
@@ -24,8 +25,7 @@ std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength) {
 	//Create a vector to store the grid coordinates
 	std::vector<GridCoordinate> lineGridCoordinates;
 
-	s32 currLength = 0;
-	s32 currHeight = squareGridLength;
+	s32 currLength = -4800;
 	s32 middleY = squareGridLength / 2;
 	/*Get the coordinate of each grid, this loop basically
 	stores a horizontal line of grid coordinates in the vector
@@ -48,7 +48,7 @@ std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength) {
 
 	// Number of rows and columns
 	int numRows = 50; // Number of horizontal grid lines
-	int numCols = lineGridCoordinates.size();
+	int numCols = (int)lineGridCoordinates.size();
 
 	// Generate the full grid
 	for (int row = -numRows; row < numRows; ++row) {
@@ -84,11 +84,11 @@ GridCoordinate getClosestGridCoordinate(const std::vector<GridCoordinate>& grid,
 	GridCoordinate closestCoord = grid[0];
 
 	// Use the novel pythagorean theorem to get the distance between the closest coordinate and the mouse, this is just a starting point so it doesn't matter
-	s32 closestDist = sqrt((closestCoord.x - adjustedMouseX) * (closestCoord.x - adjustedMouseX) + (closestCoord.y - adjustedMouseY) * (closestCoord.y - adjustedMouseY));
+	double closestDist = sqrt((closestCoord.x - adjustedMouseX) * (closestCoord.x - adjustedMouseX) + (closestCoord.y - adjustedMouseY) * (closestCoord.y - adjustedMouseY));
 
 	// For each grid coordinate, check if it is closer to the mouse than the current closest coordinate
 	for (GridCoordinate coord : grid) {
-		s32 dist = sqrt((coord.x - adjustedMouseX) * (coord.x - adjustedMouseX) + (coord.y - adjustedMouseY) * (coord.y - adjustedMouseY));
+		double dist = sqrt((coord.x - adjustedMouseX) * (coord.x - adjustedMouseX) + (coord.y - adjustedMouseY) * (coord.y - adjustedMouseY));
 		
 		// If the distance is smaller, update the closest coordinate and distance
 		if (dist < closestDist) {
@@ -106,7 +106,7 @@ GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& gri
 		AEInputGetCursorPosition(&mouseX, &mouseY);
 
 		//Get the closest grid coordinate to the mouse
-		GridCoordinate closestCoord = getClosestGridCoordinate(grid, mouseX, mouseY, diver.posX, diver.posY);
+		GridCoordinate closestCoord = getClosestGridCoordinate(grid, mouseX, mouseY, (s32)diver.posX, (s32)diver.posY);
 
 		//Debugging
 		std::cout << "Closest Coordinate " << closestCoord.x << " " << closestCoord.y << '\n';
@@ -114,6 +114,9 @@ GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& gri
 		//Return the closest grid coordinate
 		return closestCoord;
 	}
+
+	return { 0,0 };
+
 }
 /************************************
 *									*
@@ -190,27 +193,6 @@ AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, 
 	return transformMtx;
 }
 
-//int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y)
-//{
-//	// Reason why use half width and height is because the rectangle button was drew from the middle
-//	float half_width = area_width / 2.0;
-//	float half_height = area_height / 2.0;
-//
-//	// Compute the boundaries of the button rectangle
-//	float left_bound = area_center_x - half_width;
-//	float right_bound = area_center_x + half_width;
-//	float top_bound = area_center_y - half_height;
-//	float bottom_bound = area_center_y + half_height;
-//
-//	// Check if the Mouse_Input is within the boundaries
-//	if (click_x >= left_bound && click_x <= right_bound && click_y >= top_bound && click_y <= bottom_bound) {
-//		return 1;
-//	}
-//	else {
-//		return 0;
-//	}
-//}
-
 int IsCircleClicked(float circle_center_x, float circle_center_y, float radius, float click_x, float click_y)
 {
 	// distance = sgrt of [(X1 - X2)^2 + (Y1 - Y2)^2], we eliminate the sqrt by squaring the radius later
@@ -235,17 +217,17 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 }
 
 
-void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player) {
+void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player, LavaSpout& lava) {
 	f32 rec_width = f32(AEGfxGetWindowWidth());
 	f32 rec_height =f32(AEGfxGetWindowHeight());
 	f32 square_size = 20.f; //size of each square grid
-	f32 radius = 200.f; //radius of the spotlight
+	f32 radius = 100.f; //radius of the spotlight
 	f32 buffer = 100.f; //to accomodate the rendering of squares at the side windows
 
 	//Dim the black colour rectangle
-	AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
+	//AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.8f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.95f);
 	
 	f32 x_pos = player.posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player.posY - (rec_height/2.0f) - buffer;
@@ -254,7 +236,7 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player) {
 			f32 x_coord = x_pos + (x * square_size);
 			f32 y_coord = y_pos + (y * square_size);
 			//Only draw the squares if it is not inside the circle
-			if (!IsCircleClicked(player.posX, player.posY, radius, x_coord, y_coord)) {
+			if (!IsCircleClicked(player.posX, player.posY, radius, x_coord, y_coord) && !IsCircleClicked(lava.lavaX, lava.lavaY, radius, x_coord, y_coord)) {
 				AEMtx33 black_overlayMtx = createTransformMtx(square_size, square_size, 0, x_coord, y_coord);
 				AEGfxSetTransform(black_overlayMtx.m);
 				AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
@@ -268,7 +250,7 @@ void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
 	f32 radius = 200.f;
 	AEMtx33 spotlightMtx = createTransformMtx(radius, radius, 0, player->posX, player->posY);
 	AEGfxSetBlendMode(AE_GFX_BM_ADD);
-	AEGfxSetColorToAdd(2.0f, 2.0f, 2.0f, 0.3f);
+	AEGfxSetColorToAdd(2.0f, 2.0f, 2.0f, 0.5f);
 	
 	AEGfxSetTransform(spotlightMtx.m);
 	AEGfxMeshDraw(circle_mesh, AE_GFX_MDM_TRIANGLES);
@@ -322,6 +304,71 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
+void PlayerDash(Player* player, AEGfxVertexList* CooldownMesh, f32 dt) { // player dash movement
+	// Don't allow dashing if movement is locked
+	if (player->lockMovement) {
+		return;
+	}
+	// Constants for the cooldown bar appearance
+	const float BAR_WIDTH = 100.0f;
+	const float BAR_HEIGHT = 10.0f;
+	const float OFFSET_Y = 50.0f;  // Distance above player
+
+	// Update dash cooldown
+	if (player->dashCooldownTimer > 0) {
+		player->dashCooldownTimer -= dt;
+		// Draw cooldown background (grey bar)
+		AEMtx33 backgroundMtx = createTransformMtx(BAR_WIDTH, BAR_HEIGHT, 0.0f,
+			player->posX,
+			player->posY + OFFSET_Y);
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetColorToAdd(0.5f, 0.5f, 0.5f, 1.0f);  // Grey color
+		AEGfxSetTransform(backgroundMtx.m);
+		AEGfxMeshDraw(CooldownMesh, AE_GFX_MDM_TRIANGLES);
+
+		// Draw cooldown fill (blue bar)
+		float fillPercentage = (player->dashCooldownTimer / player->dashCooldown);
+		AEMtx33 fillMtx = createTransformMtx(BAR_WIDTH * fillPercentage, BAR_HEIGHT, 0.0f,
+			player->posX - (BAR_WIDTH * (1 - fillPercentage)) / 2,
+			player->posY + OFFSET_Y);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 1.0f, 1.0f);  // Blue color
+		AEGfxSetTransform(fillMtx.m);
+		AEGfxMeshDraw(CooldownMesh, AE_GFX_MDM_TRIANGLES);
+	}
+
+	// Check for dash input (SPACE key) and if we can dash
+	if (AEInputCheckTriggered(AEVK_SPACE) && player->dashCooldownTimer <= 0 && !player->isDashing) {
+		player->isDashing = true;
+		player->currentDashTime = player->dashDuration;
+		player->dashCooldownTimer = player->dashCooldown;
+	}
+
+	// Handle the actual dash movement
+	if (player->isDashing) {
+		// Move player in direction they're facing
+		float dashDistance = player->dashSpeed * dt;
+		player->posX += dashDistance * AECos(AEDegToRad(player->rotate_angle));
+		player->posY += dashDistance * AESin(AEDegToRad(player->rotate_angle));
+
+		//add animation here >;
+
+		// Update dash duration
+		player->currentDashTime -= dt;
+		if (player->currentDashTime <= 0) {
+			player->isDashing = false;
+		}
+
+		
+	}
+}
+
+void initIcicle(Icicle& icicle) {
+	icicle.childX = icicle.PosX;
+	icicle.childY = icicle.PosY;
+	icicle.boundaries.PosX = icicle.PosX;
+	icicle.boundaries.PosY = icicle.PosY;
+}
+
 //Draw icicle at the given position
 void DrawIcicle(Icicle &icicle , AEGfxVertexList* icicleMesh) {
 	AEGfxSetColorToAdd(0.0f, 1.0f, 1.0f, 1.0f); // Icicle Colour (blue)
@@ -368,15 +415,6 @@ bool icicleCollision(Player &player, Icicle &icicle) {
 	return false;
 }
 
-// player default WSAD controls
-void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
-	player->speed = f32(AEFrameRateControllerGetFrameTime()) * 300.f; //speed of player according to frame rate //player movement 
-	if (AEInputCheckCurr(AEVK_W)) player->posY -= player->speed; 
-	if (AEInputCheckCurr(AEVK_S)) player->posY += player->speed;
-	if (AEInputCheckCurr(AEVK_A)) player->posX += player->speed; 
-	if (AEInputCheckCurr(AEVK_D)) player->posX -= player->speed;
- }
-
  //collision for player and boundary 
  void CheckCollision(Player& player, const Boundaries& boundary) {
 	 // Calculate bounds
@@ -410,36 +448,89 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 	}
 }
 
- // for bounce collision between player and enemy
- void ElasticEnemyCollision(Player& player, Ground_enemy& enemy) {
- // Calculate the edges of the centered enemy rectangle 
- float enemyLeft = enemy.PosX - enemy.Width / 2;
- float enemyRight = enemy.PosX + enemy.Width / 2; 
- float enemyTop = enemy.PosY - enemy.Height / 2;
- float enemyBottom = enemy.PosY + enemy.Height / 2;
- // Calculate the edges of the player rectangle  
- float playerLeft = player.posX - player.width / 2;
- float playerRight = player.posX + player.width / 2; 
- float playerTop = player.posY - player.height / 2;
- float playerBottom = player.posY + player.height / 2;
- // Check for collision 
-	 if (playerRight > enemyLeft && playerLeft < enemyRight && playerBottom > enemyTop&& playerTop < enemyBottom) {
-		 // Bounce back distance 
-		 float bounceBackDistance = 40.0f; // Adjust this value to control bounce intensity
-		 float moveDirectionMultiplier = 1.0f;  
 
-		 if (AEInputCheckCurr(AEVK_S)) { // only for moving backwards
-		 // If moving backwards, reverse the bounce direction  
-			moveDirectionMultiplier = -1.0f;
+
+ // for bounce collision between player and enemy
+ void ElasticEnemyCollision(Player& player, f32 enemy_x, f32 enemy_y, f32 enemy_width, f32 enemy_height) {
+// need a flag for checking if player dashing D:
+	 if (!player.isDashing) {
+		 //flag for collision
+		 bool isBouncing = false;
+		 // Calculate the edges of the centered enemy rectangle 
+		 float enemyLeft = enemy_x - enemy_width / 2;
+		 float enemyRight = enemy_x + enemy_width / 2;
+		 float enemyTop = enemy_y - enemy_height / 2;
+		 float enemyBottom = enemy_y + enemy_height / 2;
+		 // Calculate the edges of the player rectangle  
+		 float playerLeft = player.posX - player.width / 2;
+		 float playerRight = player.posX + player.width / 2;
+		 float playerTop = player.posY - player.height / 2;
+		 float playerBottom = player.posY + player.height / 2;
+		 // Check for collision 
+		 if (playerRight > enemyLeft && playerLeft < enemyRight && playerBottom > enemyTop && playerTop < enemyBottom) {
+			 isBouncing = true;
+			 // Bounce back distance 
+			 float bounceBackDistance = 75.0f; // Adjust this value to control bounce intensity
+			 float moveDirectionMultiplier = 0.0f;
+
+			 // Check movement input states
+			 bool movingForward = AEInputCheckCurr(AEVK_W);
+			 bool movingBackward = AEInputCheckCurr(AEVK_S);
+
+			 if (movingForward && movingBackward) {
+				 // Conflict: Player presses both W and S
+				 moveDirectionMultiplier = 1.0f; // update player pos always priotises w 
+				 std::cout << "movement conflict detected: W and S pressed together\n";
+			 }
+			 else if (movingBackward) {
+				 moveDirectionMultiplier = -1.0f;
+				 std::cout << "movement currently: backwards\n";
+			 }
+			 else if (movingForward) {
+				 moveDirectionMultiplier = 1.0f;
+				 std::cout << "movement currently: forwards\n";
+			 }
+
+			 // Apply bounce effect 
+			 if (isBouncing) {
+				 bounceBackDistance -= 25.0f;
+				 player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
+				 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
+				 if (bounceBackDistance <= 0) isBouncing = false;
+			 }
+
+			 player.health -= 1;
+
+			 // Bounce the player back in the opposite direction of current movement  
+			
 		 }
-	 // Bounce the player back in the opposite direction of current movement  
-	 player.posX -= moveDirectionMultiplier * bounceBackDistance * AECos(AEDegToRad(player.rotate_angle));
-	 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
-   }
+	 }
+	 else {
+		 // During dash, check for collision but don't bounce
+		  // Calculate the edges of the centered enemy rectangle 
+		 float enemyLeft = enemy_x - enemy_width / 2;
+		 float enemyRight = enemy_x + enemy_width / 2;
+		 float enemyTop = enemy_y - enemy_height / 2;
+		 float enemyBottom = enemy_y + enemy_height / 2;
+		 // Calculate the edges of the player rectangle  
+		 float playerLeft = player.posX - player.width / 2;
+		 float playerRight = player.posX + player.width / 2;
+		 float playerTop = player.posY - player.height / 2;
+		 float playerBottom = player.posY + player.height / 2;
+
+		 // Check for collision during dash
+		 if (playerRight > enemyLeft && playerLeft < enemyRight &&
+			 playerBottom > enemyTop && playerTop < enemyBottom) {
+			 
+			 //add enemy taken damage
+			 //maybe add animation to signify enemy was killed
+		 }
+	 }
+	 
 }
 
 
-void InitializePlatform(Platform& platform) {
+void InitializeBoundary(Boundaries& platform) {
 
 	AEMtx33 scaleMtx, translateMtx;
 	AEMtx33Scale(&scaleMtx, platform.Width, platform.Height);
@@ -447,51 +538,45 @@ void InitializePlatform(Platform& platform) {
 	AEMtx33Concat(&platform.finalTransform, &translateMtx, &scaleMtx);
 }
 
-void RenderPlatform(Platform& platform, AEGfxVertexList* mesh) {
 
-	AEGfxSetColorToAdd(0.0f, 1.0f, 0.0f, 1.0f); // Green color
-	AEGfxSetTransform(platform.finalTransform.m); // Apply precomputed transformation
-	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
-}
 
-void UpdateGroundEnemy(Ground_enemy& enemy, Platform& platform, float dt) {
+void UpdateGroundEnemy(Ground_enemy& enemy, Boundaries &boundary, float dt) {
 	
-	float platformLeft = platform.PosX - (platform.Width / 2) - (enemy.Width / 2);
-	float platformRight = platform.PosX + (platform.Width / 2) + (enemy.Width / 2);
-	float platformTop = platform.PosY + (platform.Height / 2) + (enemy.Width / 2);
-	float platformBottom = platform.PosY - (platform.Height / 2) - (enemy.Width / 2);
+	float platformLeft = boundary.PosX - (boundary.Width / 2) - (enemy.Width / 2);
+	float platformRight = boundary.PosX + (boundary.Width / 2) + (enemy.Width / 2);
+	float platformTop = boundary.PosY + (boundary.Height / 2) + (enemy.Width / 2);
+	float platformBottom = boundary.PosY - (boundary.Height / 2) - (enemy.Width / 2);
 
-	switch (enemy.state) {
-	case MOVE_RIGHT:
+	switch (enemy.MovementState) {
+	case Ground_enemy::MOVE_RIGHT:
 		enemy.PosX += enemy.speed * dt;
 		if (enemy.PosX >= platformRight) {
 			enemy.PosX = platformRight;  // Stop at edge
-			enemy.state = MOVE_DOWN;     // Change direction
+			enemy.MovementState = Ground_enemy::MOVE_DOWN;     // Change direction
 		}
 		break;
 
-	case MOVE_DOWN:
+	case Ground_enemy::MOVE_DOWN:
 		enemy.PosY -= enemy.speed * dt;
 		if (enemy.PosY <= platformBottom) {
 			enemy.PosY = platformBottom;
-			enemy.state = MOVE_LEFT;
+			enemy.MovementState = Ground_enemy::MOVE_LEFT;
 		}
 		break;
 
-	case MOVE_LEFT:
+	case Ground_enemy::MOVE_LEFT:
 		enemy.PosX -= enemy.speed * dt;
 		if (enemy.PosX <= platformLeft) {
 			enemy.PosX = platformLeft;
-			enemy.state = MOVE_UP;
+			enemy.MovementState = Ground_enemy::MOVE_UP;
 		}
 		break;
 
-	case MOVE_UP:
+	case Ground_enemy::MOVE_UP:
 		enemy.PosY += enemy.speed * dt;
 		if (enemy.PosY >= platformTop) {
 			enemy.PosY = platformTop;
-			enemy.state = MOVE_RIGHT;
+			enemy.MovementState = Ground_enemy::MOVE_RIGHT;
 		}
 		break;
 	}
@@ -539,7 +624,7 @@ void RenderHealthBar(const Player& player, AEGfxVertexList* mesh) {
 }
 
 void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt) {
-	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red for lava
+	AEGfxSetColorToAdd(1.0f, 0.61f, 0.0f, 1.0f); // Red for lava
 
 	// Handle cooldown before respawn
 	if (!lavaSpout.isActive) {
@@ -553,7 +638,7 @@ void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float 
 			lavaSpout.lavaY = lavaSpout.PosY;
 
 			// Random horizontal velocity between -30 to -60 or 30 to 60
-			lavaSpout.velocityX = (rand() % 31 + 30) * (rand() % 2 == 0 ? 1 : -1);
+			lavaSpout.velocityX = (f32)((rand() % 31 + 30) * (rand() % 2 == 0 ? 1 : -1));
 			lavaSpout.velocityY = 120.0f;  // Initial upward velocity
 
 			lavaSpout.timeElapsed = 0;
@@ -586,7 +671,6 @@ void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float 
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-
 bool lavaCollision(Player& player, LavaSpout& lavaSpout) {
 	if (lavaSpout.isActive && AreCirclesIntersecting(player.posX, player.posY, player.width / 2, lavaSpout.lavaX, lavaSpout.lavaY, 15)) {
 		player.takedamage(1); // Reduce health by 1
@@ -600,32 +684,89 @@ bool lavaCollision(Player& player, LavaSpout& lavaSpout) {
 	return false;
 }
 
+void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, float dt) {
+	float dx = playerX - enemy.PosX;
+	float dy = playerY - enemy.PosY;
+	float distanceSquared = dx * dx + dy * dy;
 
-//health bar
-/*
-void RenderHealthBar(const Player& player) {
-	float barWidth = 200.0f; // Total width of the health bar
-	float barHeight = 20.0f; // Height of the health bar
-	float healthPercentage = static_cast<float>(player.health) / player.maxhealth;
+	float originalOffset = 0.0f; // Default position (inside boundary)
 
-	// Health bar position (above the player)
-	float barPosX = player.posX;
-	float barPosY = player.posY + player.height + 20.0f;
+	switch (enemy.State) {
+		case Burrowing_enemy::IDLE:
+		enemy.PosX = enemy.boundary->PosX + originalOffset; // Ensure it's inside the boundary
+		if (sqrt(distanceSquared) < enemy.detectionRadius) {
+			enemy.State = Burrowing_enemy::ALERT;
+			enemy.alertTimer = 0.3f;  // Small delay before popping out
+			enemy.isVisible = true;
+		}
+		break;
 
-	//need help with the colour
-	/*
-	// Create the health bar background (red)
-	AEMtx33 backgroundTransform = createTransformMtx(barWidth, barHeight, 0.0f, barPosX, barPosY);
-	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red for background
-	AEGfxSetTransform(backgroundTransform.m);
-	AEGfxMeshDraw(createSquareMesh(), AE_GFX_MDM_TRIANGLES);
-	
+        case Burrowing_enemy::ALERT:
+            if (enemy.alertTimer > 0) {
+                enemy.alertTimer -= dt;
 
-	// Create the current health bar (green)
-	float currentWidth = barWidth * healthPercentage;
-	AEMtx33 healthTransform = createTransformMtx(currentWidth, barHeight, 0.0f, barPosX - (barWidth - currentWidth) / 2, barPosY);
-	AEGfxSetColorToMultiply(0.0f, 1.0f, 0.0f, 1.0f); // Green for health
-	AEGfxSetTransform(healthTransform.m);
-	AEGfxMeshDraw(createSquareMesh(), AE_GFX_MDM_TRIANGLES);
+			} else {
+				enemy.State = Burrowing_enemy::ATTACKING;
+				enemy.attackCooldown = 0.3f; // Stays out for a short moment
+				enemy.Width = 100.0f; // Instantly stretch out fully
+				enemy.PosX = enemy.boundary->PosX - (enemy.Width / 2.0f); // Adjust position instantly
+			}
+			break;
+
+		case Burrowing_enemy::ATTACKING:
+			if (enemy.attackCooldown > 0) {
+				enemy.attackCooldown -= dt;
+				enemy.Width += 300.0f * dt;  
+				if (enemy.Width > 100.0f) enemy.Width = 100.0f; // Cap width
+			}
+			else {
+				enemy.State = Burrowing_enemy::RETREATING;
+			}
+			break;
+
+		case Burrowing_enemy::RETREATING:
+			enemy.Width -= 1200.0f * dt;  // Shrink back
+			if (enemy.Width < 40.0f) {
+				enemy.Width = 40.0f;
+				enemy.PosX = enemy.boundary->PosX; // Reset position
+				enemy.isVisible = false;
+				enemy.State = Burrowing_enemy::WAITING;
+				enemy.alertTimer = 1.5f; // Delay before popping out again
+			}
+			break;
+
+		case Burrowing_enemy::WAITING:
+			if (sqrt(distanceSquared) > enemy.detectionRadius) { // Player moved away
+				enemy.State = Burrowing_enemy::IDLE; // Ready to pop out again
+			}
+			break;
+	}
 }
-*/
+
+void RenderBurrowingEnemy(Burrowing_enemy& enemy, AEGfxVertexList* BurrowingEnemymesh) {
+	if (!enemy.isVisible) return; // Only render if the enemy has emerged
+
+	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 1.0f); // Red color for the enemy
+
+	float renderPosX = enemy.boundary->PosX - (enemy.Width / 2.0f); // Keep left-aligned
+	float renderPosY = enemy.boundary->PosY;
+
+	// Create transformation matrix for positioning
+	AEMtx33 enemyTransform = createTransformMtx(enemy.Width, enemy.Height, 0.0f, renderPosX, renderPosY);
+	AEGfxSetTransform(enemyTransform.m);
+
+	// Draw enemy mesh
+	AEGfxMeshDraw(BurrowingEnemymesh, AE_GFX_MDM_TRIANGLES);
+
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh) {
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f); // Green for platform
+
+	AEMtx33 boundaryTransform = createTransformMtx(boundary.Width, boundary.Height, 0.0f, boundary.PosX, boundary.PosY);
+	AEGfxSetTransform(boundaryTransform.m);
+	AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
+
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+}

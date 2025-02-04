@@ -2,12 +2,6 @@
 // For all structs
 // when creating variable, keep first letter capital for consistency
 
-enum GroundEnemyState {
-	MOVE_RIGHT,
-	MOVE_DOWN,
-	MOVE_LEFT,
-	MOVE_UP
-};
 
 struct Player {
 	f32 posX, posY; // position of the player
@@ -16,6 +10,13 @@ struct Player {
 	f32 speed; //  speed of player
 	int health; //health and
 	int maxhealth; // player max health
+	//for player dash properties
+	bool isDashing; // Flag to check if player is currently dashing
+	float dashSpeed; // How fast the dash moves
+	float dashDuration; // How long the dash lasts
+	float dashCooldown; // Time before player can dash again
+	float currentDashTime; // Track current dash duration
+	float dashCooldownTimer; // Track cooldown time
 	bool lockMovement = false; //Prevent player from moving and rotating
 	f32 lockTimeElapsed = 0; //Time elapsed for icicle drop
 	f32 lockTime = 1; //Time to lock player movement
@@ -25,20 +26,7 @@ struct Player {
 	}
 };
 
-struct Ground_enemy {
-	float PosX, PosY;
-	float Width, Height;
-	float angle;
-	float speed;
-	AEMtx33 finalTransform;
-	GroundEnemyState state;
-};
 
-struct Platform {
-	float PosX, PosY;
-	float Width, Height;
-	AEMtx33 finalTransform;
-};
 
 struct Floating_enemy {
 	float PosX, PosY;
@@ -49,19 +37,21 @@ struct Floating_enemy {
 struct Boundaries {
 	float PosX, PosY; 
 	float Width, Height;
+	AEMtx33 finalTransform;
 }; // this is for the boundaries / borders around map
 // Initialize with an array of structs
 
 struct Icicle {
-	float PosX, PosY;
+	f32 PosX = 0;
+	f32 PosY = 0;
 	float dropOffsetY = 0;
 	float dropSpeed = 70;
-	float childX = PosX;
-	float childY = PosY;
+	float childX = 0;
+	float childY = 0;
 	float timeElapsed = 0;
 	float cooldown = 2;
 	float cooldownElapsed = 0;
-	Boundaries boundaries = {PosX, PosY, 40, 40};
+	Boundaries boundaries = { 0, 0, 40, 40};
 };
 
 struct LavaSpout {
@@ -69,7 +59,7 @@ struct LavaSpout {
 	float lavaX, lavaY;  // Lava drop position
 	float velocityX, velocityY; // For parabolic motion
 	float dropSpeed = 120.0f; // Speed of falling lava
-	float cooldown = 2.0f; // Time before respawning
+	float cooldown = 1.0f; // Time before respawning
 	float cooldownElapsed = 0.0f;
 	float timeElapsed = 0.0f;
 	bool isActive = false;  // Controls visibility and movement
@@ -84,7 +74,53 @@ struct LavaSpout {
 	}
 };
 
+struct Ground_enemy {
+	float PosX, PosY;
+	float Width, Height;
+	float angle;
+	float speed;
+	AEMtx33 finalTransform;
+
+	enum GroundEnemyMovement { // Ground enemy movement
+		MOVE_RIGHT,
+		MOVE_DOWN,
+		MOVE_LEFT,
+		MOVE_UP
+	};
+	GroundEnemyMovement MovementState;
+
+	enum GroundEnemyState {
+		IDLE,
+		TRACKING,
+		ATTACKING,
+		RETREATING
+	};
+	GroundEnemyState State;
+};
+
+struct Burrowing_enemy {
+	float PosX, PosY;
+	float Width, Height;
+	float speed;
+	float detectionRadius;
+	float attackCooldown;
+	bool isVisible;
+	float alertTimer;  // Time before popping out
+	bool spawningParticles; // Indicates if particles are active
+
+	enum BurrowingEnemyState {
+		IDLE,
+		ALERT,
+		ATTACKING,
+		RETREATING,
+		WAITING
+	};
+	BurrowingEnemyState State;
+
+	Boundaries* boundary;
+};
+
+/*LavaSpout dirtParticles;*/
 struct GridCoordinate {
 	s32 x, y;
 };
-
