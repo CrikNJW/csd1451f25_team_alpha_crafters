@@ -10,9 +10,9 @@
 AEGfxVertexList* createSquareMesh();
 AEGfxVertexList* createCircleMesh();
 AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, f32 translY);
-std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength);
-GridCoordinate getClosestGridCoordinate(const std::vector<GridCoordinate>& grid, s32 mouseX, s32 mouseY, s32 playerX, s32 playerY);
-GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& grid, Player& diver);
+GridCoordinate getClosestGridCoordinate(s32 mouseX, s32 mouseY, s32 playerX, s32 playerY, s32 squareGridLength);
+GridCoordinate handle_LMouseClickInEditor(Player& diver, s32 squareGridLength, std::vector<ObjectToPlace>& placedObjects, AEGfxVertexList* mesh);
+void PlaceObject(s32 worldSpaceX, s32 worldSpaceY, AEGfxVertexList* mesh);
 
 void DrawIcicle(Icicle &icicle, AEGfxVertexList* icicleMesh);
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt);
@@ -24,12 +24,10 @@ int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter
 
 int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c2_y, float r2);
 
-void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player);
+void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player, LavaSpout& lavaSpout);
 
 void SpotLight(Player* player, AEGfxVertexList* circle_mesh);
 void UpdatePlayerPos(Player* player, AEGfxVertexList* player_mesh, f32 dt);
-
-void UpdatePlayerMovement(Player* player, AEGfxVertexList* player_mesh);
 
 void PlayerDash(Player* player, AEGfxVertexList* CooldownMesh, f32 dt);
 
@@ -49,7 +47,7 @@ bool lavaCollision(Player& player, LavaSpout& lavaSpout);
 
 void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt);
 
-void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, AEGfxVertexList* lavaMesh, float dt);
+void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, float dt);
 
 void RenderBurrowingEnemy(Burrowing_enemy& enemy, AEGfxVertexList* mesh);
 
