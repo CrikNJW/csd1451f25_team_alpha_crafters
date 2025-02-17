@@ -79,7 +79,7 @@ AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, 
 	return transformMtx;
 }
 
-int IsCircleClicked(float circle_center_x, float circle_center_y, float radius, float click_x, float click_y)
+int InCircleRadius(float circle_center_x, float circle_center_y, float radius, float click_x, float click_y)
 {
 	// distance = sgrt of [(X1 - X2)^2 + (Y1 - Y2)^2], we eliminate the sqrt by squaring the radius later
 	float distance_squared = (click_x - circle_center_x) * (click_x - circle_center_x) + (click_y - circle_center_y) * (click_y - circle_center_y);
@@ -106,13 +106,13 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player, LavaSpout& l
 	f32 rec_width = f32(AEGfxGetWindowWidth());
 	f32 rec_height =f32(AEGfxGetWindowHeight());
 	f32 square_size = 20.f; //size of each square grid
-	f32 radius = 100.f; //radius of the spotlight
+	f32 radius = 120.f; //radius of the spotlight
 	f32 buffer = 100.f; //to accomodate the rendering of squares at the side windows
 
 	//Dim the black colour rectangle
 	//AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.1f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.9f);
 	
 	f32 x_pos = player.posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player.posY - (rec_height/2.0f) - buffer;
@@ -121,7 +121,7 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player, LavaSpout& l
 			f32 x_coord = x_pos + (x * square_size);
 			f32 y_coord = y_pos + (y * square_size);
 			//Only draw the squares if it is not inside the circle
-			if (!IsCircleClicked(player.posX, player.posY, radius, x_coord, y_coord) && !IsCircleClicked(lava.lavaX, lava.lavaY, radius, x_coord, y_coord)) {
+			if (!InCircleRadius(player.posX, player.posY, radius, x_coord, y_coord) && !InCircleRadius(lava.lavaX, lava.lavaY, radius, x_coord, y_coord)) {
 				AEMtx33 black_overlayMtx = createTransformMtx(square_size, square_size, 0, x_coord, y_coord);
 				AEGfxSetTransform(black_overlayMtx.m);
 				AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
@@ -154,7 +154,7 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 	}
 	else {
 		player->speed = f32(AEFrameRateControllerGetFrameTime() * 300.f); //speed of player according to frame rate
-		f32 rotate_degree = 4.f; //rotation degree is set to 2 degree when trigerred
+		f32 rotate_degree = 4.f; //rotation degree is set to 4 degree when trigerred
 
 		if (AEInputCheckCurr(AEVK_W)) {
 			//alpha engine only takes input in radians for function sin, cos, tan
