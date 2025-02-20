@@ -5,14 +5,9 @@
 #include "Structs.hpp"
 #include <vector>
 
-
-
 AEGfxVertexList* createSquareMesh();
 AEGfxVertexList* createCircleMesh();
 AEMtx33 createTransformMtx(f32 scaleX, f32 scaleY, f32 rotate_rad, f32 translX, f32 translY);
-GridCoordinate getClosestGridCoordinate(s32 mouseX, s32 mouseY, s32 playerX, s32 playerY, s32 squareGridLength);
-GridCoordinate handle_LMouseClickInEditor(Player& diver, s32 squareGridLength, std::vector<ObjectToPlace>& placedObjects, AEGfxVertexList* mesh);
-void PlaceObject(s32 worldSpaceX, s32 worldSpaceY, AEGfxVertexList* mesh);
 
 void DrawIcicle(Icicle &icicle, AEGfxVertexList* icicleMesh);
 void Draw_UpdateIcicleDrop(Icicle &icicle, AEGfxVertexList* icicleMesh, f32 dt);

@@ -2,7 +2,6 @@
 // For all structs
 // when creating variable, keep first letter capital for consistency
 
-
 struct Player {
 	f32 posX, posY; // position of the player
 	float width, height; // width and height of player
@@ -10,6 +9,7 @@ struct Player {
 	f32 speed; //  speed of player
 	int health; //health and
 	int maxhealth; // player max health
+
 	//for player dash properties
 	bool isDashing; // Flag to check if player is currently dashing
 	float dashSpeed; // How fast the dash moves
@@ -20,19 +20,13 @@ struct Player {
 	bool lockMovement = false; //Prevent player from moving and rotating
 	f32 lockTimeElapsed = 0; //Time elapsed for icicle drop
 	f32 lockTime = 1; //Time to lock player movement
+
 	void takedamage(int damage) {
 		health -= damage;
 		if (health < 0) health = 0; // make sure the health doesnt go below 0
 	}
 };
 
-
-
-struct Floating_enemy {
-	float PosX, PosY;
-	float Width, Height;
-	int Health;
-};
 
 struct Boundaries {
 	float PosX, PosY; 
@@ -125,7 +119,9 @@ struct GridCoordinate {
 	s32 x, y;
 };
 
-struct ObjectToPlace {
+struct GameObject {
+	int id; // id of the object
+	f32 posX, posY; // position of the object
 	AEGfxVertexList* mesh;
 	GridCoordinate gridPos;
 };

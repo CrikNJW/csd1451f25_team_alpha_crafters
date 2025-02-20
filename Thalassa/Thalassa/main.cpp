@@ -2,11 +2,13 @@
 // includes
 
 #include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"
 #include <iostream>
+#include <vector>
+#include "AEEngine.h"
 #include "utils.hpp"
 #include "Structs.hpp"
-#include <vector>
+#include "FloatingEnemy.hpp"
+#include "LCS.hpp"
 
 // ---------------------------------------------------------------------------
 // main
@@ -30,6 +32,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AEGfxVertexList* squareMesh = createSquareMesh();
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
 	f32 dt;
+
+	//LCS Variables
+	AEGfxVertexList* selectedMesh = squareMesh; //For LCS
+	int objID = 1;
+	std::vector<Floatie*> floatingEnemies; //All gameobjects placed in the level
 
 	//Dummy icicle array that stores coordinates of each icicle.
 	Icicle* icicle = new Icicle[2]{ {-400,200}, {-300,200} };
@@ -72,14 +79,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	1600.0f, // Width 
 	50.0f    // Height 
 	};
-
 	Boundaries testWall2{
 	0.0f,   // X position (center) 
 	425.0f, // Y position (top of screen) 
 	1600.0f, // Width 
 	50.0f    // Height 
 	};
-
 	Boundaries testWall3{
 	-800.0f,   // X position (center) 
 	0.0f, // Y position (top of screen) 
@@ -87,7 +92,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	900.0f    // Height 
 	};
 	InitializeBoundary(testWall3);
-
 	Boundaries testWall4{
 	800.0f,   // X position (center) 
 	0.0f, // Y position 
@@ -96,7 +100,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	};
 	InitializeBoundary(testWall4);
-
 	//Initialization of test ground_enemy 
 	Ground_enemy ground_enemy1{
 	 -200.0f,
@@ -141,11 +144,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Create an enemy mesh for rendering
 	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh();
+	AEGfxVertexList* floatieMesh = createSquareMesh();
 
 	// Create array of boundaries 
 	Boundaries boundaries_array[] = { testWall,  testWall2, burrowingBoundary, volcanoPlatform, platform, testWall4 , testWall3 };
 	// boundary count to calculate amount of boundaries we need to check collision for 
-	int boundaryCount = sizeof(boundaries_array) / sizeof(Boundaries);
+	int boundaryCount = sizeof(boundaries_array) / sizeof(Boundaries); 
 
 	// Create array of ground enemys 
 	Ground_enemy* ground_enemy_array[] = { &ground_enemy1, &enemy };
@@ -154,9 +158,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Create array of burrowing enemys
 	Burrowing_enemy* burrowing_enemy_array[] = { &burrowingEnemy1 };
 	int burrowing_enemy_count = sizeof(burrowing_enemy_array) / sizeof(Burrowing_enemy*);
-	
-	//Vector to store objects placed in the level
-	std::vector<ObjectToPlace> placedObjects;
 
 	// Game Loop
 	while (gGameRunning)
@@ -172,12 +173,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
 		//Level Creation System Testing
-		GridCoordinate clickPos = handle_LMouseClickInEditor(diver, 50, placedObjects, squareMesh);
-		std::cout << "Placed Objects: " << placedObjects.size() << '\n';
-		//Loop through placed objects and draw them
-		for (int i = 0; i < placedObjects.size(); i++) {
-			PlaceObject(placedObjects[i].gridPos.x, placedObjects[i].gridPos.y, placedObjects[i].mesh);
+		if (AEInputCheckTriggered(AEVK_1)) {
+			selectedMesh = squareMesh;
+			objID = 1;
 		}
+		else if (AEInputCheckTriggered(AEVK_2)) {
+			selectedMesh = floatieMesh;
+			objID = 2;
+		}
+
+		//This basically adds the selected object with its id to the gameobjects vector
+		GridCoordinate clickPos = handle_LMouseClickInEditor(diver, 50, objID, floatingEnemies, selectedMesh);
+		UpdateFloatingEnemies(floatingEnemies, diver, dt); //Loop through placed objects and draw them
 
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
@@ -264,11 +271,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	
 	// free the system
 	AEGfxMeshFree(squareMesh);
+	AEGfxMeshFree(floatieMesh);
 	//AEGfxMeshFree(spotlightMesh);
 	AEGfxMeshFree(burrowingEnemyMesh);
 
 	//Free the icicle array
 	delete[] icicle;
+
+	//Loop through the gameobjects vector and delete each object
+	for (int i = 0; i < floatingEnemies.size(); i++) {
+		delete floatingEnemies[i];
+	}
 
 	// free the system
 	AESysExit();
