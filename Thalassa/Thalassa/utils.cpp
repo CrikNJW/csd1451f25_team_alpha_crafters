@@ -5,6 +5,7 @@
 #include <cmath>
 #include <vector>
 #include "FloatingEnemy.hpp"
+#include "LCS.hpp"
 
 //Marcos for the trigo functions that take input in degree 
 //cuz alpha engine only takes input in radians for function sin, cos, tan
@@ -655,4 +656,18 @@ void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh) {
 	AEGfxMeshDraw(platformMesh, AE_GFX_MDM_TRIANGLES);
 
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+void RenderFloatingEnemies(std::vector<Floatie*>& floatingEnemies, Player& diver, f32 dt) {
+	for (int i = 0; i < floatingEnemies.size(); i++) {
+		PlaceObject((s32)floatingEnemies[i]->gameobj.posX, (s32)floatingEnemies[i]->gameobj.posY, floatingEnemies[i]->gameobj.mesh);
+	}
+}
+
+void UpdateFloatingEnemies(std::vector<Floatie*>& floatingEnemies, Player& diver, f32 dt) {
+	for (int i = 0; i < floatingEnemies.size(); i++) {
+		floatingEnemies[i]->CheckDistance(diver);
+		floatingEnemies[i]->Update(diver, dt);
+		floatingEnemies[i]->IdleMovement(dt);
+	}
 }

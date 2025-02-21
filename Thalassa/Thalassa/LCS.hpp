@@ -1,7 +1,10 @@
+#pragma once
+
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 #include <iostream>
 #include "Structs.hpp"
+#include "FloatingEnemy.hpp"
 #include <vector>
 
 GridCoordinate getClosestGridCoordinate(s32 mouseX, s32 mouseY, s32 playerX, s32 playerY, s32 squareGridLength);

@@ -34,9 +34,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	f32 dt;
 
 	//LCS Variables
-	AEGfxVertexList* selectedMesh = squareMesh; //For LCS
-	int objID = 1;
-	std::vector<Floatie*> floatingEnemies; //All gameobjects placed in the level
+	AEGfxVertexList* LCS_SelectedMesh = squareMesh; //For LCS
+	bool LCS_Mode = false; //To trigger AI logic
+	int LCS_CurrKey = 0;
+	int LCS_ObjID = 1;
+	std::vector<Floatie*> LCS_FloatingEnemies; //All gameobjects placed in the level
 
 	//Dummy icicle array that stores coordinates of each icicle.
 	Icicle* icicle = new Icicle[2]{ {-400,200}, {-300,200} };
@@ -172,19 +174,40 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
-		//Level Creation System Testing
-		if (AEInputCheckTriggered(AEVK_1)) {
-			selectedMesh = squareMesh;
-			objID = 1;
-		}
-		else if (AEInputCheckTriggered(AEVK_2)) {
-			selectedMesh = floatieMesh;
-			objID = 2;
+		//Trigger Level Creation System
+		if (AEInputCheckTriggered(AEVK_L)) {
+			LCS_Mode = !LCS_Mode;
 		}
 
-		//This basically adds the selected object with its id to the gameobjects vector
-		GridCoordinate clickPos = handle_LMouseClickInEditor(diver, 50, objID, floatingEnemies, selectedMesh);
-		UpdateFloatingEnemies(floatingEnemies, diver, dt); //Loop through placed objects and draw them
+		//Level Creation System Testing
+		if (LCS_Mode) {
+			if (AEInputCheckTriggered(AEVK_1)) {
+				LCS_SelectedMesh = squareMesh;
+				LCS_ObjID = 1;
+				LCS_CurrKey = 1;
+			}
+			else if (AEInputCheckTriggered(AEVK_2)) {
+				LCS_SelectedMesh = floatieMesh;
+				LCS_ObjID = 2;
+				LCS_CurrKey = 2;
+			}
+			//-------------------------------------------------------------------------------------
+			if (LCS_CurrKey == 1) { //Square Block
+				//GridCoordinate clickPos = handle_LMouseClickInEditor(diver, 50, LCS_ObjID, //Insert LCS Vector Here//, LCS_SelectedMesh);
+			}
+			else if (LCS_CurrKey == 2) { //Floating Enemy
+				//Detects click position, and adds a obj to the specified vector
+				GridCoordinate clickPos = handle_LMouseClickInEditor(diver, 50, LCS_ObjID, LCS_FloatingEnemies, LCS_SelectedMesh);
+			}
+
+			//Render the object ONLY, does not trigger logic. This is because we want to see it in the LCS without it moving around.
+			RenderFloatingEnemies(LCS_FloatingEnemies, diver, dt);
+		}
+
+		if (!LCS_Mode) {
+			RenderFloatingEnemies(LCS_FloatingEnemies, diver, dt);
+			UpdateFloatingEnemies(LCS_FloatingEnemies, diver, dt); //Loop through placed objects and draw them
+		}
 
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
@@ -279,8 +302,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	delete[] icicle;
 
 	//Loop through the gameobjects vector and delete each object
-	for (int i = 0; i < floatingEnemies.size(); i++) {
-		delete floatingEnemies[i];
+	for (int i = 0; i < LCS_FloatingEnemies.size(); i++) {
+		delete LCS_FloatingEnemies[i];
 	}
 
 	// free the system

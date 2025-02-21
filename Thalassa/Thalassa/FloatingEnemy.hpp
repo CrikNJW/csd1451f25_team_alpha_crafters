@@ -4,12 +4,14 @@
 #include "AEEngine.h"
 #include "Structs.hpp"
 #include <iostream>
+#include <vector>
 
 class Floatie {
 public:
 	enum FloatingEnemyStates {
 		IDLE,
 		CHASE,
+		LCS_MODE
 	};
 
 	GameObject gameobj;
@@ -28,13 +30,3 @@ public:
 	void IdleMovement(f32 dt); //Move the floatie in a random direction
 private:
 };
-
-
-void UpdateFloatingEnemies(std::vector<Floatie*>& floatingEnemies, Player& diver, f32 dt) {
-	for (int i = 0; i < floatingEnemies.size(); i++) {
-		PlaceObject(floatingEnemies[i]->gameobj.posX, floatingEnemies[i]->gameobj.posY, floatingEnemies[i]->gameobj.mesh);
-		floatingEnemies[i]->CheckDistance(diver);
-		floatingEnemies[i]->Update(diver, dt);
-		floatingEnemies[i]->IdleMovement(dt);
-	}
-}

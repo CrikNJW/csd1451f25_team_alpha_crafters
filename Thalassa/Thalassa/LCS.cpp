@@ -47,8 +47,8 @@ GridCoordinate getClosestGridCoordinate(s32 mouseX, s32 mouseY, s32 playerX, s32
 
 	/*Snap to the nearest grid coordinate by rounding up or down, this is more performant than
 	abusing vectors and iterating through them*/
-	s32 gridX = round((float)worldMouseX / squareGridLength) * squareGridLength;
-	s32 gridY = round((float)worldMouseY / squareGridLength) * squareGridLength;
+	s32 gridX = (s32)(round((float)worldMouseX / squareGridLength) * squareGridLength);
+	s32 gridY = (s32)(round((float)worldMouseY / squareGridLength) * squareGridLength);
 
 	//Create a coordinate to store the closest grid coordinate
 	GridCoordinate closestGrid = { gridX, gridY };

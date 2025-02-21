@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Structs.hpp"
 #include <vector>
+#include "FloatingEnemy.hpp"
 
 AEGfxVertexList* createSquareMesh();
 AEGfxVertexList* createCircleMesh();
@@ -16,34 +17,31 @@ void initIcicle(Icicle& icicle);
 
 //int IsAreaClicked(float area_center_x, float area_center_y, float area_width, float area_height, float click_x, float click_y);
 int IsCircleClicked(float circle_center_x, float circle_center_y, float diameter, float click_x, float click_y);
-
 int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c2_y, float r2);
 
 void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player, LavaSpout& lavaSpout);
-
 void SpotLight(Player* player, AEGfxVertexList* circle_mesh);
+
 void UpdatePlayerPos(Player* player, AEGfxVertexList* player_mesh, f32 dt);
 
 void PlayerDash(Player* player, AEGfxVertexList* CooldownMesh, f32 dt);
 
 void CheckCollision(Player& player, const Boundaries& boundary);
-
 void ElasticEnemyCollision(Player& player, f32 enemy_x, f32 enemy_y, f32 enemy_width, f32 enemy_height);
 
 void InitializeBoundary(Boundaries& platform);
+void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh);
 
 void UpdateGroundEnemy(Ground_enemy& enemy, Boundaries& boundary, float dt);
-
 void RenderGroundEnemy(Ground_enemy& enemy, AEGfxVertexList* mesh);
 
 void RenderHealthBar(const Player& player, AEGfxVertexList* mesh);
 
 bool lavaCollision(Player& player, LavaSpout& lavaSpout);
-
 void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt);
 
 void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, float dt);
-
 void RenderBurrowingEnemy(Burrowing_enemy& enemy, AEGfxVertexList* mesh);
 
-void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh);
+void RenderFloatingEnemies(std::vector<Floatie*>& floatingEnemies, Player& diver, f32 dt);
+void UpdateFloatingEnemies(std::vector<Floatie*>& floatingEnemies, Player& diver, f32 dt);
