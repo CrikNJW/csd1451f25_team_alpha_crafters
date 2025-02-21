@@ -28,7 +28,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	//Load Background texture
 	AEGfxTexture* bgTex = AEGfxTextureLoad("Assets/deepseabg.jpg");
-	AEMtx33 bgMtx = createTransformMtx(1600.0f, 900.0f, 0, 0, 0);
+	AEMtx33 bgMtx = createTransformMtx(100.0f, 100.0f, 0, 0, 0);
 	//Initialize variables 
 	AEGfxVertexList* squareMesh = createSquareMesh();
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);

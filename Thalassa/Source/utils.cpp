@@ -153,7 +153,7 @@ void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
 		}
 	}
 	else {
-		player->speed = f32(AEFrameRateControllerGetFrameTime() * 300.f); //speed of player according to frame rate
+		player->speed = f32(AEFrameRateControllerGetFrameTime() * 400.f); //speed of player according to frame rate
 		f32 rotate_degree = 4.f; //rotation degree is set to 4 degree when trigerred
 
 		if (AEInputCheckCurr(AEVK_W)) {
