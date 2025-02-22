@@ -11,17 +11,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameStateManager.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="ThalassaLevel.cpp" />
+    <ClCompile Include="utils.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="FloatingEnemy.cpp" />
     <ClCompile Include="LCS.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameStateList.hpp" />
+    <ClInclude Include="GameStateManager.hpp" />
+    <ClInclude Include="MainMenu.hpp" />
+    <ClInclude Include="Structs.hpp" />
+    <ClInclude Include="ThalassaLevel.hpp" />
     <ClInclude Include="Block.hpp" />
     <ClInclude Include="FloatingEnemy.hpp" />
     <ClInclude Include="LCS.hpp" />
-    <ClInclude Include="Structs.hpp" />
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
