@@ -456,7 +456,6 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 }
 
 
-
  // for bounce collision between player and enemy
  void ElasticEnemyCollision(Player& player, f32 enemy_x, f32 enemy_y, f32 enemy_width, f32 enemy_height) {
 // need a flag for checking if player dashing D:
@@ -532,7 +531,6 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 			 //maybe add animation to signify enemy was killed
 		 }
 	 }
-	 
 }
 
 
@@ -543,7 +541,6 @@ void InitializeBoundary(Boundaries& platform) {
 	AEMtx33Trans(&translateMtx, platform.PosX, platform.PosY);
 	AEMtx33Concat(&platform.finalTransform, &translateMtx, &scaleMtx);
 }
-
 
 
 void UpdateGroundEnemy(Ground_enemy& enemy, Boundaries &boundary, float dt) {

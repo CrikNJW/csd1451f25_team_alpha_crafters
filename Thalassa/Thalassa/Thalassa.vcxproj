@@ -11,12 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Source\main.cpp" />
-    <ClCompile Include="..\Source\utils.cpp" />
+    <ClCompile Include="GameStateManager.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="ThalassaLevel.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Source\Structs.hpp" />
-    <ClInclude Include="..\Source\utils.hpp" />
+    <ClInclude Include="GameStateList.hpp" />
+    <ClInclude Include="GameStateManager.hpp" />
+    <ClInclude Include="MainMenu.hpp" />
+    <ClInclude Include="Structs.hpp" />
+    <ClInclude Include="ThalassaLevel.hpp" />
+    <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -86,7 +93,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine\lib\fmodL.dll" "$(OutDir)" /s /r /y /q</
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
