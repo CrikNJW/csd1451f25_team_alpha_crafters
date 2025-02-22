@@ -1,11 +1,13 @@
 #include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"
 #include <iostream>
-#include "Structs.hpp"
 #include <cmath>
 #include <vector>
-#include "FloatingEnemy.hpp"
+
+#include "AEEngine.h"
+#include "Structs.hpp"
+#include "Enemies.hpp"
 #include "Block.hpp"
+#include "Hazards.hpp"
 #include "utils.hpp"
 
 /************************************

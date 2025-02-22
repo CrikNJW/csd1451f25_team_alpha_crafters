@@ -1,10 +1,14 @@
 #pragma once
 #include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"
 #include <iostream>
-#include "Structs.hpp"
 #include <vector>
-#include "FloatingEnemy.hpp"
+
+#include "AEEngine.h"
+#include "Structs.hpp"
+#include "Enemies.hpp"
+#include "Hazards.hpp"
+#include "Player.hpp"
+#include "LCS.hpp"
 
 AEGfxVertexList* createSquareMesh();
 AEGfxVertexList* createCircleMesh();

@@ -11,23 +11,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Enemies.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="ThalassaLevel.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="Block.cpp" />
-    <ClCompile Include="FloatingEnemy.cpp" />
     <ClCompile Include="LCS.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Enemies.hpp" />
     <ClInclude Include="GameStateList.hpp" />
     <ClInclude Include="GameStateManager.hpp" />
+    <ClInclude Include="Hazards.hpp" />
     <ClInclude Include="MainMenu.hpp" />
+    <ClInclude Include="Player.hpp" />
     <ClInclude Include="Structs.hpp" />
     <ClInclude Include="ThalassaLevel.hpp" />
     <ClInclude Include="Block.hpp" />
-    <ClInclude Include="FloatingEnemy.hpp" />
     <ClInclude Include="LCS.hpp" />
     <ClInclude Include="utils.hpp" />
   </ItemGroup>

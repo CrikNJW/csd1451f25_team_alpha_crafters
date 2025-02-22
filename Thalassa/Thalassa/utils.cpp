@@ -1,11 +1,14 @@
 #include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"
 #include <iostream>
-#include "Structs.hpp"
 #include <cmath>
 #include <vector>
-#include "FloatingEnemy.hpp"
+
+#include "AEEngine.h"
+#include "Structs.hpp"
+#include "Enemies.hpp"
+#include "Player.hpp"
 #include "LCS.hpp"
+#include "Hazards.hpp"
 
 //Marcos for the trigo functions that take input in degree 
 //cuz alpha engine only takes input in radians for function sin, cos, tan
@@ -425,7 +428,6 @@ void InitializeBoundary(Boundaries& platform) {
 
 
 void UpdateGroundEnemy(Ground_enemy& enemy, Boundaries &boundary, float dt) {
-	
 	float platformLeft = boundary.PosX - (boundary.Width / 2) - (enemy.Width / 2);
 	float platformRight = boundary.PosX + (boundary.Width / 2) + (enemy.Width / 2);
 	float platformTop = boundary.PosY + (boundary.Height / 2) + (enemy.Width / 2);
