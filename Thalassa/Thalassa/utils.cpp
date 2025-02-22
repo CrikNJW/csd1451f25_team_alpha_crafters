@@ -10,118 +10,6 @@
 //#define AESinDeg(x) AESin(AEDegToRad(x));
 //#define AECosDeg(x) AESin(AEDegToRad(x));
 
-/************************************
-*									*
-*	LEVEL CREATION SYSTEM			*
-*									*
-*************************************/
-
-/*
-* Creates a vector of grid coordinates for the level.
-* @param squareGridLength: The length of each square grid.
-* @return: A vector of grid coordinates for the level.
-*/
-std::vector<GridCoordinate> initializeGridSystem(s32 squareGridLength) {
-	//Create a vector to store the grid coordinates
-	std::vector<GridCoordinate> lineGridCoordinates;
-
-	s32 currLength = 0;
-	s32 currHeight = squareGridLength;
-	s32 middleY = squareGridLength / 2;
-	/*Get the coordinate of each grid, this loop basically
-	stores a horizontal line of grid coordinates in the vector
-	We will multiply/add to the Y coordinate for all elements
-	to get a bigger area.*/
-	while (currLength < 4800){
-		s32 prevLength = currLength;
-
-		currLength += squareGridLength;
-
-		//Get the middle of the grid
-		s32 middleX = (currLength + prevLength) / 2;
-
-		//Store the grid coordinate in the vector
-		lineGridCoordinates.push_back({ middleX, middleY });
-	}
-
-	// Create a vector to store the full grid coordinates
-	std::vector<GridCoordinate> fullGridCoordinates;
-
-	// Number of rows and columns
-	int numRows = 50; // Number of horizontal grid lines
-	int numCols = lineGridCoordinates.size();
-
-	// Generate the full grid
-	for (int row = -numRows; row < numRows; ++row) {
-		for (int col = 0; col < numCols; ++col) {
-			GridCoordinate coord = lineGridCoordinates[col];
-			coord.y += row * squareGridLength;
-			fullGridCoordinates.push_back(coord);
-		}
-	}
-
-	/*// Print the grid coordinates
-	for (GridCoordinate coord : fullGridCoordinates) {
-		std::cout << "X: " << coord.x << " Y: " << coord.y << '\n';
-	}*/
-
-	return fullGridCoordinates;
-}
-
-/*
-* Gets the closest grid coordinate in std::vector grid to the mouse position
-* @param grid: The vector of grid coordinates to check
-* @param mouseX: The x position of the mouse
-* @param mouseY: The y position of the mouse
-* @return: The closest grid coordinate to the mouse
-*/
-GridCoordinate getClosestGridCoordinate(const std::vector<GridCoordinate>& grid, s32 mouseX, s32 mouseY, s32 playerX, s32 playerY) {
-	//mouseX and mouseY currently SCREEN SPACE, we need to convert them to WORLD SPACE to account for player position.
-	//We will do this by adding the player's position to the mouse position
-	s32 adjustedMouseX = mouseX + playerX;
-	s32 adjustedMouseY = mouseY + playerY;
-	
-	// Initialize the closest coordinate to the first grid, this is just a starting point so it doesn't matter
-	GridCoordinate closestCoord = grid[0];
-
-	// Use the novel pythagorean theorem to get the distance between the closest coordinate and the mouse, this is just a starting point so it doesn't matter
-	s32 closestDist = sqrt((closestCoord.x - adjustedMouseX) * (closestCoord.x - adjustedMouseX) + (closestCoord.y - adjustedMouseY) * (closestCoord.y - adjustedMouseY));
-
-	// For each grid coordinate, check if it is closer to the mouse than the current closest coordinate
-	for (GridCoordinate coord : grid) {
-		s32 dist = sqrt((coord.x - adjustedMouseX) * (coord.x - adjustedMouseX) + (coord.y - adjustedMouseY) * (coord.y - adjustedMouseY));
-		
-		// If the distance is smaller, update the closest coordinate and distance
-		if (dist < closestDist) {
-			closestDist = dist; // Update the closest distance
-			closestCoord = coord; // Update the closest coordinate
-		}
-	}
-
-	return closestCoord;
-}
-
-GridCoordinate handle_LMouseClickInEditor(const std::vector<GridCoordinate>& grid, Player& diver) {
-	if (AEInputCheckReleased(AEVK_LBUTTON)) {
-		s32 mouseX, mouseY;
-		AEInputGetCursorPosition(&mouseX, &mouseY);
-
-		//Get the closest grid coordinate to the mouse
-		GridCoordinate closestCoord = getClosestGridCoordinate(grid, mouseX, mouseY, diver.posX, diver.posY);
-
-		//Debugging
-		std::cout << "Closest Coordinate " << closestCoord.x << " " << closestCoord.y << '\n';
-
-		//Return the closest grid coordinate
-		return closestCoord;
-	}
-}
-/************************************
-*									*
-*	END OF LEVEL CREATION SYSTEM	*
-*									*
-*************************************/
-
 AEGfxVertexList* createSquareMesh() {
 	u32 white = 0xFFFFFFFF;
 
@@ -214,18 +102,17 @@ int AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float c
 	}
 }
 
-
-void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player) {
+void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player, LavaSpout& lava) {
 	f32 rec_width = f32(AEGfxGetWindowWidth());
 	f32 rec_height =f32(AEGfxGetWindowHeight());
 	f32 square_size = 20.f; //size of each square grid
-	f32 radius = 200.f; //radius of the spotlight
+	f32 radius = 100.f; //radius of the spotlight
 	f32 buffer = 100.f; //to accomodate the rendering of squares at the side windows
 
 	//Dim the black colour rectangle
 	//AEGfxSetBlendMode(AE_GFX_BM_MULTIPLY); //change to AE_GFX_BM_MULTIPLY for complete darkness
 	//Adjust the opacity of the darkness
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.95f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.1f);
 	
 	f32 x_pos = player.posX - (rec_width/2.0f) - buffer;
 	f32 y_pos = player.posY - (rec_height/2.0f) - buffer;
@@ -234,7 +121,7 @@ void DrawBlackOverlay(AEGfxVertexList* square_mesh, Player& player) {
 			f32 x_coord = x_pos + (x * square_size);
 			f32 y_coord = y_pos + (y * square_size);
 			//Only draw the squares if it is not inside the circle
-			if (!IsCircleClicked(player.posX, player.posY, radius, x_coord, y_coord)) {
+			if (!IsCircleClicked(player.posX, player.posY, radius, x_coord, y_coord) && !IsCircleClicked(lava.lavaX, lava.lavaY, radius, x_coord, y_coord)) {
 				AEMtx33 black_overlayMtx = createTransformMtx(square_size, square_size, 0, x_coord, y_coord);
 				AEGfxSetTransform(black_overlayMtx.m);
 				AEGfxMeshDraw(square_mesh, AE_GFX_MDM_TRIANGLES);
@@ -413,15 +300,6 @@ bool icicleCollision(Player &player, Icicle &icicle) {
 	return false;
 }
 
-// player default WSAD controls
-void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
-	player->speed = f32(AEFrameRateControllerGetFrameTime()) * 300.f; //speed of player according to frame rate //player movement 
-	if (AEInputCheckCurr(AEVK_W)) player->posY -= player->speed; 
-	if (AEInputCheckCurr(AEVK_S)) player->posY += player->speed;
-	if (AEInputCheckCurr(AEVK_A)) player->posX += player->speed; 
-	if (AEInputCheckCurr(AEVK_D)) player->posX -= player->speed;
- }
-
  //collision for player and boundary 
  void CheckCollision(Player& player, const Boundaries& boundary) {
 	 // Calculate bounds
@@ -504,8 +382,9 @@ void UpdatePlayerMovement(Player *player , AEGfxVertexList* player_mesh) {
 				 player.posY -= moveDirectionMultiplier * bounceBackDistance * AESin(AEDegToRad(player.rotate_angle));
 				 if (bounceBackDistance <= 0) isBouncing = false;
 			 }
-			 
+
 			 player.health -= 1;
+
 			 // Bounce the player back in the opposite direction of current movement  
 			
 		 }
@@ -627,7 +506,7 @@ void RenderHealthBar(const Player& player, AEGfxVertexList* mesh) {
 }
 
 void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float dt) {
-	AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f); // Red for lava
+	AEGfxSetColorToAdd(1.0f, 0.61f, 0.0f, 1.0f); // Red for lava
 
 	// Handle cooldown before respawn
 	if (!lavaSpout.isActive) {
@@ -687,12 +566,11 @@ bool lavaCollision(Player& player, LavaSpout& lavaSpout) {
 	return false;
 }
 
-void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, AEGfxVertexList* lavaMesh, float dt) {
+void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, float dt) {
 	float dx = playerX - enemy.PosX;
 	float dy = playerY - enemy.PosY;
 	float distanceSquared = dx * dx + dy * dy;
 
-	float attackOffset = 60.0f;  // How far the enemy should pop out
 	float originalOffset = 0.0f; // Default position (inside boundary)
 
 	switch (enemy.State) {

@@ -124,3 +124,8 @@ struct Burrowing_enemy {
 struct GridCoordinate {
 	s32 x, y;
 };
+
+struct ObjectToPlace {
+	AEGfxVertexList* mesh;
+	GridCoordinate gridPos;
+};
