@@ -171,14 +171,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
-		//Level Creation System Testing
-		GridCoordinate clickPos = handle_LMouseClickInEditor(diver, 50, placedObjects, squareMesh);
-		std::cout << "Placed Objects: " << placedObjects.size() << '\n';
-		//Loop through placed objects and draw them
-		for (int i = 0; i < placedObjects.size(); i++) {
-			PlaceObject(placedObjects[i].gridPos.x, placedObjects[i].gridPos.y, placedObjects[i].mesh);
-		}
-
 		//GROUND CIRCLING ENEMY SYSTEM
 		// Update enemy transformation
 		UpdateGroundEnemy(enemy, platform, dt);
