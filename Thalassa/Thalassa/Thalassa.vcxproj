@@ -11,13 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Block.cpp" />
     <ClCompile Include="FloatingEnemy.cpp" />
     <ClCompile Include="LCS.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Classes.hpp" />
+    <ClInclude Include="Block.hpp" />
     <ClInclude Include="FloatingEnemy.hpp" />
     <ClInclude Include="LCS.hpp" />
     <ClInclude Include="Structs.hpp" />

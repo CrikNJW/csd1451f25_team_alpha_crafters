@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 
-class Floatie {
+class Floatie : public GameObject { //Floatie class inherits from GameObject struct
 public:
 	enum FloatingEnemyStates {
 		IDLE,
@@ -14,7 +14,6 @@ public:
 		LCS_MODE
 	};
 
-	GameObject gameobj;
 	int health = 1;
 	int damage = 1;
 	float speed = 100;

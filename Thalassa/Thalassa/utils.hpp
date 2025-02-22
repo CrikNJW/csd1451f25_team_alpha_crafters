@@ -43,5 +43,6 @@ void Draw_UpdateLavaDrop(LavaSpout& lavaSpout, AEGfxVertexList* lavaMesh, float 
 void UpdateBurrowingEnemy(Burrowing_enemy& enemy, float playerX, float playerY, float dt);
 void RenderBurrowingEnemy(Burrowing_enemy& enemy, AEGfxVertexList* mesh);
 
-void RenderFloatingEnemies(std::vector<Floatie*>& floatingEnemies, Player& diver, f32 dt);
-void UpdateFloatingEnemies(std::vector<Floatie*>& floatingEnemies, Player& diver, f32 dt);
+void RenderBlocks(std::vector<GameObject*>& LCS_GameObjects, Player& diver, f32 dt);
+void RenderFloatingEnemies(std::vector<GameObject*>& LCS_GameObjects, Player& diver, f32 dt);
+void UpdateFloatingEnemies(std::vector<GameObject*>& LCS_GameObjects, Player& diver, f32 dt);

@@ -658,16 +658,30 @@ void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-void RenderFloatingEnemies(std::vector<Floatie*>& floatingEnemies, Player& diver, f32 dt) {
-	for (int i = 0; i < floatingEnemies.size(); i++) {
-		PlaceObject((s32)floatingEnemies[i]->gameobj.posX, (s32)floatingEnemies[i]->gameobj.posY, floatingEnemies[i]->gameobj.mesh);
+void RenderBlocks(std::vector<GameObject*>& LCS_GameObjects, Player& diver, f32 dt) {
+	for (int i = 0; i < LCS_GameObjects.size(); i++) {
+		if (LCS_GameObjects[i]->id == BLOCK) {
+			PlaceObject((s32)LCS_GameObjects[i]->posX, (s32)LCS_GameObjects[i]->posY, LCS_GameObjects[i]->mesh);
+		}
 	}
 }
 
-void UpdateFloatingEnemies(std::vector<Floatie*>& floatingEnemies, Player& diver, f32 dt) {
-	for (int i = 0; i < floatingEnemies.size(); i++) {
-		floatingEnemies[i]->CheckDistance(diver);
-		floatingEnemies[i]->Update(diver, dt);
-		floatingEnemies[i]->IdleMovement(dt);
+void RenderFloatingEnemies(std::vector<GameObject*>& LCS_GameObjects, Player& diver, f32 dt) {
+	for (int i = 0; i < LCS_GameObjects.size(); i++) {
+		if (LCS_GameObjects[i]->id == FLOATING_ENEMY) {
+			PlaceObject((s32)LCS_GameObjects[i]->posX, (s32)LCS_GameObjects[i]->posY, LCS_GameObjects[i]->mesh);
+		}
+	}
+}
+
+void UpdateFloatingEnemies(std::vector<GameObject*>& LCS_GameObjects, Player& diver, f32 dt) {
+	for (int i = 0; i < LCS_GameObjects.size(); i++) {
+		if (LCS_GameObjects[i]->id == FLOATING_ENEMY) {
+			//Cast to FloatingEnemy, so that i can call their functions
+			Floatie* floatie = static_cast<Floatie*>(LCS_GameObjects[i]);
+			floatie->CheckDistance(diver);
+			floatie->Update(diver, dt);
+			floatie->IdleMovement(dt);
+		}
 	}
 }

@@ -5,6 +5,7 @@
 #include <cmath>
 #include <vector>
 #include "FloatingEnemy.hpp"
+#include "Block.hpp"
 #include "utils.hpp"
 
 /************************************
@@ -55,7 +56,7 @@ GridCoordinate getClosestGridCoordinate(s32 mouseX, s32 mouseY, s32 playerX, s32
 	return closestGrid;
 }
 
-GridCoordinate handle_LMouseClickInEditor(Player& diver, s32 squareGridLength, int objID, std::vector<Floatie*>& floatingEnemies, AEGfxVertexList* mesh) {
+void LCS_HandleMouseClick(Player& diver, s32 squareGridLength, int& LCS_ObjID, std::vector<GameObject*>& LCS_GameObjects, std::vector<Boundaries>& LCS_Boundaries, AEGfxVertexList* mesh) {
 	if (AEInputCheckReleased(AEVK_LBUTTON)) {
 		s32 mouseX, mouseY;
 		AEInputGetCursorPosition(&mouseX, &mouseY);
@@ -63,20 +64,42 @@ GridCoordinate handle_LMouseClickInEditor(Player& diver, s32 squareGridLength, i
 		//Get the closest grid coordinate to the mouse
 		GridCoordinate closestCoord = getClosestGridCoordinate(mouseX, mouseY, (s32)diver.posX, (s32)diver.posY, squareGridLength);
 
-		if (objID == 2) {
-			//Create a new floating enemy object at the closest grid coordinate
-			Floatie* object = new Floatie(closestCoord.x, closestCoord.y, mesh);
-			floatingEnemies.push_back(object);
+		switch (LCS_ObjID) {
+			case BLOCK: { //ObjID 1 matches square block
+				Block* block = new Block(closestCoord.x, closestCoord.y, mesh);
+				block->boundaries = { (float)closestCoord.x, (float)closestCoord.y, block->boundaries.Width, block->boundaries.Height };
+				LCS_GameObjects.push_back(block);
+				LCS_Boundaries.push_back(block->boundaries);
+				break;
+			}
+
+			case ICICLE: { //ObjID 2 matches icicle
+				break;
+			}
+
+			case LAVA_SPOUT: { //ObjID 3 matches lava spout
+				break;
+			}
+
+			case SEAWEED: { //ObjID 4 matches seaweed
+				break;
+			}
+
+			case GROUND_ENEMY: { //ObjID 5 matches ground enemy
+				break;
+			}
+
+			case BURROWING_ENEMY: { //ObjID 6 matches burrowing enemy
+				break;
+			}
+
+			case FLOATING_ENEMY: { //ObjID 7 matches floating enemy
+				Floatie* floatie = new Floatie(closestCoord.x, closestCoord.y, mesh);
+				LCS_GameObjects.push_back(floatie);
+				break;
+			}
 		}
-
-		//Debugging
-		//std::cout << "Closest Coordinate " << closestCoord.x << " " << closestCoord.y << '\n';
-
-		//Return the closest grid coordinate
-		return closestCoord;
 	}
-
-	return { 0,0 };
 }
 
 void PlaceObject(s32 worldSpaceX, s32 worldSpaceY, AEGfxVertexList* mesh) {
@@ -86,6 +109,51 @@ void PlaceObject(s32 worldSpaceX, s32 worldSpaceY, AEGfxVertexList* mesh) {
 	AEGfxSetTransform(transformMtx.m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 	AEGfxSetColorToMultiply(0, 0, 0, 0);
+}
+
+void LCS_Trigger(bool& LCS_Mode) {
+	//Trigger Level Creation System
+	if (AEInputCheckTriggered(AEVK_L)) {
+		LCS_Mode = !LCS_Mode;
+	}
+}
+
+void LCS_KeyTrigger(AEGfxVertexList*& LCS_SelectedMesh, int& LCS_ObjID, int& LCS_CurrKey, std::vector<AEGfxVertexList*> LCS_Meshes) {
+	if (AEInputCheckTriggered(AEVK_1)) { //Square Block
+		LCS_SelectedMesh = LCS_Meshes[BLOCK - 1];
+		LCS_ObjID = 1;
+		LCS_CurrKey = 1;
+	}
+	else if (AEInputCheckTriggered(AEVK_2)) { //Icicle
+		LCS_SelectedMesh = LCS_Meshes[ICICLE - 1];
+		LCS_ObjID = 2;
+		LCS_CurrKey = 2;
+	}
+	else if (AEInputCheckTriggered(AEVK_3)) { //Lava Spout
+		LCS_SelectedMesh = LCS_Meshes[LAVA_SPOUT - 1];
+		LCS_ObjID = 3;
+		LCS_CurrKey = 3;
+	}
+	else if (AEInputCheckTriggered(AEVK_4)) { //Seaweed
+		LCS_SelectedMesh = LCS_Meshes[SEAWEED - 1];
+		LCS_ObjID = 4;
+		LCS_CurrKey = 4;
+	}
+	else if (AEInputCheckTriggered(AEVK_5)) { //Ground Enemy
+		LCS_SelectedMesh = LCS_Meshes[GROUND_ENEMY - 1];
+		LCS_ObjID = 5;
+		LCS_CurrKey = 5;
+	}
+	else if (AEInputCheckTriggered(AEVK_6)) { //Burrowing Enemy
+		LCS_SelectedMesh = LCS_Meshes[BURROWING_ENEMY - 1];
+		LCS_ObjID = 6;
+		LCS_CurrKey = 6;
+	}
+	else if (AEInputCheckTriggered(AEVK_7)) { //Floating Enemy
+		LCS_SelectedMesh = LCS_Meshes[FLOATING_ENEMY - 1];
+		LCS_ObjID = 7;
+		LCS_CurrKey = 7;
+	}
 }
 
 /************************************

@@ -7,15 +7,15 @@
 
 //Constructor
 Floatie::Floatie(float pos_X, float pos_Y, AEGfxVertexList* mesh) {
-	gameobj.id = 2;
-	gameobj.mesh = mesh;
-	gameobj.posX = pos_X;
-	gameobj.posY = pos_Y;
+	this->id = FLOATING_ENEMY;
+	this->mesh = mesh;
+	this->posX = pos_X;
+	this->posY = pos_Y;
 }
 
 void Floatie::CheckDistance(Player& player) {
 	//Get the distance between the player and the object
-	float distance = (float)sqrt(pow(player.posX - gameobj.posX, 2) + pow(player.posY - gameobj.posY, 2));
+	float distance = (float)sqrt(pow(player.posX - posX, 2) + pow(player.posY - posY, 2));
 	if (distance <= 300) {
 		currentState = CHASE;
 	}
@@ -29,9 +29,9 @@ void Floatie::Update(Player& player, f32 dt) {
 	if (currentState == CHASE) {
 		speed = 100;
 		//Move towards player
-		f32 angle = atan2(player.posY - gameobj.posY, player.posX - gameobj.posX);
-		gameobj.posX += cos(angle) * speed * dt;
-		gameobj.posY += sin(angle) * speed * dt;
+		f32 angle = atan2(player.posY - posY, player.posX - posX);
+		posX += cos(angle) * speed * dt;
+		posY += sin(angle) * speed * dt;
 	}
 }
 
@@ -57,8 +57,8 @@ void Floatie::IdleMovement(f32 dt) {
 		}
 
 		// Move in the current direction if not stopped
-		gameobj.posX += cos(moveAngle) * speed * dt;
-		gameobj.posY += sin(moveAngle) * speed * dt;
+		posX += cos(moveAngle) * speed * dt;
+		posY += sin(moveAngle) * speed * dt;
 	}
 }
 

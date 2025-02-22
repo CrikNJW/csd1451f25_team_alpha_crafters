@@ -29,7 +29,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 
 	//Initialize variables 
-	AEGfxVertexList* squareMesh = createSquareMesh();
+	AEGfxVertexList* squareMesh = createSquareMesh(); //Mesh for block
+	AEGfxVertexList* icicleMesh = createSquareMesh(); //Mesh for icicle
+	AEGfxVertexList* lavaMesh = createSquareMesh(); //Mesh for lava spout
+	AEGfxVertexList* seaweedMesh = createSquareMesh(); //Mesh for seaweed
+	AEGfxVertexList* groundEnemyMesh = createSquareMesh(); //Mesh for ground enemy
+	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh(); //Mesh for burrowing enemy
+	AEGfxVertexList* floatieMesh = createSquareMesh(); //Mesh for floating enemy
 	AEMtx33 playerMtx = createTransformMtx(50.0f, 50.0f, 0, 0, 0);
 	f32 dt;
 
@@ -38,7 +44,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	bool LCS_Mode = false; //To trigger AI logic
 	int LCS_CurrKey = 0;
 	int LCS_ObjID = 1;
-	std::vector<Floatie*> LCS_FloatingEnemies; //All gameobjects placed in the level
+	std::vector<AEGfxVertexList*> LCS_Meshes = { squareMesh, icicleMesh, lavaMesh, seaweedMesh, groundEnemyMesh, burrowingEnemyMesh, floatieMesh }; //List of meshes for LCS
+	std::vector<GameObject*> LCS_GameObjects; //All gameobjects placed in the level
+	std::vector<Boundaries> LCS_Boundaries; //All boundaries/collision data placed in the level
 
 	//Dummy icicle array that stores coordinates of each icicle.
 	Icicle* icicle = new Icicle[2]{ {-400,200}, {-300,200} };
@@ -144,10 +152,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	burrowingEnemy1.PosY = burrowingBoundary.PosY;
 	burrowingEnemy1.PosX = burrowingBoundary.PosX;
 
-	// Create an enemy mesh for rendering
-	AEGfxVertexList* burrowingEnemyMesh = createSquareMesh();
-	AEGfxVertexList* floatieMesh = createSquareMesh();
-
 	// Create array of boundaries 
 	Boundaries boundaries_array[] = { testWall,  testWall2, burrowingBoundary, volcanoPlatform, platform, testWall4 , testWall3 };
 	// boundary count to calculate amount of boundaries we need to check collision for 
@@ -174,39 +178,32 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
-		//Trigger Level Creation System
-		if (AEInputCheckTriggered(AEVK_L)) {
-			LCS_Mode = !LCS_Mode;
-		}
+		//Trigger Level Creation System with "L" key
+		LCS_Trigger(LCS_Mode);
 
 		//Level Creation System Testing
 		if (LCS_Mode) {
-			if (AEInputCheckTriggered(AEVK_1)) {
-				LCS_SelectedMesh = squareMesh;
-				LCS_ObjID = 1;
-				LCS_CurrKey = 1;
-			}
-			else if (AEInputCheckTriggered(AEVK_2)) {
-				LCS_SelectedMesh = floatieMesh;
-				LCS_ObjID = 2;
-				LCS_CurrKey = 2;
-			}
-			//-------------------------------------------------------------------------------------
-			if (LCS_CurrKey == 1) { //Square Block
-				//GridCoordinate clickPos = handle_LMouseClickInEditor(diver, 50, LCS_ObjID, //Insert LCS Vector Here//, LCS_SelectedMesh);
-			}
-			else if (LCS_CurrKey == 2) { //Floating Enemy
-				//Detects click position, and adds a obj to the specified vector
-				GridCoordinate clickPos = handle_LMouseClickInEditor(diver, 50, LCS_ObjID, LCS_FloatingEnemies, LCS_SelectedMesh);
-			}
-
+			LCS_KeyTrigger(LCS_SelectedMesh, LCS_ObjID, LCS_CurrKey, LCS_Meshes);
+			LCS_HandleMouseClick(diver, 50, LCS_ObjID, LCS_GameObjects, LCS_Boundaries, LCS_SelectedMesh);
 			//Render the object ONLY, does not trigger logic. This is because we want to see it in the LCS without it moving around.
-			RenderFloatingEnemies(LCS_FloatingEnemies, diver, dt);
+			RenderBlocks(LCS_GameObjects, diver, dt);
+			RenderFloatingEnemies(LCS_GameObjects, diver, dt);
+
+			//Check for collisions with all placed objects
+			for (int i = 0; i < LCS_Boundaries.size(); ++i) {
+				CheckCollision(diver, LCS_Boundaries[i]);
+			}
 		}
 
 		if (!LCS_Mode) {
-			RenderFloatingEnemies(LCS_FloatingEnemies, diver, dt);
-			UpdateFloatingEnemies(LCS_FloatingEnemies, diver, dt); //Loop through placed objects and draw them
+			RenderBlocks(LCS_GameObjects, diver, dt);
+			RenderFloatingEnemies(LCS_GameObjects, diver, dt);
+			UpdateFloatingEnemies(LCS_GameObjects, diver, dt); //Loop through placed objects and draw them
+
+			//Check for collisions with all placed objects
+			for (int i = 0; i < LCS_Boundaries.size(); ++i) {
+				CheckCollision(diver, LCS_Boundaries[i]);
+			}
 		}
 
 		//GROUND CIRCLING ENEMY SYSTEM
@@ -294,16 +291,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	
 	// free the system
 	AEGfxMeshFree(squareMesh);
-	AEGfxMeshFree(floatieMesh);
-	//AEGfxMeshFree(spotlightMesh);
+	AEGfxMeshFree(icicleMesh);
+	AEGfxMeshFree(lavaMesh);
+	AEGfxMeshFree(seaweedMesh);
+	AEGfxMeshFree(groundEnemyMesh);
 	AEGfxMeshFree(burrowingEnemyMesh);
+	AEGfxMeshFree(floatieMesh);
 
 	//Free the icicle array
 	delete[] icicle;
 
 	//Loop through the gameobjects vector and delete each object
-	for (int i = 0; i < LCS_FloatingEnemies.size(); i++) {
-		delete LCS_FloatingEnemies[i];
+	for (GameObject* gameObject : LCS_GameObjects) {
+		delete gameObject;
 	}
 
 	// free the system
