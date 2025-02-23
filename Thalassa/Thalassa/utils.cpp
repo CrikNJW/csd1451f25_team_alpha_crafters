@@ -150,6 +150,8 @@ void SpotLight(Player* player, AEGfxVertexList* circle_mesh) {
 //Hi Varick
 
 void UpdatePlayerPos(Player *player, AEGfxVertexList* player_mesh, f32 dt) {
+	//f32 friction{ 0.99f };
+
 	if (player->lockMovement == true) {
 		player->lockTimeElapsed += dt;
 		if (player->lockTimeElapsed >= player->lockTime) {
