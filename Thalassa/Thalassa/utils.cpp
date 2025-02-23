@@ -1,9 +1,14 @@
 #include <crtdbg.h> // To check for memory leaks
-#include "AEEngine.h"
 #include <iostream>
-#include "Structs.hpp"
 #include <cmath>
 #include <vector>
+
+#include "AEEngine.h"
+#include "Structs.hpp"
+#include "Enemies.hpp"
+#include "Player.hpp"
+#include "LCS.hpp"
+#include "Hazards.hpp"
 
 //Marcos for the trigo functions that take input in degree 
 //cuz alpha engine only takes input in radians for function sin, cos, tan
@@ -334,7 +339,6 @@ bool icicleCollision(Player &player, Icicle &icicle) {
 }
 
 
-
  // for bounce collision between player and enemy
  void ElasticEnemyCollision(Player& player, f32 enemy_x, f32 enemy_y, f32 enemy_width, f32 enemy_height) {
 // need a flag for checking if player dashing D:
@@ -411,7 +415,6 @@ bool icicleCollision(Player &player, Icicle &icicle) {
 			 //maybe add animation to signify enemy was killed
 		 }
 	 }
-	 
 }
 
 
@@ -424,9 +427,7 @@ void InitializeBoundary(Boundaries& platform) {
 }
 
 
-
 void UpdateGroundEnemy(Ground_enemy& enemy, Boundaries &boundary, float dt) {
-	
 	float platformLeft = boundary.PosX - (boundary.Width / 2) - (enemy.Width / 2);
 	float platformRight = boundary.PosX + (boundary.Width / 2) + (enemy.Width / 2);
 	float platformTop = boundary.PosY + (boundary.Height / 2) + (enemy.Width / 2);
@@ -656,90 +657,30 @@ void RenderBoundary(Boundaries& boundary, AEGfxVertexList* platformMesh) {
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-/************************************
-*									*
-*	LEVEL CREATION SYSTEM			*
-*									*
-*************************************/
-
-/*
-* Gets the closest grid coordinate in std::vector grid to the mouse position
-* @param grid: The vector of grid coordinates to check
-* @param mouseX: The x position of the mouse
-* @param mouseY: The y position of the mouse
-* @return: The closest grid coordinate to the mouse
-*/
-GridCoordinate getClosestGridCoordinate(s32 mouseX, s32 mouseY, s32 playerX, s32 playerY, s32 squareGridLength) {
-	s32 screenWidth = AEGfxGetWindowWidth();
-	s32 screenHeight = AEGfxGetWindowHeight();
-	s32 screenCenterX = screenWidth / 2;
-	s32 screenCenterY = screenHeight / 2;
-
-	/*Convert screen-space mouse coordinates to world-space coordinates
-
-	E.g. If player is at world-space 0,0, clicking the center of the screen
-	would give us screen-space 800,450. We want to convert this to world-space 0,0 as it
-	accurately reflects the player's position.
-
-	Solution to get adjusted X: ScreenspaceX(800) - screenCenterX(800) + playerworldspaceX(0) = worldspaceX(0)
-	Solution to get adjusted Y: screenCenterY(450) - ScreenspaceY(450) + playerworldspaceY(0) = worldspaceY(0)
-
-	Y-axis is inverted in world-space, screen-space goes from top to bottom, world-space goes from center to top/to bottom.
-
-	E.g. If player is at worldspace (300,200), clicking the center of the screen will give us screenspace(800,450)
-
-	adjustedX = 800 - 800 + 300 = 300
-	adjustedY = 450 - 450 + 200 = 200
-	*/
-	s32 worldMouseX = mouseX - screenCenterX + playerX;
-	s32 worldMouseY = screenCenterY - mouseY + playerY;
-
-	/*Snap to the nearest grid coordinate by rounding up or down, this is more performant than
-	abusing vectors and iterating through them*/
-	s32 gridX = round((float)worldMouseX / squareGridLength) * squareGridLength;
-	s32 gridY = round((float)worldMouseY / squareGridLength) * squareGridLength;
-
-	//Create a coordinate to store the closest grid coordinate
-	GridCoordinate closestGrid = { gridX, gridY };
-	return closestGrid;
-}
-
-GridCoordinate handle_LMouseClickInEditor(Player& diver, s32 squareGridLength, std::vector<ObjectToPlace>& placedObjects, AEGfxVertexList* mesh) {
-	if (AEInputCheckReleased(AEVK_LBUTTON)) {
-		s32 mouseX, mouseY;
-		AEInputGetCursorPosition(&mouseX, &mouseY);
-
-		//Get the closest grid coordinate to the mouse
-		GridCoordinate closestCoord = getClosestGridCoordinate(mouseX, mouseY, (s32)diver.posX, (s32)diver.posY, squareGridLength);
-
-		ObjectToPlace object;
-		object.mesh = mesh;
-		object.gridPos.x = closestCoord.x;
-		object.gridPos.y = closestCoord.y;
-
-		//Add the closest grid coordinate to the vector
-		placedObjects.push_back(object);
-
-		//Debugging
-		std::cout << "Closest Coordinate " << closestCoord.x << " " << closestCoord.y << '\n';
-
-		//Return the closest grid coordinate
-		return closestCoord;
+void RenderBlocks(std::vector<GameObject*>& LCS_GameObjects, Player& diver, f32 dt) {
+	for (int i = 0; i < LCS_GameObjects.size(); i++) {
+		if (LCS_GameObjects[i]->id == BLOCK) {
+			PlaceObject((s32)LCS_GameObjects[i]->posX, (s32)LCS_GameObjects[i]->posY, LCS_GameObjects[i]->mesh);
+		}
 	}
-
-	return { 0,0 };
 }
 
-void PlaceObject(s32 worldSpaceX, s32 worldSpaceY, AEGfxVertexList* mesh) {
-	//Create a transform matrix to place the object at the specified world-space coordinates
-	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f); // White colour
-	AEMtx33 transformMtx = createTransformMtx(50, 50, 0, worldSpaceX, worldSpaceY);
-	AEGfxSetTransform(transformMtx.m);
-	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-	AEGfxSetColorToMultiply(0, 0, 0, 0);
+void RenderFloatingEnemies(std::vector<GameObject*>& LCS_GameObjects, Player& diver, f32 dt) {
+	for (int i = 0; i < LCS_GameObjects.size(); i++) {
+		if (LCS_GameObjects[i]->id == FLOATING_ENEMY) {
+			PlaceObject((s32)LCS_GameObjects[i]->posX, (s32)LCS_GameObjects[i]->posY, LCS_GameObjects[i]->mesh);
+		}
+	}
 }
-/************************************
-*									*
-*	END OF LEVEL CREATION SYSTEM	*
-*									*
-*************************************/
+
+void UpdateFloatingEnemies(std::vector<GameObject*>& LCS_GameObjects, Player& diver, f32 dt) {
+	for (int i = 0; i < LCS_GameObjects.size(); i++) {
+		if (LCS_GameObjects[i]->id == FLOATING_ENEMY) {
+			//Cast to FloatingEnemy, so that i can call their functions
+			Floatie* floatie = static_cast<Floatie*>(LCS_GameObjects[i]);
+			floatie->CheckDistance(diver);
+			floatie->Update(diver, dt);
+			floatie->IdleMovement(dt);
+		}
+	}
+}

@@ -1,0 +1,11 @@
+#pragma once
+
+enum GameState {
+
+	GS_MAIN_MENU,
+	GS_THALASSA,
+	GS_CREDITS,
+	GS_LEVEL_CREATION,
+	GS_RESTART,
+	GS_QUIT,
+};
