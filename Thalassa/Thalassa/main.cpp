@@ -30,6 +30,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Using custom window procedure
 	AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL);
 
+	//Load Background texture
+	AEGfxTexture* bgTex = AEGfxTextureLoad("Assets/deepseabg.jpg");
+	AEMtx33 bgMtx = createTransformMtx(100.0f, 100.0f, 0, 0, 0);
 	//Initialize variables 
 	AEGfxVertexList* squareMesh = createSquareMesh(); //Mesh for block
 	AEGfxVertexList* icicleMesh = createSquareMesh(); //Mesh for icicle
@@ -174,10 +177,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		AESysFrameStart();
 
 		dt = f32(AEFrameRateControllerGetFrameTime());
+		
+		AEGfxSetBackgroundColor(0.5f, 0.5f, 0.5f); // Tell the Alpha Engine to set the background to black.
+
+		// Tell the Alpha Engine to get ready to draw something with texture.
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f); // Set the the color to multiply to white, so that the sprite can display the full range of colors (default is black).
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f); // Set the color to add to nothing, so that we don't alter the sprite's color
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND); // Set blend mode to AE_GFX_BM_BLEND, which will allow transparency.
+		AEGfxSetTransparency(1.0f);
+		AEGfxTextureSet(bgTex, 0, 0);
+		AEGfxSetTransform(bgMtx.m);
+		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
+
 		// Tell the Alpha Engine to get ready to draw something.
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Color (AE_GFX_RM_TEXTURE)
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f); // Tell the Alpha Engine to set the background to black.
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // Draw with Color, if draw with texture use AE_GFX_RM_TEXTURE
+		
+
 		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.0f);
 
 		//Trigger Level Creation System with "L" key

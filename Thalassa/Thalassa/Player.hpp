@@ -1,6 +1,8 @@
 #pragma once
 #include <AEEngine.h>
 
+const float DIVER_ACCEL = 100.f; //player acceleration (in m/s^2)
+
 struct Player {
 	f32 posX, posY; // position of the player
 	float width, height; // width and height of player
