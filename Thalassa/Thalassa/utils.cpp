@@ -421,7 +421,6 @@ bool icicleCollision(Player &player, Icicle &icicle) {
 
 
 void InitializeBoundary(Boundaries& platform) {
-
 	AEMtx33 scaleMtx, translateMtx;
 	AEMtx33Scale(&scaleMtx, platform.Width, platform.Height);
 	AEMtx33Trans(&translateMtx, platform.PosX, platform.PosY);

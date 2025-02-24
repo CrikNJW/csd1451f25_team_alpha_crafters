@@ -116,6 +116,14 @@ void PlaceObject(s32 worldSpaceX, s32 worldSpaceY, AEGfxVertexList* mesh) {
 void LCS_Trigger(bool& LCS_Mode) {
 	//Trigger Level Creation System
 	if (AEInputCheckTriggered(AEVK_L)) {
+		if (LCS_Mode) {
+			std::cout << "LCS Mode Disabled\n";
+		}
+
+		else {
+			std::cout << "LCS Mode Enabled\n";
+		}
+
 		LCS_Mode = !LCS_Mode;
 	}
 }
